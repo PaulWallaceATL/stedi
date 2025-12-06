@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type PanelState = {
@@ -260,6 +261,20 @@ export default function Home() {
             (no client secrets). Set `STEDI_BASE_URL` if you need a non-default
             region.
           </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/mocks"
+              className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400"
+            >
+              View Stedi mock payloads
+            </Link>
+            <Link
+              href="/api/stedi/mock"
+              className="text-sm text-emerald-300 underline underline-offset-4 hover:text-emerald-200"
+            >
+              Raw mock JSON
+            </Link>
+          </div>
           <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="font-semibold text-white">Environment tips</span>
