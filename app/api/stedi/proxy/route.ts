@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 type IncomingBody = {
   path?: string;
   method?: string;
@@ -34,7 +37,9 @@ export async function POST(request: Request) {
       : `${base.replace(/\/+$/, "")}${cleanedPath}`;
 
     const headers: Record<string, string> = {
-      Authorization: apiKey.startsWith("Key ") ? apiKey : `Key ${apiKey}`,
+      // Stedi accepts raw key or "Key <key>". Use raw by default to match docs.
+      Authorization: apiKey.startsWith("Key ") ? apiKey : apiKey,
+      "User-Agent": "clinix-ai-stedi-proxy/1.0",
     };
 
     if (!["GET", "DELETE"].includes(method.toUpperCase())) {
