@@ -24,7 +24,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const base = process.env.STEDI_BASE_URL || "https://core.us.stedi.com";
+    const base =
+      process.env.STEDI_BASE_URL ||
+      process.env.STEDI_API_BASE_URL ||
+      "https://core.us.stedi.com";
     const url = path.startsWith("http") ? path : `${base}${path}`;
 
     const headers: Record<string, string> = {
