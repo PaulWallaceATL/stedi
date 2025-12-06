@@ -25,13 +25,16 @@ export async function POST(request: Request) {
     }
 
     const base =
-      process.env.STEDI_BASE_URL ||
-      process.env.STEDI_API_BASE_URL ||
-      "https://core.us.stedi.com";
-    const url = path.startsWith("http") ? path : `${base}${path}`;
+      (process.env.STEDI_BASE_URL || process.env.STEDI_API_BASE_URL || "")
+        .trim() || "https://core.us.stedi.com";
+
+    const cleanedPath = path.startsWith("/") ? path : `/${path}`;
+    const url = path.startsWith("http")
+      ? path
+      : `${base.replace(/\/+$/, "")}${cleanedPath}`;
 
     const headers: Record<string, string> = {
-      Authorization: apiKey,
+      Authorization: apiKey.startsWith("Key ") ? apiKey : `Key ${apiKey}`,
     };
 
     if (!["GET", "DELETE"].includes(method.toUpperCase())) {
