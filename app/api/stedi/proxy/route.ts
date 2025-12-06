@@ -36,9 +36,12 @@ export async function POST(request: Request) {
       ? path
       : `${base.replace(/\/+$/, "")}${cleanedPath}`;
 
+    const normalizedKey = apiKey.startsWith("Key ")
+      ? apiKey
+      : `Key ${apiKey}`.replace(/Key\s+Key\s+/i, "Key ");
+
     const headers: Record<string, string> = {
-      // Stedi accepts raw key or "Key <key>". Use raw by default to match docs.
-      Authorization: apiKey.startsWith("Key ") ? apiKey : apiKey,
+      Authorization: normalizedKey,
       "User-Agent": "clinix-ai-stedi-proxy/1.0",
     };
 
