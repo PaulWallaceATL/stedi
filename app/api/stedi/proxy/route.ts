@@ -44,15 +44,33 @@ export async function POST(request: Request) {
       headers["Idempotency-Key"] = idempotencyKey;
     }
 
-    const upstream = await fetch(url, {
-      method,
-      headers,
-      body:
-        ["GET", "DELETE"].includes(method.toUpperCase()) || body === undefined
-          ? undefined
-          : JSON.stringify(body),
-      cache: "no-store",
-    });
+    let upstream;
+    try {
+      upstream = await fetch(url, {
+        method,
+        headers,
+        body:
+          ["GET", "DELETE"].includes(method.toUpperCase()) || body === undefined
+            ? undefined
+            : JSON.stringify(body),
+        cache: "no-store",
+      });
+    } catch (fetchError) {
+      return NextResponse.json(
+        {
+          error:
+            fetchError instanceof Error
+              ? fetchError.message
+              : "fetch failed (unknown)",
+          url,
+          method,
+          path,
+          base,
+          hasApiKey: Boolean(apiKey),
+        },
+        { status: 502 },
+      );
+    }
 
     const raw = await upstream.text();
     let data: unknown = raw;
