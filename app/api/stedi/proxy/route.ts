@@ -28,8 +28,12 @@ export async function POST(request: Request) {
     }
 
     const base =
-      (process.env.STEDI_BASE_URL || process.env.STEDI_API_BASE_URL || "")
-        .trim() || "https://core.us.stedi.com";
+      (
+        process.env.STEDI_HEALTHCARE_BASE_URL ||
+        process.env.STEDI_BASE_URL ||
+        process.env.STEDI_API_BASE_URL ||
+        ""
+      ).trim() || "https://core.us.stedi.com";
 
     const cleanedPath = path.startsWith("/") ? path : `/${path}`;
     const url = path.startsWith("http")
