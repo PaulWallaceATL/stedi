@@ -48,15 +48,23 @@ export async function POST(request: Request) {
       cache: "no-store",
     });
 
-    const data = await upstream.json().catch(() => null);
+    const raw = await upstream.text();
+    let data: unknown = raw;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = raw || null;
+    }
     const responseHeaders = Object.fromEntries(upstream.headers.entries());
 
     return NextResponse.json(
       {
         ok: upstream.ok,
         status: upstream.status,
+        statusText: upstream.statusText,
         headers: responseHeaders,
         data,
+        raw,
       },
       { status: upstream.status },
     );
