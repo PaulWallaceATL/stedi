@@ -61,12 +61,16 @@ export async function POST(request: Request) {
         cache: "no-store",
       });
     } catch (fetchError) {
+      const err = fetchError as
+        | (Error & { code?: string; cause?: unknown })
+        | undefined;
       return NextResponse.json(
         {
-          error:
-            fetchError instanceof Error
-              ? fetchError.message
-              : "fetch failed (unknown)",
+          error: err?.message || "fetch failed (unknown)",
+          code: err?.code,
+          name: err?.name,
+          cause: err?.cause ?? null,
+          stack: err?.stack ? err.stack.split("\n").slice(0, 3).join("\n") : null,
           url,
           method,
           path,
