@@ -203,6 +203,12 @@ export default function Home() {
       updateResult(panelId, { loading: true, error: undefined, response: null });
       const parsed = JSON.parse(payloads[panelId] || "{}");
 
+      const proxyBase =
+        process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "") || "";
+      const endpoint = proxyBase
+        ? `${proxyBase}/proxy`
+        : "/api/stedi/proxy";
+
       const payload: ProxyPayload = {
         path: paths[panelId],
         method: "POST",
@@ -210,7 +216,7 @@ export default function Home() {
         body: parsed,
       };
 
-      const res = await fetch("/api/stedi/proxy", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
