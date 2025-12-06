@@ -36,12 +36,9 @@ export async function POST(request: Request) {
       ? path
       : `${base.replace(/\/+$/, "")}${cleanedPath}`;
 
-    const normalizedKey = apiKey.startsWith("Key ")
-      ? apiKey
-      : `Key ${apiKey}`.replace(/Key\s+Key\s+/i, "Key ");
-
     const headers: Record<string, string> = {
-      Authorization: normalizedKey,
+      // Pass through exactly what you set in STEDI_API_KEY (test_ or prod key).
+      Authorization: apiKey.trim(),
       "User-Agent": "clinix-ai-stedi-proxy/1.0",
     };
 
