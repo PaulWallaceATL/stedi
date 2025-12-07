@@ -19,7 +19,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing path" }, { status: 400 });
     }
 
-    const apiKey = process.env.STEDI_API_KEY;
+    const cleanedPath = path.startsWith("/") ? path : `/${path}`;
+
+    const apiKey = process.env.STEDI_API_KEY?.trim();
     if (!apiKey) {
       return NextResponse.json(
         { error: "STEDI_API_KEY is not configured" },
@@ -33,9 +35,8 @@ export async function POST(request: Request) {
         process.env.STEDI_BASE_URL ||
         process.env.STEDI_API_BASE_URL ||
         ""
-      ).trim() || "https://core.us.stedi.com";
+      ).trim() || "https://healthcare.us.stedi.com";
 
-    const cleanedPath = path.startsWith("/") ? path : `/${path}`;
     const url = path.startsWith("http")
       ? path
       : `${base.replace(/\/+$/, "")}${cleanedPath}`;

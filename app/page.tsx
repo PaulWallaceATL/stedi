@@ -19,21 +19,17 @@ type ProxyPayload = {
 const toPretty = (value: unknown) => JSON.stringify(value, null, 2);
 
 const sampleEligibility = {
-  tradingPartnerId: "MOCKPAYER",
-  member: {
-    id: "W000000000",
-    firstName: "JANE",
-    lastName: "DOE",
-    dateOfBirth: "1970-01-01",
-  },
-  provider: { npi: "1234567890" },
-  serviceTypeCodes: ["98"],
-  serviceDate: "2025-01-05",
+  tradingPartnerServiceId: "60054",
+  provider: { organizationName: "Provider Name", npi: "1999999984" },
+  subscriber: { firstName: "John", lastName: "Doe", memberId: "AETNA9wcSu" },
+  dependents: [{ firstName: "Jordan", lastName: "Doe", dateOfBirth: "20010714" }],
+  encounter: { serviceTypeCodes: ["30"] },
 };
 
 const sampleClaim837P = {
   controlNumber: "00001234",
-  tradingPartnerId: "MOCKPAYER",
+  tradingPartnerId: "STEDI",
+  usageIndicator: "T", // test indicator to avoid live payer submission
   billingProvider: {
     npi: "1234567890",
     taxId: "987654321",
@@ -130,7 +126,7 @@ const panelOrder = [
     title: "Eligibility & Benefits (270/271)",
     description:
       "Validate coverage, copay/coinsurance, frequency and age limits before scheduling or billing.",
-    defaultPath: "/2023-10-01/eligibility-check",
+    defaultPath: "/2024-04-01/change/medicalnetwork/eligibility/v3",
     sample: sampleEligibility,
     docHint: "Use test key + approved test members in Stedi docs.",
   },
