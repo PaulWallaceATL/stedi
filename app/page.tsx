@@ -149,7 +149,7 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Dark veil hero inspired by React Bits dark-veil */}
+      {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
       <section
         className="relative overflow-hidden border-b border-slate-900"
         style={{
@@ -157,33 +157,37 @@ export default function LandingPage() {
             "radial-gradient(140% 120% at 0% 0%, rgba(59,130,246,0.20), rgba(5,7,12,0)), radial-gradient(120% 120% at 100% 20%, rgba(14,165,233,0.18), rgba(5,7,12,0)), radial-gradient(120% 120% at 70% 80%, rgba(6,182,212,0.12), rgba(5,7,12,0)), #05070c",
         }}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_32%),radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.04),transparent_30%)] mix-blend-screen opacity-80" />
-        <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_32%),radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.04),transparent_30%)] mix-blend-screen opacity-80 veil-animate" />
+        <div className="pointer-events-none veil-animate-slow absolute inset-0 bg-[conic-gradient(from_120deg_at_30%_40%,rgba(59,130,246,0.08),transparent_30%),conic-gradient(from_240deg_at_70%_60%,rgba(14,165,233,0.06),transparent_32%)]" />
+
+        <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 py-18 text-center sm:py-20 lg:py-24">
           <div className="space-y-7" ref={heroRef}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-200 shadow-sm shadow-sky-900/40 backdrop-blur">
+            <span className="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-700 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200 shadow-sm shadow-sky-900/40 backdrop-blur">
               Eligibility • Claims • Status • Appeals
             </span>
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
               {heroCopy.title}
             </h1>
-            <p className="max-w-2xl text-lg text-slate-200">{heroCopy.subtitle}</p>
-            <div className="flex flex-wrap gap-3">
+            <p className="mx-auto max-w-3xl text-xl text-slate-200 sm:text-[1.15rem]">
+              {heroCopy.subtitle}
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/api"
-                className="rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition hover:-translate-y-1 hover:bg-sky-400"
+                className="rounded-full bg-sky-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition hover:-translate-y-1 hover:bg-sky-400"
               >
                 Launch API Workbench
               </Link>
               <Link
                 href="#workflow"
-                className="rounded-full border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
+                className="rounded-full border border-slate-700 bg-slate-900 px-6 py-3.5 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
               >
                 See the workflow
               </Link>
             </div>
             <div
               ref={statsRef}
-              className="grid grid-cols-2 gap-4 text-sm text-slate-200 sm:grid-cols-3"
+              className="mx-auto grid max-w-4xl grid-cols-1 gap-4 text-sm text-slate-200 sm:grid-cols-3"
             >
               <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 shadow-md shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60">
                 <p className="text-2xl font-semibold text-white">270/271</p>
@@ -205,35 +209,22 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="relative h-[420px] overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-black shadow-2xl shadow-sky-900/40">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.25),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.20),transparent_32%),radial-gradient(circle_at_60%_80%,rgba(6,182,212,0.16),transparent_34%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.06),transparent_30%),linear-gradient(240deg,rgba(255,255,255,0.04),transparent_35%)] mix-blend-screen" />
-            <div className="absolute inset-x-8 bottom-8 h-28 rounded-full bg-sky-500/20 blur-3xl" />
-            <div className="relative z-10 flex h-full items-center justify-center text-center text-slate-200">
-              <div className="max-w-sm space-y-3 rounded-2xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-xl shadow-black/40 backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.3em] text-sky-200">Dark Veil</p>
-                <p className="text-2xl font-semibold text-white">Medical-grade calm</p>
-                <p className="text-sm text-slate-200/80">
-                  Replacing the 3D helix with a focused dark veil canvas inspired by React Bits.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <section
         id="workflow"
         ref={workflowReveal.ref}
-        className={`border-b border-slate-900 bg-slate-950 transition duration-700 ${
+        className={`relative overflow-hidden border-b border-slate-900 bg-slate-950 transition duration-700 ${
           workflowReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="mx-auto max-w-6xl px-6 py-16 space-y-6">
-          <p className="text-sm uppercase tracking-[0.22em] text-sky-300">
+        <div className="pointer-events-none veil-animate absolute inset-0 bg-[conic-gradient(from_90deg_at_20%_20%,rgba(59,130,246,0.06),transparent_32%),conic-gradient(from_210deg_at_80%_60%,rgba(6,182,212,0.05),transparent_34%)]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-18 space-y-6 sm:py-20 lg:py-24">
+          <p className="text-sm uppercase tracking-[0.24em] text-sky-300">
             End-to-end product workflow
           </p>
-          <h2 className="text-3xl font-semibold text-white">From eligibility to appeals</h2>
+          <h2 className="text-3xl font-semibold text-white sm:text-4xl">From eligibility to appeals</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {workflow.map((item, idx) => (
               <div
@@ -243,7 +234,7 @@ export default function LandingPage() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
                   Step {idx + 1}
                 </p>
-                <p className="mt-2 text-sm text-slate-200">{item}</p>
+                <p className="mt-2 text-base text-slate-200">{item}</p>
               </div>
             ))}
           </div>
@@ -252,19 +243,20 @@ export default function LandingPage() {
 
       <section
         ref={denialReveal.ref}
-        className={`border-b border-slate-900 bg-slate-950 transition duration-700 ${
+        className={`relative overflow-hidden border-b border-slate-900 bg-slate-950 transition duration-700 ${
           denialReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-2">
+        <div className="pointer-events-none veil-animate absolute inset-0 bg-[radial-gradient(circle_at_16%_10%,rgba(59,130,246,0.08),transparent_35%),radial-gradient(circle_at_90%_20%,rgba(6,182,212,0.06),transparent_36%)]" />
+        <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-18 lg:grid-cols-2 lg:py-20">
           <div className="space-y-5">
             <p className="text-sm uppercase tracking-[0.22em] text-sky-300">
               What powers denial prevention
             </p>
-            <h3 className="text-2xl font-semibold text-white">
+            <h3 className="text-3xl font-semibold text-white sm:text-4xl">
               Learn from historical claims and real-time signals
             </h3>
-            <p className="text-slate-200">
+            <p className="text-lg text-slate-200">
               Clinix AI ingests 6–12 months of 837/835/276/277/270/271 plus EMR encounters to map
               payer quirks, CARC/RARC patterns, frequency limits, and documentation needs. Every
               submission sharpens the model and keeps staff out of rework.
@@ -273,31 +265,31 @@ export default function LandingPage() {
               {bullets.slice(0, 6).map((item) => (
                 <div
                   key={item}
-                  className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-200 shadow-md shadow-black/30 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
+                  className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/70 p-4 text-base text-slate-200 shadow-md shadow-black/30 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
                 >
                   <span className="mt-1 h-2 w-2 rounded-full bg-sky-400" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-4">
               <Link
                 href="/api"
-                className="rounded-full bg-sky-500 px-4 py-3 text-sm font-semibold text-slate-950 shadow-md shadow-sky-600/30 transition hover:-translate-y-1 hover:bg-sky-400"
+                className="rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 shadow-md shadow-sky-600/30 transition hover:-translate-y-1 hover:bg-sky-400"
               >
                 Try the API workbench
               </Link>
               <Link
                 href="/rag"
-                className="rounded-full border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
+                className="rounded-full border border-slate-700 bg-slate-900 px-5 py-3 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
               >
                 Explore RAG
               </Link>
             </div>
           </div>
           <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60">
-            <h4 className="text-lg font-semibold text-white">X12 coverage</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+            <h4 className="text-xl font-semibold text-white">X12 coverage</h4>
+            <ul className="mt-3 space-y-2 text-base text-slate-200">
               <li>837P/837I/837D — clean claim generation & submission</li>
               <li>270/271 — eligibility with frequency/age limits surfaced</li>
               <li>276/277/277CA — real-time status, rejection labeling</li>
@@ -312,14 +304,15 @@ export default function LandingPage() {
 
       <section
         ref={playbookReveal.ref}
-        className={`border-b border-slate-900 bg-slate-950 transition duration-700 ${
+        className={`relative overflow-hidden border-b border-slate-900 bg-slate-950 transition duration-700 ${
           playbookReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
-          <div className="flex flex-col gap-2">
+        <div className="pointer-events-none veil-animate-slow absolute inset-0 bg-[conic-gradient(from_45deg_at_25%_25%,rgba(59,130,246,0.05),transparent_32%),conic-gradient(from_180deg_at_80%_70%,rgba(14,165,233,0.05),transparent_34%)]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-18 space-y-8 sm:py-20 lg:py-24">
+          <div className="flex flex-col gap-3">
             <p className="text-sm uppercase tracking-[0.18em] text-sky-300">Playbooks</p>
-            <h3 className="text-2xl font-semibold text-white">
+            <h3 className="text-3xl font-semibold text-white sm:text-4xl">
               Denials, cash flow, and appeals—handled by design
             </h3>
           </div>
@@ -333,7 +326,7 @@ export default function LandingPage() {
                 className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
               >
                 <h4 className="text-lg font-semibold text-white">{pb.title}</h4>
-                <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                <ul className="mt-3 space-y-2 text-base text-slate-200">
                   {pb.points.map((p) => (
                     <li key={p} className="flex items-start gap-2">
                       <span className="mt-1 h-2 w-2 rounded-full bg-sky-400" />
@@ -349,17 +342,18 @@ export default function LandingPage() {
 
       <section
         ref={spotlightReveal.ref}
-        className={`border-b border-slate-900 bg-slate-950 transition duration-700 ${
+        className={`relative overflow-hidden border-b border-slate-900 bg-slate-950 transition duration-700 ${
           spotlightReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
-          <div className="flex flex-col gap-2">
+        <div className="pointer-events-none veil-animate absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.05),transparent_36%),radial-gradient(circle_at_80%_70%,rgba(6,182,212,0.06),transparent_32%)]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-18 space-y-8 sm:py-20 lg:py-24">
+          <div className="flex flex-col gap-3">
             <p className="text-sm uppercase tracking-[0.18em] text-sky-300">Spotlight</p>
-            <h3 className="text-2xl font-semibold text-white">
+            <h3 className="text-3xl font-semibold text-white sm:text-4xl">
               Built to stop denials before they start
             </h3>
-            <p className="max-w-3xl text-slate-200">
+            <p className="max-w-3xl text-lg text-slate-200">
               Clinix AI combines Stedi rails, payer-specific rules, and ML signals from eligibility,
               status, and remits. The result: fewer reworks, cleaner cash, and faster appeals.
             </p>
@@ -376,7 +370,7 @@ export default function LandingPage() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
                   {item.label}
                 </p>
-                <p className="mt-2 text-sm text-slate-200">{item.copy}</p>
+                <p className="mt-2 text-base text-slate-200">{item.copy}</p>
               </div>
             ))}
           </div>
@@ -385,29 +379,30 @@ export default function LandingPage() {
 
       <section
         ref={ctaReveal.ref}
-        className={`bg-slate-950 transition duration-700 ${
+        className={`relative overflow-hidden bg-slate-950 transition duration-700 ${
           ctaReveal.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-8 shadow-2xl shadow-black/50">
-            <h3 className="text-2xl font-semibold text-white">
+        <div className="pointer-events-none veil-animate-slow absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,rgba(59,130,246,0.06),transparent_38%),conic-gradient(from_180deg_at_60%_40%,rgba(6,182,212,0.04),transparent_36%)]" />
+        <div className="relative mx-auto max-w-6xl px-6 py-18 sm:py-20 lg:py-24">
+          <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 p-10 shadow-2xl shadow-black/50">
+            <h3 className="text-3xl font-semibold text-white sm:text-4xl">
               Ready to reduce denials and automate your billing stack?
             </h3>
-            <p className="mt-3 max-w-3xl text-slate-200">
+            <p className="mt-3 max-w-3xl text-lg text-slate-200">
               Drop in your Stedi keys, hit the workbench, and plug the engine into your EMR.
               Every 277 and 835 makes the model smarter—and your claims cleaner.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-4">
               <Link
                 href="/api"
-                className="rounded-full bg-sky-500 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-600/30 transition hover:-translate-y-1 hover:bg-sky-400"
+                className="rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-600/30 transition hover:-translate-y-1 hover:bg-sky-400"
               >
                 Launch API workbench
               </Link>
               <Link
                 href="/mocks"
-                className="rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-100 hover:-translate-y-1 hover:border-sky-500/60"
+                className="rounded-full border border-slate-700 px-6 py-3 text-sm font-semibold text-slate-100 hover:-translate-y-1 hover:border-sky-500/60"
               >
                 View mock payloads
               </Link>
@@ -415,6 +410,16 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <style jsx global>{`
+        @keyframes veilFloat {
+          0% { transform: translate3d(0px, 0px, 0) scale(1); opacity: 0.9; }
+          50% { transform: translate3d(10px, -8px, 0) scale(1.02); opacity: 0.95; }
+          100% { transform: translate3d(-10px, 6px, 0) scale(1.01); opacity: 0.9; }
+        }
+        .veil-animate { animation: veilFloat 14s ease-in-out infinite alternate; }
+        .veil-animate-slow { animation: veilFloat 20s ease-in-out infinite alternate; }
+      `}</style>
     </main>
   );
 }
