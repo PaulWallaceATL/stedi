@@ -225,17 +225,19 @@ export default function LandingPage() {
             End-to-end product workflow
           </p>
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">From eligibility to appeals</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+
+          <div className="scroll-stack" aria-label="Workflow scroll stack">
             {workflow.map((item, idx) => (
-              <div
+              <article
                 key={item}
-                className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-md shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
+                className="scroll-card rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-left shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
+                style={{ ["--i" as string]: idx } as React.CSSProperties}
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
                   Step {idx + 1}
                 </p>
                 <p className="mt-2 text-base text-slate-200">{item}</p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
@@ -419,6 +421,25 @@ export default function LandingPage() {
         }
         .veil-animate { animation: veilFloat 14s ease-in-out infinite alternate; }
         .veil-animate-slow { animation: veilFloat 20s ease-in-out infinite alternate; }
+        .scroll-stack {
+          position: relative;
+          display: grid;
+          gap: 12px;
+          padding: 8px 0;
+        }
+        .scroll-card {
+          position: sticky;
+          top: 120px;
+          transform: translateY(calc(var(--i) * 10px)) scale(calc(1 - var(--i) * 0.015));
+          transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+          will-change: transform;
+        }
+        @media (max-width: 768px) {
+          .scroll-card {
+            top: 80px;
+            transform: translateY(calc(var(--i) * 6px)) scale(calc(1 - var(--i) * 0.01));
+          }
+        }
       `}</style>
     </main>
   );
