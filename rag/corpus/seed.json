@@ -1,0 +1,185 @@
+{
+  "rules": [
+    {
+      "id": "rule-pos-modifier",
+      "payerId": "STEDI",
+      "specialty": "primary_care",
+      "description": "For office visits, use POS 11; common modifiers: 25 when significant, separately identifiable E/M service on the same day."
+    },
+    {
+      "id": "rule-dx-cpt-alignment",
+      "payerId": "STEDI",
+      "specialty": "primary_care",
+      "description": "Ensure diagnosis pointers map to clinical reason for each service line; at least one pointer required per service line."
+    },
+    {
+      "id": "rule-prior-auth",
+      "payerId": "STEDI",
+      "specialty": "primary_care",
+      "description": "If prior-auth is known required, include priorAuthRefNumber; otherwise omit."
+    },
+    {
+      "id": "rule-placeholder-bcbs-prior-auth",
+      "payerId": "BCBS-PLACEHOLDER",
+      "specialty": "cardiology",
+      "description": "PLACEHOLDER ONLY: Example that some high-cost cardiology imaging may require prior auth. REPLACE WITH REAL PAYER DATA BEFORE PROD."
+    },
+    {
+      "id": "rule-placeholder-aetna-modifier",
+      "payerId": "AETNA-PLACEHOLDER",
+      "specialty": "orthopedics",
+      "description": "PLACEHOLDER ONLY: Example that modifier 59 or XS may be required for distinct procedural services. REPLACE WITH REAL PAYER DATA BEFORE PROD."
+    },
+    {
+      "id": "rule-placeholder-cms-pt-frequency",
+      "payerId": "CMS-PLACEHOLDER",
+      "specialty": "pt_ot",
+      "description": "PLACEHOLDER ONLY: Example that PT/OT may have visit frequency limits (e.g., 60/year). REPLACE WITH REAL PAYER DATA BEFORE PROD."
+    },
+    {
+      "id": "rule-placeholder-uhc-prior-auth-surgery",
+      "payerId": "UHC-PLACEHOLDER",
+      "specialty": "surgery",
+      "description": "PLACEHOLDER ONLY: Some elective surgeries may require prior auth. REPLACE WITH REAL UHC DATA BEFORE PROD."
+    },
+    {
+      "id": "rule-placeholder-cigna-dental-bundle",
+      "payerId": "CIGNA-PLACEHOLDER",
+      "specialty": "dental",
+      "description": "PLACEHOLDER ONLY: Certain dental codes may bundle and disallow modifier 59; verify separable services. REPLACE WITH REAL PAYER DATA BEFORE PROD."
+    },
+    {
+      "id": "rule-placeholder-dx-cpt-compatibility",
+      "payerId": "GENERIC-PLACEHOLDER",
+      "specialty": "general",
+      "description": "PLACEHOLDER ONLY: DX↔CPT compatibility is required; ensure submitted diagnoses justify procedures. REPLACE WITH REAL DATA BEFORE PROD."
+    }
+  ],
+  "exemplars": [
+    {
+      "id": "exemplar-missing-pointer",
+      "payerId": "STEDI",
+      "specialty": "primary_care",
+      "issue": "Missing diagnosisPointer for 99213",
+      "before": {
+        "claim": {
+          "serviceLines": [{ "procedureCode": "99213", "diagnosisPointers": [] }]
+        }
+      },
+      "after": {
+        "claim": {
+          "serviceLines": [{ "procedureCode": "99213", "diagnosisPointers": [1] }]
+        }
+      },
+      "note": "Add at least one diagnosis pointer."
+    },
+    {
+      "id": "exemplar-modifier-25",
+      "payerId": "STEDI",
+      "specialty": "primary_care",
+      "issue": "Evaluation and management with separately identifiable service",
+      "before": {
+        "claim": {
+          "serviceLines": [{ "procedureCode": "99213", "modifiers": [] }]
+        }
+      },
+      "after": {
+        "claim": {
+          "serviceLines": [{ "procedureCode": "99213", "modifiers": ["25"] }]
+        }
+      },
+      "note": "Add modifier 25 when E/M is significant and separately identifiable on the same day."
+    },
+    {
+      "id": "exemplar-placeholder-prior-auth",
+      "payerId": "BCBS-PLACEHOLDER",
+      "specialty": "cardiology",
+      "issue": "High-cost imaging without prior auth (placeholder)",
+      "before": {
+        "claim": {
+          "claim": {
+            "priorAuthRefNumber": null
+          }
+        }
+      },
+      "after": {
+        "claim": {
+          "claim": {
+            "priorAuthRefNumber": "PLACEHOLDER-AUTH"
+          }
+        }
+      },
+      "note": "PLACEHOLDER ONLY. Replace with real payer guidance and remove this exemplar before production."
+    },
+    {
+      "id": "exemplar-placeholder-pt-frequency",
+      "payerId": "CMS-PLACEHOLDER",
+      "specialty": "pt_ot",
+      "issue": "Exceeded PT visit limit (placeholder)",
+      "before": {
+        "claim": {
+          "claim": {
+            "totalChargeAmount": "500.00"
+          }
+        }
+      },
+      "after": {
+        "claim": {
+          "claim": {
+            "totalChargeAmount": "500.00",
+            "note": "PLACEHOLDER ONLY: Verify visit count; may require prior auth or exception."
+          }
+        }
+      },
+      "note": "PLACEHOLDER ONLY. Replace with real frequency/limit handling before production."
+    },
+    {
+      "id": "exemplar-placeholder-dental-bundle",
+      "payerId": "CIGNA-PLACEHOLDER",
+      "specialty": "dental",
+      "issue": "Bundled dental services (placeholder)",
+      "before": {
+        "claim": {
+          "claim": {
+            "serviceLines": [
+              { "procedureCode": "D1110", "modifiers": [] },
+              { "procedureCode": "D4910", "modifiers": [] }
+            ]
+          }
+        }
+      },
+      "after": {
+        "claim": {
+          "claim": {
+            "serviceLines": [
+              { "procedureCode": "D1110", "modifiers": [] },
+              { "procedureCode": "D4910", "modifiers": [], "note": "PLACEHOLDER ONLY: Check if bundling applies; remove if not separately billable." }
+            ]
+          }
+        }
+      },
+      "note": "PLACEHOLDER ONLY. Replace with actual dental bundling guidance before production."
+    },
+    {
+      "id": "exemplar-placeholder-uhc-surgery-auth",
+      "payerId": "UHC-PLACEHOLDER",
+      "specialty": "surgery",
+      "issue": "Elective surgery without prior auth (placeholder)",
+      "before": {
+        "claim": {
+          "claim": {
+            "priorAuthRefNumber": null
+          }
+        }
+      },
+      "after": {
+        "claim": {
+          "claim": {
+            "priorAuthRefNumber": "PLACEHOLDER-AUTH-SURGERY"
+          }
+        }
+      },
+      "note": "PLACEHOLDER ONLY. Replace with real UHC surgical auth requirements before production."
+    }
+  ]
+}

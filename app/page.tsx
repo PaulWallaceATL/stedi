@@ -265,6 +265,12 @@ export default function Home() {
               View Stedi mock payloads
             </Link>
             <Link
+              href="/rag"
+              className="inline-flex items-center justify-center rounded-full bg-indigo-400 px-4 py-2 text-sm font-semibold text-black transition hover:bg-indigo-300"
+            >
+              Test RAG scrubber
+            </Link>
+            <Link
               href="/api/stedi/mock"
               className="text-sm text-emerald-300 underline underline-offset-4 hover:text-emerald-200"
             >
