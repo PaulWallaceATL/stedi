@@ -3,6 +3,7 @@
 import gsap from "gsap";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ScrollStack, { ScrollStackItem } from "./components/ScrollStack";
 
 const bullets = [
   "Real-time eligibility (270/271) with payer guardrails and plan rules",
@@ -226,20 +227,19 @@ export default function LandingPage() {
           </p>
           <h2 className="text-3xl font-semibold text-white sm:text-4xl">From eligibility to appeals</h2>
 
-          <div className="scroll-stack" aria-label="Workflow scroll stack">
+          <ScrollStack className="space-y-0">
             {workflow.map((item, idx) => (
-              <article
+              <ScrollStackItem
                 key={item}
-                className="scroll-card rounded-2xl border border-slate-800 bg-slate-900/80 p-6 md:p-7 min-h-[180px] md:min-h-[210px] text-left shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
-                style={{ ["--i" as string]: idx } as React.CSSProperties}
+                itemClassName="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 md:p-7 min-h-[200px] md:min-h-[220px] text-left shadow-lg shadow-black/40"
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
                   Step {idx + 1}
                 </p>
                 <p className="mt-2 text-base text-slate-200">{item}</p>
-              </article>
+              </ScrollStackItem>
             ))}
-          </div>
+          </ScrollStack>
         </div>
       </section>
 
@@ -421,42 +421,6 @@ export default function LandingPage() {
         }
         .veil-animate { animation: veilFloat 14s ease-in-out infinite alternate; }
         .veil-animate-slow { animation: veilFloat 20s ease-in-out infinite alternate; }
-        .scroll-stack {
-          position: relative;
-          display: grid;
-          gap: 0;
-          --stack-count: 7;
-          --stack-top: 160px;
-          --stack-gap: 14px;
-          --stack-overlap: 140px;
-          --card-min: 220px;
-          padding: calc(var(--stack-top) + var(--stack-overlap)) 0 calc(var(--stack-top) + var(--stack-overlap));
-          min-height: 2600px;
-        }
-        .scroll-card {
-          position: sticky;
-          top: var(--stack-top);
-          margin-top: calc(var(--i) * -1 * var(--stack-overlap));
-          transform: translateY(calc(var(--i) * var(--stack-gap))) scale(calc(1 - var(--i) * 0.012));
-          min-height: var(--card-min);
-          transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-          will-change: transform;
-          z-index: calc(100 - var(--i));
-        }
-        @media (max-width: 768px) {
-          .scroll-stack {
-            --stack-top: 120px;
-            --stack-gap: 10px;
-            --stack-overlap: 110px;
-            --card-min: 200px;
-            padding-top: calc(var(--stack-top) + var(--stack-overlap));
-            padding-bottom: calc(var(--stack-top) + var(--stack-overlap) + 120px);
-            min-height: 2000px;
-          }
-          .scroll-card {
-            transform: translateY(calc(var(--i) * var(--stack-gap))) scale(calc(1 - var(--i) * 0.012));
-          }
-        }
       `}</style>
     </main>
   );

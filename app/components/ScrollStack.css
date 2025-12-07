@@ -1,0 +1,35 @@
+.scroll-stack-scroller {
+  position: relative;
+  overflow: hidden;
+  padding: 200px 0 240px;
+  min-height: 2200px;
+}
+
+.scroll-stack-inner {
+  position: relative;
+}
+
+.scroll-stack-card {
+  position: sticky;
+  top: 160px;
+  transform-origin: top center;
+  will-change: transform;
+  transition: transform 200ms ease;
+}
+
+.scroll-stack-end {
+  height: 600px;
+}
+
+@media (max-width: 768px) {
+  .scroll-stack-scroller {
+    padding: 180px 0 200px;
+  }
+  .scroll-stack-card {
+    top: 120px;
+  }
+  .scroll-stack-end {
+    height: 480px;
+  }
+}
+
