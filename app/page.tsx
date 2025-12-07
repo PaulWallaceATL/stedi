@@ -424,20 +424,27 @@ export default function LandingPage() {
         .scroll-stack {
           position: relative;
           display: grid;
-          gap: 12px;
-          padding: 8px 0;
+          gap: 0;
+          padding: 140px 0 140px;
         }
         .scroll-card {
           position: sticky;
-          top: 120px;
-          transform: translateY(calc(var(--i) * 10px)) scale(calc(1 - var(--i) * 0.015));
+          top: 140px;
+          margin-top: calc(var(--i) * -120px);
+          transform: translateY(calc(var(--i) * 6px)) scale(calc(1 - var(--i) * 0.01));
           transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
           will-change: transform;
+          z-index: calc(100 - var(--i));
         }
         @media (max-width: 768px) {
           .scroll-card {
-            top: 80px;
-            transform: translateY(calc(var(--i) * 6px)) scale(calc(1 - var(--i) * 0.01));
+            top: 100px;
+            margin-top: calc(var(--i) * -90px);
+            transform: translateY(calc(var(--i) * 4px)) scale(calc(1 - var(--i) * 0.008));
+          }
+          .scroll-stack {
+            padding-top: 110px;
+            padding-bottom: 110px;
           }
         }
       `}</style>
