@@ -35,11 +35,11 @@ function HeroHelix() {
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#22d3ee",
-        emissive: "#0ea5e9",
-        emissiveIntensity: 0.75,
-        roughness: 0.2,
-        metalness: 0.65,
+        color: "#0f7bdc",
+        emissive: "#0b6bb8",
+        emissiveIntensity: 0.6,
+        roughness: 0.18,
+        metalness: 0.55,
       }),
     [],
   );
@@ -161,132 +161,137 @@ export default function LandingPage() {
   );
 
   return (
-    <main className="min-h-screen bg-black text-slate-50">
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(52,211,153,0.12),transparent_32%)]" />
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:py-24">
-          <div className="relative z-10 space-y-6" ref={heroRef}>
-            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
-              Eligibility • Clean Claims • Status • Remits • Appeals
-            </p>
-            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-white via-sky-50 to-cyan-50">
+        <div className="pointer-events-none absolute inset-0 opacity-80 [background:radial-gradient(circle_at_18%_18%,rgba(14,182,163,0.18),transparent_30%),radial-gradient(circle_at_82%_12%,rgba(15,123,220,0.18),transparent_32%)]" />
+        <div className="absolute -left-32 top-24 h-64 w-64 rounded-full bg-white/70 blur-3xl" />
+        <div className="absolute -right-24 bottom-10 h-52 w-52 rounded-full bg-cyan-100/70 blur-3xl" />
+        <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
+          <div className="space-y-7" ref={heroRef}>
+            <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-sky-700 shadow-sm">
+              Eligibility • Claims • Status • Appeals
+            </span>
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {heroCopy.title}
             </h1>
-            <p className="max-w-2xl text-lg text-slate-200">{heroCopy.subtitle}</p>
+            <p className="max-w-2xl text-lg text-slate-600">{heroCopy.subtitle}</p>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/api"
-                className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-black shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"
+                className="rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-600/25 transition hover:-translate-y-0.5 hover:bg-sky-500"
               >
                 Launch API Workbench
               </Link>
               <Link
                 href="#workflow"
-                className="rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-700"
               >
                 See the workflow
               </Link>
             </div>
             <div
               ref={statsRef}
-              className="grid grid-cols-2 gap-3 text-sm text-slate-200 sm:grid-cols-3"
+              className="grid grid-cols-2 gap-4 text-sm text-slate-700 sm:grid-cols-3"
             >
-              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-2xl font-semibold text-white">270/271</p>
-                <p className="text-xs uppercase tracking-wide text-emerald-300">
-                  Eligibility with guardrails
+              <div className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                <p className="text-2xl font-semibold text-slate-900">270/271</p>
+                <p className="text-xs uppercase tracking-wide text-sky-700">
+                  Eligibility guardrails
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-2xl font-semibold text-white">837P</p>
-                <p className="text-xs uppercase tracking-wide text-emerald-300">
+              <div className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                <p className="text-2xl font-semibold text-slate-900">837P</p>
+                <p className="text-xs uppercase tracking-wide text-sky-700">
                   Clean claim automation
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-                <p className="text-2xl font-semibold text-white">835</p>
-                <p className="text-xs uppercase tracking-wide text-emerald-300">
-                  Denial learning & appeals
+              <div className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                <p className="text-2xl font-semibold text-slate-900">835</p>
+                <p className="text-xs uppercase tracking-wide text-sky-700">
+                  Remits & appeals
                 </p>
               </div>
             </div>
           </div>
-          <div className="relative h-[420px] rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl shadow-emerald-500/20">
+          <div className="relative h-[420px] rounded-3xl border border-slate-200 bg-white shadow-xl shadow-sky-500/10">
             <Canvas camera={{ position: [0, 0, 4] }}>
-              <ambientLight intensity={0.6} />
+              <ambientLight intensity={0.7} />
               <directionalLight position={[4, 4, 4]} intensity={1} />
               <HeroHelix />
               <Environment preset="city" />
               <OrbitControls enableZoom={false} enablePan={false} />
             </Canvas>
-            <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/10" />
+            <div className="pointer-events-none absolute inset-0 rounded-3xl border border-white/60" />
+            <div className="pointer-events-none absolute inset-x-10 bottom-6 h-20 rounded-full bg-sky-100 blur-3xl" />
           </div>
         </div>
       </section>
 
-      <section id="workflow" className="border-b border-white/10 bg-gradient-to-b from-black to-slate-950">
+      <section id="workflow" className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16 space-y-6">
-          <p className="text-sm uppercase tracking-[0.22em] text-emerald-300">
+          <p className="text-sm uppercase tracking-[0.22em] text-sky-700">
             End-to-end product workflow
           </p>
-          <h2 className="text-3xl font-semibold">From eligibility to appeals</h2>
+          <h2 className="text-3xl font-semibold text-slate-900">From eligibility to appeals</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {workflow.map((item, idx) => (
               <div
                 key={item}
-                className="rounded-xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-emerald-500/10"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-sky-500/10"
               >
-                <p className="text-xs font-semibold text-emerald-300">Step {idx + 1}</p>
-                <p className="mt-2 text-sm text-slate-100">{item}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
+                  Step {idx + 1}
+                </p>
+                <p className="mt-2 text-sm text-slate-700">{item}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-black">
+      <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-2">
-          <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.22em] text-emerald-300">
+          <div className="space-y-5">
+            <p className="text-sm uppercase tracking-[0.22em] text-sky-700">
               What powers denial prevention
             </p>
-            <h3 className="text-2xl font-semibold text-white">
+            <h3 className="text-2xl font-semibold text-slate-900">
               Learn from historical claims and real-time signals
             </h3>
-            <p className="text-slate-200">
-              Clinix AI ingests 6–12 months of 837/835/276/277/270/271 plus EMR encounters to
-              map payer quirks, CARC/RARC patterns, frequency limits, and documentation needs.
-              Every submission sharpens the model and keeps staff out of rework.
+            <p className="text-slate-600">
+              Clinix AI ingests 6–12 months of 837/835/276/277/270/271 plus EMR encounters to map
+              payer quirks, CARC/RARC patterns, frequency limits, and documentation needs. Every
+              submission sharpens the model and keeps staff out of rework.
             </p>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {bullets.slice(0, 6).map((item) => (
                 <div
                   key={item}
-                  className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-100"
+                  className="flex items-start gap-2 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700 shadow-sm"
                 >
-                  <span className="mr-2 text-emerald-300">●</span>
-                  {item}
+                  <span className="mt-1 h-2 w-2 rounded-full bg-sky-500" />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/api"
-                className="rounded-full bg-white px-4 py-3 text-sm font-semibold text-black hover:bg-emerald-100"
+                className="rounded-full bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-sky-600/25 transition hover:-translate-y-0.5 hover:bg-sky-500"
               >
                 Try the API workbench
               </Link>
               <Link
                 href="/rag"
-                className="rounded-full border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                className="rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-700"
               >
                 Explore RAG
               </Link>
             </div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-emerald-500/10">
-            <h4 className="text-lg font-semibold text-white">X12 coverage</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-100">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-sky-500/10">
+            <h4 className="text-lg font-semibold text-slate-900">X12 coverage</h4>
+            <ul className="mt-3 space-y-2 text-sm text-slate-700">
               <li>837P/837I/837D — clean claim generation & submission</li>
               <li>270/271 — eligibility with frequency/age limits surfaced</li>
               <li>276/277/277CA — real-time status, rejection labeling</li>
@@ -299,13 +304,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-gradient-to-b from-slate-950 to-black">
+      <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
           <div className="flex flex-col gap-2">
-            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
-              Playbooks
-            </p>
-            <h3 className="text-2xl font-semibold text-white">
+            <p className="text-sm uppercase tracking-[0.18em] text-sky-700">Playbooks</p>
+            <h3 className="text-2xl font-semibold text-slate-900">
               Denials, cash flow, and appeals—handled by design
             </h3>
           </div>
@@ -316,13 +319,13 @@ export default function LandingPage() {
             {playbooks.map((pb) => (
               <div
                 key={pb.title}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-emerald-500/10"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-md shadow-sky-500/10"
               >
-                <h4 className="text-lg font-semibold text-white">{pb.title}</h4>
-                <ul className="mt-3 space-y-2 text-sm text-slate-100">
+                <h4 className="text-lg font-semibold text-slate-900">{pb.title}</h4>
+                <ul className="mt-3 space-y-2 text-sm text-slate-700">
                   {pb.points.map((p) => (
                     <li key={p} className="flex items-start gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+                      <span className="mt-1 h-2 w-2 rounded-full bg-sky-500" />
                       <span>{p}</span>
                     </li>
                   ))}
@@ -333,16 +336,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-black">
+      <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
           <div className="flex flex-col gap-2">
-            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
-              Spotlight
-            </p>
-            <h3 className="text-2xl font-semibold text-white">
+            <p className="text-sm uppercase tracking-[0.18em] text-sky-700">Spotlight</p>
+            <h3 className="text-2xl font-semibold text-slate-900">
               Built to stop denials before they start
             </h3>
-            <p className="max-w-3xl text-slate-200">
+            <p className="max-w-3xl text-slate-600">
               Clinix AI combines Stedi rails, payer-specific rules, and ML signals from eligibility,
               status, and remits. The result: fewer reworks, cleaner cash, and faster appeals.
             </p>
@@ -354,38 +355,38 @@ export default function LandingPage() {
             {spotlight.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-emerald-500/10"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-md shadow-sky-500/10"
               >
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">
                   {item.label}
                 </p>
-                <p className="mt-2 text-sm text-slate-100">{item.copy}</p>
+                <p className="mt-2 text-sm text-slate-700">{item.copy}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-black">
+      <section className="bg-gradient-to-r from-sky-600 via-sky-600 to-teal-500">
         <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-emerald-500/20 via-sky-500/10 to-transparent p-8 shadow-2xl shadow-emerald-500/20">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-sky-900/30 backdrop-blur">
             <h3 className="text-2xl font-semibold text-white">
               Ready to reduce denials and automate your billing stack?
             </h3>
-            <p className="mt-3 max-w-3xl text-slate-100">
+            <p className="mt-3 max-w-3xl text-white/80">
               Drop in your Stedi keys, hit the workbench, and plug the engine into your EMR.
               Every 277 and 835 makes the model smarter—and your claims cleaner.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href="/api"
-                className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-black hover:bg-emerald-400"
+                className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow-lg shadow-white/20 transition hover:-translate-y-0.5 hover:bg-sky-50"
               >
                 Launch API workbench
               </Link>
               <Link
                 href="/mocks"
-                className="rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                className="rounded-full border border-white/50 px-5 py-3 text-sm font-semibold text-white hover:-translate-y-0.5 hover:border-white"
               >
                 View mock payloads
               </Link>

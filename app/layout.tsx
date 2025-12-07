@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import NavBar from "./components/NavBar";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Clinix AI | Stedi Claims Workbench",
+  title: "Clinix AI | Medical-grade Claims & Revenue Platform",
   description:
-    "Run eligibility, build 837P claims, track 276/277, and pull 835s via Stedi.",
+    "A clinically polished experience for eligibility, clean claims, status, remits, and appeal automation powered by Stedi.",
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${manrope.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
         <NavBar />
         {children}
       </body>

@@ -241,10 +241,10 @@ export default function ApiWorkbenchPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-50">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
         <header className="flex flex-col gap-3">
-          <p className="text-sm font-medium text-emerald-400">
+          <p className="text-sm font-semibold text-sky-700">
             Eligibility • 837P • 276/277 • 835 • 275
           </p>
           <div className="flex flex-wrap items-center gap-3">
@@ -253,30 +253,30 @@ export default function ApiWorkbenchPage() {
             </h1>
             <Link
               href="/"
-              className="text-xs text-slate-300 underline underline-offset-4 hover:text-white"
+              className="text-xs text-slate-600 underline underline-offset-4 hover:text-slate-900"
             >
               Back to marketing site
             </Link>
           </div>
-          <p className="max-w-4xl text-base text-slate-200">
+          <p className="max-w-4xl text-base text-slate-600">
             {header.subtitle} Auth is handled server-side via `STEDI_API_KEY`
             (no client secrets). Set `STEDI_BASE_URL` if you need a non-default
             region.
           </p>
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-semibold text-white">Environment tips</span>
-              <span className="text-xs text-slate-300">
+              <span className="font-semibold text-slate-900">Environment tips</span>
+              <span className="text-xs text-slate-500">
                 Stedi test keys work only with approved test payloads. Use
                 Idempotency-Key to safely retry.
               </span>
             </div>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-              <label className="text-xs uppercase tracking-wide text-slate-400">
+              <label className="text-xs uppercase tracking-wide text-slate-500">
                 Optional Idempotency-Key
               </label>
               <input
-                className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-sky-200 focus:ring"
                 placeholder="uuid-v4 here for retries"
                 value={idempotencyKey}
                 onChange={(e) => setIdempotencyKey(e.target.value)}
@@ -291,22 +291,22 @@ export default function ApiWorkbenchPage() {
             return (
               <section
                 key={panel.id}
-                className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-emerald-500/10"
+                className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-md shadow-sky-500/10"
               >
                 <div className="flex flex-col gap-2">
-                  <h2 className="text-xl font-semibold text-white">
+                  <h2 className="text-xl font-semibold text-slate-900">
                     {panel.title}
                   </h2>
-                  <p className="text-sm text-slate-200">{panel.description}</p>
-                  <p className="text-xs text-emerald-300">{panel.docHint}</p>
+                  <p className="text-sm text-slate-600">{panel.description}</p>
+                  <p className="text-xs text-sky-700">{panel.docHint}</p>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Stedi API path
                   </label>
                   <input
-                    className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-sky-200 focus:ring"
                     value={paths[panel.id]}
                     onChange={(e) =>
                       setPaths((prev) => ({ ...prev, [panel.id]: e.target.value }))
@@ -317,12 +317,12 @@ export default function ApiWorkbenchPage() {
 
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Payload (JSON)
                     </label>
                     <button
                       type="button"
-                      className="text-xs text-emerald-300 underline-offset-4 hover:underline"
+                      className="text-xs text-sky-700 underline-offset-4 hover:underline"
                       onClick={() =>
                         navigator.clipboard?.writeText(payloads[panel.id] || "")
                       }
@@ -331,7 +331,7 @@ export default function ApiWorkbenchPage() {
                     </button>
                   </div>
                   <textarea
-                    className="h-52 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+                    className="h-52 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 font-mono text-xs text-slate-900 outline-none ring-sky-200 focus:ring"
                     value={payloads[panel.id]}
                     onChange={(e) =>
                       setPayloads((prev) => ({ ...prev, [panel.id]: e.target.value }))
@@ -342,17 +342,17 @@ export default function ApiWorkbenchPage() {
 
                 <div className="flex flex-col gap-3">
                   <button
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400 disabled:opacity-70"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-500 disabled:opacity-70"
                     disabled={state?.loading}
                     onClick={() => callProxy(panel.id)}
                   >
                     {state?.loading ? "Sending..." : "Send to Stedi"}
                   </button>
                   {state?.error && (
-                    <p className="text-xs text-rose-300">Error: {state.error}</p>
+                    <p className="text-xs text-rose-600">Error: {state.error}</p>
                   )}
                   {state?.response && (
-                    <pre className="max-h-56 overflow-auto rounded-lg border border-white/10 bg-black/60 p-3 text-xs text-slate-100">
+                    <pre className="max-h-56 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800">
                       {state.response}
                     </pre>
                   )}
@@ -362,9 +362,9 @@ export default function ApiWorkbenchPage() {
           })}
         </div>
 
-        <footer className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-200">
-          <p className="font-semibold text-white">Ship steps</p>
-          <ol className="mt-3 list-decimal space-y-1 pl-6">
+        <footer className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-700 shadow-sm">
+          <p className="font-semibold text-slate-900">Ship steps</p>
+          <ol className="mt-3 list-decimal space-y-2 pl-6">
             <li>
               Add Vercel env vars: `STEDI_API_KEY` (required) and optionally
               `STEDI_BASE_URL` for non-default regions.

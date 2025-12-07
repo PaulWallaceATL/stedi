@@ -82,37 +82,37 @@ export default function RagTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-50">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
         <header className="flex flex-col gap-2">
-          <p className="text-sm font-semibold text-emerald-400">RAG tester</p>
+          <p className="text-sm font-semibold text-sky-700">RAG tester</p>
           <h1 className="text-3xl font-semibold">{header.title}</h1>
-          <p className="text-sm text-slate-200">{header.subtitle}</p>
-          <p className="text-xs text-slate-300">
+          <p className="text-sm text-slate-600">{header.subtitle}</p>
+          <p className="text-xs text-slate-500">
             Secrets stay server-side; /api/rag/suggest reads RAG_API_KEY, RAG_MODEL,
             and RAG_PROVIDER from env.
           </p>
         </header>
 
-        <section className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-5">
+        <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-md shadow-sky-500/10">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm text-slate-200">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            <label className="flex flex-col gap-1 text-sm text-slate-700">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Payer ID (optional)
               </span>
               <input
-                className="rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-sky-200 focus:ring"
                 value={payerId}
                 onChange={(e) => setPayerId(e.target.value)}
                 placeholder="STEDI or BCBS-PLACEHOLDER"
               />
             </label>
-            <label className="flex flex-col gap-1 text-sm text-slate-200">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+            <label className="flex flex-col gap-1 text-sm text-slate-700">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Specialty (optional)
               </span>
               <input
-                className="rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-sky-200 focus:ring"
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
                 placeholder="primary_care, orthopedics, etc."
@@ -122,11 +122,11 @@ export default function RagTestPage() {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Claim payload (JSON)
               </span>
               <button
-                className="text-xs text-emerald-300 underline-offset-4 hover:underline"
+                className="text-xs text-sky-700 underline-offset-4 hover:underline"
                 type="button"
                 onClick={() => navigator.clipboard?.writeText(claimJson || "")}
               >
@@ -134,7 +134,7 @@ export default function RagTestPage() {
               </button>
             </div>
             <textarea
-              className="h-72 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-slate-50 outline-none ring-emerald-400/40 focus:ring"
+              className="h-72 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 font-mono text-xs text-slate-900 outline-none ring-sky-200 focus:ring"
               value={claimJson}
               onChange={(e) => setClaimJson(e.target.value)}
               spellCheck={false}
@@ -143,7 +143,7 @@ export default function RagTestPage() {
 
           <div className="flex flex-col gap-3">
             <button
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400 disabled:opacity-70"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-500 disabled:opacity-70"
               type="button"
               onClick={send}
               disabled={loading}
@@ -151,12 +151,12 @@ export default function RagTestPage() {
               {loading ? "Sending..." : "Send to RAG"}
             </button>
             {error && (
-              <p className="rounded-md border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-100">
+              <p className="rounded-md border border-rose-500/40 bg-rose-500/5 p-3 text-xs text-rose-700">
                 {error}
               </p>
             )}
             {response && (
-              <pre className="max-h-80 overflow-auto rounded-lg border border-white/10 bg-black/60 p-3 text-xs text-slate-100">
+              <pre className="max-h-80 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800">
                 {response}
               </pre>
             )}
