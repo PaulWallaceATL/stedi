@@ -230,7 +230,7 @@ export default function LandingPage() {
             {workflow.map((item, idx) => (
               <article
                 key={item}
-                className="scroll-card rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-left shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
+                className="scroll-card rounded-2xl border border-slate-800 bg-slate-900/80 p-6 md:p-7 min-h-[180px] md:min-h-[210px] text-left shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
                 style={{ ["--i" as string]: idx } as React.CSSProperties}
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
@@ -425,26 +425,28 @@ export default function LandingPage() {
           position: relative;
           display: grid;
           gap: 0;
-          padding: 140px 0 140px;
+          padding: 220px 0 220px;
+          min-height: 2000px;
         }
         .scroll-card {
           position: sticky;
-          top: 140px;
-          margin-top: calc(var(--i) * -120px);
-          transform: translateY(calc(var(--i) * 6px)) scale(calc(1 - var(--i) * 0.01));
+          top: 180px;
+          margin-top: calc(var(--i) * -110px);
+          transform: translateY(calc(var(--i) * 8px)) scale(calc(1 - var(--i) * 0.012));
           transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
           will-change: transform;
           z-index: calc(100 - var(--i));
         }
         @media (max-width: 768px) {
           .scroll-card {
-            top: 100px;
+            top: 120px;
             margin-top: calc(var(--i) * -90px);
-            transform: translateY(calc(var(--i) * 4px)) scale(calc(1 - var(--i) * 0.008));
+            transform: translateY(calc(var(--i) * 5px)) scale(calc(1 - var(--i) * 0.01));
           }
           .scroll-stack {
-            padding-top: 110px;
-            padding-bottom: 110px;
+            padding-top: 140px;
+            padding-bottom: 160px;
+            min-height: 1600px;
           }
         }
       `}</style>
