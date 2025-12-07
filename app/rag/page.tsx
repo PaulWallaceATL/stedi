@@ -56,7 +56,10 @@ export default function RagTestPage() {
       setError(null);
       setResponse(null);
       const parsed = JSON.parse(claimJson || "{}");
-      const res = await fetch("/api/rag/suggest", {
+      const ragBase =
+        process.env.NEXT_PUBLIC_RAG_URL?.replace(/\/+$/, "") || "";
+      const endpoint = ragBase ? `${ragBase}/rag/suggest` : "/api/rag/suggest";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
