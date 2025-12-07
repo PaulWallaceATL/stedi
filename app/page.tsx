@@ -425,28 +425,36 @@ export default function LandingPage() {
           position: relative;
           display: grid;
           gap: 0;
-          padding: 220px 0 220px;
-          min-height: 2000px;
+          --stack-count: 7;
+          --stack-top: 160px;
+          --stack-gap: 14px;
+          --stack-overlap: 140px;
+          --card-min: 220px;
+          padding: calc(var(--stack-top) + var(--stack-overlap)) 0 calc(var(--stack-top) + var(--stack-overlap));
+          min-height: 2600px;
         }
         .scroll-card {
           position: sticky;
-          top: 180px;
-          margin-top: calc(var(--i) * -110px);
-          transform: translateY(calc(var(--i) * 8px)) scale(calc(1 - var(--i) * 0.012));
+          top: var(--stack-top);
+          margin-top: calc(var(--i) * -1 * var(--stack-overlap));
+          transform: translateY(calc(var(--i) * var(--stack-gap))) scale(calc(1 - var(--i) * 0.012));
+          min-height: var(--card-min);
           transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
           will-change: transform;
           z-index: calc(100 - var(--i));
         }
         @media (max-width: 768px) {
-          .scroll-card {
-            top: 120px;
-            margin-top: calc(var(--i) * -90px);
-            transform: translateY(calc(var(--i) * 5px)) scale(calc(1 - var(--i) * 0.01));
-          }
           .scroll-stack {
-            padding-top: 140px;
-            padding-bottom: 160px;
-            min-height: 1600px;
+            --stack-top: 120px;
+            --stack-gap: 10px;
+            --stack-overlap: 110px;
+            --card-min: 200px;
+            padding-top: calc(var(--stack-top) + var(--stack-overlap));
+            padding-bottom: calc(var(--stack-top) + var(--stack-overlap) + 120px);
+            min-height: 2000px;
+          }
+          .scroll-card {
+            transform: translateY(calc(var(--i) * var(--stack-gap))) scale(calc(1 - var(--i) * 0.012));
           }
         }
       `}</style>
