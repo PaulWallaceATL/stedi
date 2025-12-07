@@ -1,400 +1,244 @@
 "use client";
 
+import { Environment, OrbitControls, TorusKnot } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import gsap from "gsap";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import * as THREE from "three";
 
-type PanelState = {
-  loading: boolean;
-  response: string | null;
-  error?: string;
-};
+type MeshRef = THREE.Mesh | null;
 
-type ProxyPayload = {
-  path: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  idempotencyKey?: string;
-  body?: unknown;
-};
+function HeroKnot() {
+  const ref = useRef<MeshRef>(null);
+  useFrame((_, delta) => {
+    if (ref.current) {
+      ref.current.rotation.x += delta * 0.25;
+      ref.current.rotation.y += delta * 0.2;
+    }
+  });
+  return (
+    <TorusKnot ref={ref} args={[1, 0.35, 150, 32]} scale={1.4}>
+      <meshStandardMaterial
+        color="#22d3ee"
+        emissive="#0ea5e9"
+        emissiveIntensity={0.7}
+        roughness={0.2}
+        metalness={0.6}
+      />
+    </TorusKnot>
+  );
+}
 
-const toPretty = (value: unknown) => JSON.stringify(value, null, 2);
-
-const sampleEligibility = {
-  tradingPartnerServiceId: "60054",
-  provider: { organizationName: "Provider Name", npi: "1999999984" },
-  subscriber: { firstName: "John", lastName: "Doe", memberId: "AETNA9wcSu" },
-  dependents: [{ firstName: "Jordan", lastName: "Doe", dateOfBirth: "20010714" }],
-  encounter: { serviceTypeCodes: ["30"] },
-};
-
-const sampleClaim837P = {
-  controlNumber: "00001234",
-  tradingPartnerId: "STEDI",
-  usageIndicator: "T", // test indicator to avoid live payer submission
-  billingProvider: {
-    npi: "1234567890",
-    taxId: "987654321",
-    name: "Demo Clinic",
-    address: {
-      line1: "123 Main St",
-      city: "Nashville",
-      state: "TN",
-      postalCode: "37201",
-    },
-  },
-  subscriber: {
-    id: "W000000000",
-    firstName: "JANE",
-    lastName: "DOE",
-    dateOfBirth: "1970-01-01",
-    relationship: "self",
-  },
-  patient: {
-    firstName: "JANE",
-    lastName: "DOE",
-    dateOfBirth: "1970-01-01",
-  },
-  claim: {
-    patientControlNumber: "PCN-12345",
-    totalChargeAmount: "240.00",
-    placeOfServiceCode: "11",
-    diagnosisCodes: ["M542", "R519"],
-    serviceLines: [
-      {
-        procedureCode: "99213",
-        modifiers: ["25"],
-        chargeAmount: "180.00",
-        unitCount: 1,
-        diagnosisPointers: [1],
-        serviceDate: "2025-01-05",
-      },
-      {
-        procedureCode: "97110",
-        modifiers: ["GP"],
-        chargeAmount: "60.00",
-        unitCount: 1,
-        diagnosisPointers: [2],
-        serviceDate: "2025-01-05",
-      },
-    ],
-  },
-};
-
-const sampleClaimStatus276 = {
-  tradingPartnerId: "MOCKPAYER",
-  claim: {
-    providerClaimNumber: "PCN-12345",
-    payerClaimControlNumber: "PAYER-CTRL-999",
-  },
-  subscriber: {
-    id: "W000000000",
-    firstName: "JANE",
-    lastName: "DOE",
-    dateOfBirth: "1970-01-01",
-  },
-  patient: {
-    firstName: "JANE",
-    lastName: "DOE",
-    dateOfBirth: "1970-01-01",
-  },
-};
-
-const sampleEra835 = {
-  transactionId: "replace-with-835-transaction-id",
-  format: "json",
-};
-
-const sampleAttachment275 = {
-  tradingPartnerId: "MOCKPAYER",
-  controlNumber: "ATT-0001",
-  claim: {
-    patientControlNumber: "PCN-12345",
-    payerClaimControlNumber: "PAYER-CTRL-999",
-  },
-  attachments: [
-    {
-      type: "EB",
-      description: "X-ray for tooth 14",
-      contentType: "application/pdf",
-      content: "<base64-encoded-file>",
-    },
-  ],
-};
-
-const panelOrder = [
-  {
-    id: "eligibility",
-    title: "Eligibility & Benefits (270/271)",
-    description:
-      "Validate coverage, copay/coinsurance, frequency and age limits before scheduling or billing.",
-    defaultPath: "/2024-04-01/change/medicalnetwork/eligibility/v3",
-    sample: sampleEligibility,
-    docHint: "Use test key + approved test members in Stedi docs.",
-  },
-  {
-    id: "claim",
-    title: "Clean Claim Builder (837P)",
-    description:
-      "Generate a scrubbed professional claim with payer-aware modifiers, POS, diagnosis pointers, and totals.",
-    defaultPath: "/2023-10-01/claims/submit/professional",
-    sample: sampleClaim837P,
-    docHint: "Send in test mode to receive 999 + 277CA loopbacks.",
-  },
-  {
-    id: "status",
-    title: "Claim Status (276/277 + 277CA)",
-    description:
-      "Track acceptance, pends, and denials. Great for ML labeling of rejection vs denial patterns.",
-    defaultPath: "/2023-10-01/claim-status",
-    sample: sampleClaimStatus276,
-    docHint: "Poll until a 277/277CA is ready; use payer control numbers if present.",
-  },
-  {
-    id: "remit",
-    title: "Remittance & Denial Learning (835)",
-    description:
-      "Pull ERAs to learn CARC/RARC patterns and automate write-offs or appeals.",
-    defaultPath: "/2023-10-01/reports/835",
-    sample: sampleEra835,
-    docHint: "Use transactionId from claims list or webhook payload.",
-  },
-  {
-    id: "attachments",
-    title: "Appeal Attachments (275)",
-    description:
-      "Send narratives, imaging, or EOBs for appeals or secondary billing.",
-    defaultPath: "/2023-10-01/attachments/submit",
-    sample: sampleAttachment275,
-    docHint: "Most payers expect PDF; include CARC/RARC context in your note.",
-  },
+const bullets = [
+  "Real-time eligibility (270/271) with payer guardrails",
+  "Clean claims (837P) with payer-aware modifiers & POS",
+  "Status tracking (276/277) + structural 999/277CA checks",
+  "Remits (835) + denial learning for auto-fix & appeals",
+  "Attachments (275) with narrative, imaging, EOBs",
+  "6–12 months of historical claims to tune denial prevention",
 ];
 
-export default function Home() {
-  const [results, setResults] = useState<Record<string, PanelState>>(
-    Object.fromEntries(
-      panelOrder.map((panel) => [
-        panel.id,
-        { loading: false, response: null, error: undefined },
-      ]),
-    ),
-  );
+const workflow = [
+  "Ingest patient, subscriber, encounter, provider, schedule, and historical claims",
+  "Run eligibility to surface coverage, copay, coinsurance, frequency, and plan rules",
+  "Generate scrubbed 837P with ICD-10 ↔ CPT pointers, POS, units/time, modifiers",
+  "Pre-submit ML validation to predict denials and request missing documentation",
+  "Submit via Stedi; collect 999/277CA/277 status and push to EMR",
+  "Parse 835s to learn CARC/RARC patterns, write-offs, and appeal viability",
+  "Automate appeals with 275 attachments and specialty-specific narratives",
+];
 
-  const [paths, setPaths] = useState<Record<string, string>>(
-    Object.fromEntries(panelOrder.map((panel) => [panel.id, panel.defaultPath])),
-  );
+export default function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
 
-  const [payloads, setPayloads] = useState<Record<string, string>>(
-    Object.fromEntries(panelOrder.map((panel) => [panel.id, toPretty(panel.sample)])),
-  );
-
-  const [idempotencyKey, setIdempotencyKey] = useState<string>("");
-
-  const updateResult = (id: string, partial: Partial<PanelState>) => {
-    setResults((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], ...partial },
-    }));
-  };
-
-  const callProxy = async (panelId: string) => {
-    try {
-      updateResult(panelId, { loading: true, error: undefined, response: null });
-      const parsed = JSON.parse(payloads[panelId] || "{}");
-
-      const proxyBase =
-        process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "") || "";
-      const endpoint = proxyBase
-        ? `${proxyBase}/proxy`
-        : "/api/stedi/proxy";
-
-      const payload: ProxyPayload = {
-        path: paths[panelId],
-        method: "POST",
-        idempotencyKey: idempotencyKey.trim() || undefined,
-        body: parsed,
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
+    tl.from(heroRef.current, { y: 40, opacity: 0, duration: 0.8 })
+      .from(statsRef.current?.children || [], {
+        y: 20,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.4,
       });
+  }, []);
 
-      const data = await res.json();
-      updateResult(panelId, {
-        loading: false,
-        response: toPretty(data),
-        error: res.ok ? undefined : "Stedi returned an error (see payload)",
-      });
-    } catch (error) {
-      updateResult(panelId, {
-        loading: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  };
-
-  const header = useMemo(
+  const heroCopy = useMemo(
     () => ({
-      title: "Clinix AI — Stedi Workbench",
+      title: "Clinix AI — Claims Intelligence & Automated Billing",
       subtitle:
-        "Enter claim + eligibility data, hit Stedi testbeds, and ship to production when you drop real keys into Vercel env vars.",
+        "Eligibility checks, clean claims, denial learning, and Stedi-powered submission & remittance. A self-improving billing layer that plugs into any EMR.",
     }),
     [],
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-50">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
-        <header className="flex flex-col gap-3">
-          <p className="text-sm font-medium text-emerald-400">
-            Eligibility • 837P • 276/277 • 835 • 275
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {header.title}
-          </h1>
-          <p className="max-w-4xl text-base text-slate-200">
-            {header.subtitle} Auth is handled server-side via `STEDI_API_KEY`
-            (no client secrets). Set `STEDI_BASE_URL` if you need a non-default
-            region.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/mocks"
-              className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400"
-            >
-              View Stedi mock payloads
-            </Link>
-            <Link
-              href="/rag"
-              className="inline-flex items-center justify-center rounded-full bg-indigo-400 px-4 py-2 text-sm font-semibold text-black transition hover:bg-indigo-300"
-            >
-              Test RAG scrubber
-            </Link>
-            <Link
-              href="/api/stedi/mock"
-              className="text-sm text-emerald-300 underline underline-offset-4 hover:text-emerald-200"
-            >
-              Raw mock JSON
-            </Link>
-          </div>
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-200">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-semibold text-white">Environment tips</span>
-              <span className="text-xs text-slate-300">
-                Stedi test keys work only with approved test payloads. Use
-                Idempotency-Key to safely retry.
-              </span>
-            </div>
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-              <label className="text-xs uppercase tracking-wide text-slate-400">
-                Optional Idempotency-Key
-              </label>
-              <input
-                className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
-                placeholder="uuid-v4 here for retries"
-                value={idempotencyKey}
-                onChange={(e) => setIdempotencyKey(e.target.value)}
-              />
-            </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {panelOrder.map((panel) => {
-            const state = results[panel.id];
-            return (
-              <section
-                key={panel.id}
-                className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-emerald-500/10"
+    <main className="min-h-screen bg-black text-slate-50">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(52,211,153,0.12),transparent_32%)]" />
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:py-24">
+          <div className="relative z-10 space-y-6" ref={heroRef}>
+            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
+              Eligibility • Clean Claims • Status • Remits • Appeals
+            </p>
+            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
+              {heroCopy.title}
+            </h1>
+            <p className="max-w-2xl text-lg text-slate-200">{heroCopy.subtitle}</p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/api"
+                className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-black shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"
               >
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-xl font-semibold text-white">
-                    {panel.title}
-                  </h2>
-                  <p className="text-sm text-slate-200">{panel.description}</p>
-                  <p className="text-xs text-emerald-300">{panel.docHint}</p>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-300">
-                    Stedi API path
-                  </label>
-                  <input
-                    className="w-full rounded border border-white/10 bg-black/40 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/40 focus:ring"
-                    value={paths[panel.id]}
-                    onChange={(e) =>
-                      setPaths((prev) => ({ ...prev, [panel.id]: e.target.value }))
-                    }
-                    placeholder="/2023-10-01/eligibility-check"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-slate-300">
-                      Payload (JSON)
-                    </label>
-                    <button
-                      type="button"
-                      className="text-xs text-emerald-300 underline-offset-4 hover:underline"
-                      onClick={() =>
-                        navigator.clipboard?.writeText(payloads[panel.id] || "")
-                      }
-                    >
-                      Copy
-                    </button>
-                  </div>
-                  <textarea
-                    className="h-52 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-slate-50 outline-none ring-emerald-400/40 focus:ring"
-                    value={payloads[panel.id]}
-                    onChange={(e) =>
-                      setPayloads((prev) => ({ ...prev, [panel.id]: e.target.value }))
-                    }
-                    spellCheck={false}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <button
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition hover:bg-emerald-400 disabled:opacity-70"
-                    disabled={state?.loading}
-                    onClick={() => callProxy(panel.id)}
-                  >
-                    {state?.loading ? "Sending..." : "Send to Stedi"}
-                  </button>
-                  {state?.error && (
-                    <p className="text-xs text-rose-300">Error: {state.error}</p>
-                  )}
-                  {state?.response && (
-                    <pre className="max-h-56 overflow-auto rounded-lg border border-white/10 bg-black/60 p-3 text-xs text-slate-100">
-                      {state.response}
-                    </pre>
-                  )}
-                </div>
-              </section>
-            );
-          })}
+                Launch API Workbench
+              </Link>
+              <Link
+                href="#workflow"
+                className="rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                See the workflow
+              </Link>
+            </div>
+            <div
+              ref={statsRef}
+              className="grid grid-cols-2 gap-3 text-sm text-slate-200 sm:grid-cols-3"
+            >
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-2xl font-semibold text-white">270/271</p>
+                <p className="text-xs uppercase tracking-wide text-emerald-300">
+                  Eligibility with guardrails
+                </p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-2xl font-semibold text-white">837P</p>
+                <p className="text-xs uppercase tracking-wide text-emerald-300">
+                  Clean claim automation
+                </p>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="text-2xl font-semibold text-white">835</p>
+                <p className="text-xs uppercase tracking-wide text-emerald-300">
+                  Denial learning & appeals
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="relative h-[420px] rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl shadow-emerald-500/20">
+            <Canvas camera={{ position: [0, 0, 4] }}>
+              <ambientLight intensity={0.6} />
+              <directionalLight position={[4, 4, 4]} intensity={1} />
+              <HeroKnot />
+              <Environment preset="city" />
+              <OrbitControls enableZoom={false} enablePan={false} />
+            </Canvas>
+            <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/10" />
+          </div>
         </div>
+      </section>
 
-        <footer className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-200">
-          <p className="font-semibold text-white">Ship steps</p>
-          <ol className="mt-3 list-decimal space-y-1 pl-6">
-            <li>
-              Add Vercel env vars: `STEDI_API_KEY` (required) and optionally
-              `STEDI_BASE_URL` for non-default regions.
-            </li>
-            <li>Use Stedi test keys + approved fixtures to validate each flow.</li>
-            <li>
-              Swap test key for production when ready; UI stays the same because
-              the server proxy handles auth.
-            </li>
-            <li>
-              Extend ML layers around 277/835 responses using the response JSON shown
-              here.
-            </li>
-          </ol>
-        </footer>
-      </div>
-    </div>
+      <section id="workflow" className="border-b border-white/10 bg-gradient-to-b from-black to-slate-950">
+        <div className="mx-auto max-w-6xl px-6 py-16 space-y-6">
+          <p className="text-sm uppercase tracking-[0.22em] text-emerald-300">
+            End-to-end product workflow
+          </p>
+          <h2 className="text-3xl font-semibold">From eligibility to appeals</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {workflow.map((item, idx) => (
+              <div
+                key={item}
+                className="rounded-xl border border-white/10 bg-white/5 p-4 shadow-lg shadow-emerald-500/10"
+              >
+                <p className="text-xs font-semibold text-emerald-300">Step {idx + 1}</p>
+                <p className="mt-2 text-sm text-slate-100">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-black">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-2">
+          <div className="space-y-4">
+            <p className="text-sm uppercase tracking-[0.22em] text-emerald-300">
+              What powers denial prevention
+            </p>
+            <h3 className="text-2xl font-semibold text-white">
+              Learn from historical claims and real-time signals
+            </h3>
+            <p className="text-slate-200">
+              Clinix AI ingests 6–12 months of 837/835/276/277/270/271 plus EMR encounters to
+              map payer quirks, CARC/RARC patterns, frequency limits, and documentation needs.
+              Every submission sharpens the model and keeps staff out of rework.
+            </p>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {bullets.slice(0, 6).map((item) => (
+                <div
+                  key={item}
+                  className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-slate-100"
+                >
+                  <span className="mr-2 text-emerald-300">●</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <Link
+                href="/api"
+                className="rounded-full bg-white px-4 py-3 text-sm font-semibold text-black hover:bg-emerald-100"
+              >
+                Try the API workbench
+              </Link>
+              <Link
+                href="/rag"
+                className="rounded-full border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Explore RAG
+              </Link>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-emerald-500/10">
+            <h4 className="text-lg font-semibold text-white">X12 coverage</h4>
+            <ul className="mt-3 space-y-2 text-sm text-slate-100">
+              <li>837P/837I/837D — clean claim generation & submission</li>
+              <li>270/271 — eligibility with frequency/age limits surfaced</li>
+              <li>276/277/277CA — real-time status, rejection labeling</li>
+              <li>835 — remittance parsing, CARC/RARC learning</li>
+              <li>275 — attachments for appeals and secondary billing</li>
+              <li>999/997 — syntax and envelope validation early</li>
+              <li>278 — pre-auth where required</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="rounded-2xl border border-white/10 bg-gradient-to-r from-emerald-500/20 via-sky-500/10 to-transparent p-8 shadow-2xl shadow-emerald-500/20">
+            <h3 className="text-2xl font-semibold text-white">
+              Ready to reduce denials and automate your billing stack?
+            </h3>
+            <p className="mt-3 max-w-3xl text-slate-100">
+              Drop in your Stedi keys, hit the workbench, and plug the engine into your EMR.
+              Every 277 and 835 makes the model smarter—and your claims cleaner.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link
+                href="/api"
+                className="rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-black hover:bg-emerald-400"
+              >
+                Launch API workbench
+              </Link>
+              <Link
+                href="/mocks"
+                className="rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                View mock payloads
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
