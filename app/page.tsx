@@ -1,6 +1,6 @@
 "use client";
 
-import { Environment, OrbitControls, TorusKnot } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 import Link from "next/link";
@@ -9,33 +9,57 @@ import * as THREE from "three";
 
 type MeshRef = THREE.Mesh | null;
 
-function HeroKnot() {
+class HelixCurve extends THREE.Curve<THREE.Vector3> {
+  scale: number;
+  constructor(scale = 1) {
+    super();
+    this.scale = scale;
+  }
+  getPoint(t: number, optionalTarget = new THREE.Vector3()) {
+    const turns = 3.5;
+    const angle = 2 * Math.PI * turns * t;
+    const radius = 1;
+    const x = Math.cos(angle) * radius * this.scale;
+    const y = (t - 0.5) * 5 * this.scale;
+    const z = Math.sin(angle) * radius * this.scale;
+    return optionalTarget.set(x, y, z);
+  }
+}
+
+function HeroHelix() {
   const ref = useRef<MeshRef>(null);
+  const geometry = useMemo(
+    () => new THREE.TubeGeometry(new HelixCurve(1), 320, 0.12, 24, false),
+    [],
+  );
+  const material = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#22d3ee",
+        emissive: "#0ea5e9",
+        emissiveIntensity: 0.75,
+        roughness: 0.2,
+        metalness: 0.65,
+      }),
+    [],
+  );
+
   useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.rotation.x += delta * 0.25;
-      ref.current.rotation.y += delta * 0.2;
+      ref.current.rotation.y += delta * 0.3;
+      ref.current.rotation.x += delta * 0.15;
     }
   });
-  return (
-    <TorusKnot ref={ref} args={[1, 0.35, 150, 32]} scale={1.4}>
-      <meshStandardMaterial
-        color="#22d3ee"
-        emissive="#0ea5e9"
-        emissiveIntensity={0.7}
-        roughness={0.2}
-        metalness={0.6}
-      />
-    </TorusKnot>
-  );
+
+  return <mesh ref={ref} geometry={geometry} material={material} />;
 }
 
 const bullets = [
-  "Real-time eligibility (270/271) with payer guardrails",
-  "Clean claims (837P) with payer-aware modifiers & POS",
-  "Status tracking (276/277) + structural 999/277CA checks",
-  "Remits (835) + denial learning for auto-fix & appeals",
-  "Attachments (275) with narrative, imaging, EOBs",
+  "Real-time eligibility (270/271) with payer guardrails and plan rules",
+  "Clean claims (837P) with payer-aware modifiers, POS, units, and pointers",
+  "Status tracking (276/277 + 277CA) with rejection labeling",
+  "Remits (835) to learn CARC/RARC patterns and automate appeals",
+  "Attachments (275) with narratives, imaging, and primary EOBs",
   "6–12 months of historical claims to tune denial prevention",
 ];
 
@@ -49,9 +73,60 @@ const workflow = [
   "Automate appeals with 275 attachments and specialty-specific narratives",
 ];
 
+const playbooks = [
+  {
+    title: "Denial Defense",
+    points: [
+      "Frequency/age checks from 270/271",
+      "Modifier requirements by payer",
+      "Same-day conflict detection (exam + treatment)",
+      "Auto documentation prompts before submission",
+    ],
+  },
+  {
+    title: "Cash Flow Control",
+    points: [
+      "Expected allowable from historical 835s",
+      "Patient responsibility prediction",
+      "CARC/RARC clustering for root causes",
+      "Proactive secondary + attachment routing",
+    ],
+  },
+  {
+    title: "Appeal Automation",
+    points: [
+      "Auto-drafted narratives",
+      "275 attachments (PDF, imaging, EOB)",
+      "Payer-specific appeal formats",
+      "Overturn likelihood scoring",
+    ],
+  },
+];
+
+const spotlight = [
+  {
+    label: "Eligibility Guardrails",
+    copy: "Surfaced plan rules, copay/coinsurance, frequency limits, and prior-auth warnings from 270/271 to stop denials upstream.",
+  },
+  {
+    label: "Clean Claim Engine",
+    copy: "837P with payer-aware modifiers, POS validation, ICD ↔ CPT pointers, units/time sanity, and dual insurance routing.",
+  },
+  {
+    label: "Live Status + Remits",
+    copy: "276/277 + 277CA for real-time acceptance; 835 parsing to learn CARC/RARC patterns and trigger fixes or appeals.",
+  },
+  {
+    label: "Appeal Intelligence",
+    copy: "Template the right 275 attachments, narratives, and evidence; track overturn rates to prioritize what actually wins.",
+  },
+];
+
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
+  const playbookRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
@@ -61,7 +136,19 @@ export default function LandingPage() {
         opacity: 0,
         stagger: 0.08,
         duration: 0.4,
-      });
+      })
+      .from(playbookRef.current?.children || [], {
+        y: 18,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.4,
+      }, "-=0.2")
+      .from(spotlightRef.current?.children || [], {
+        y: 14,
+        opacity: 0,
+        stagger: 0.06,
+        duration: 0.35,
+      }, "-=0.2");
   }, []);
 
   const heroCopy = useMemo(
@@ -128,7 +215,7 @@ export default function LandingPage() {
             <Canvas camera={{ position: [0, 0, 4] }}>
               <ambientLight intensity={0.6} />
               <directionalLight position={[4, 4, 4]} intensity={1} />
-              <HeroKnot />
+              <HeroHelix />
               <Environment preset="city" />
               <OrbitControls enableZoom={false} enablePan={false} />
             </Canvas>
@@ -208,6 +295,73 @@ export default function LandingPage() {
               <li>999/997 — syntax and envelope validation early</li>
               <li>278 — pre-auth where required</li>
             </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-gradient-to-b from-slate-950 to-black">
+        <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
+              Playbooks
+            </p>
+            <h3 className="text-2xl font-semibold text-white">
+              Denials, cash flow, and appeals—handled by design
+            </h3>
+          </div>
+          <div
+            ref={playbookRef}
+            className="grid grid-cols-1 gap-4 md:grid-cols-3"
+          >
+            {playbooks.map((pb) => (
+              <div
+                key={pb.title}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-emerald-500/10"
+              >
+                <h4 className="text-lg font-semibold text-white">{pb.title}</h4>
+                <ul className="mt-3 space-y-2 text-sm text-slate-100">
+                  {pb.points.map((p) => (
+                    <li key={p} className="flex items-start gap-2">
+                      <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-black">
+        <div className="mx-auto max-w-6xl px-6 py-16 space-y-8">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm uppercase tracking-[0.18em] text-emerald-300">
+              Spotlight
+            </p>
+            <h3 className="text-2xl font-semibold text-white">
+              Built to stop denials before they start
+            </h3>
+            <p className="max-w-3xl text-slate-200">
+              Clinix AI combines Stedi rails, payer-specific rules, and ML signals from eligibility,
+              status, and remits. The result: fewer reworks, cleaner cash, and faster appeals.
+            </p>
+          </div>
+          <div
+            ref={spotlightRef}
+            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          >
+            {spotlight.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-emerald-500/10"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                  {item.label}
+                </p>
+                <p className="mt-2 text-sm text-slate-100">{item.copy}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
