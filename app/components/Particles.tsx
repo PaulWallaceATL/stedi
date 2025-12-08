@@ -123,7 +123,8 @@ const Particles: React.FC<ParticlesProps> = ({
     if (!container) return;
     const renderer = new Renderer({ dpr: pixelRatio, depth: false, alpha: true });
     const gl = renderer.gl;
-    container.appendChild(gl.canvas);
+    const canvas = gl.canvas as unknown as HTMLCanvasElement;
+    container.appendChild(canvas);
     gl.clearColor(0, 0, 0, 0);
     const camera = new Camera(gl, { fov: 15 });
     camera.position.set(0, 0, cameraDistance);
