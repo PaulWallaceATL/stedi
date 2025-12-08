@@ -3,6 +3,7 @@ declare module "ogl" {
     constructor(options?: any);
     gl: WebGLRenderingContext;
     setSize(width: number, height: number): void;
+    render(args: { scene: any; camera: any }): void;
   }
   export class Camera {
     constructor(gl: WebGLRenderingContext, options?: any);
