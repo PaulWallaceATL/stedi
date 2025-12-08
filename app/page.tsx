@@ -151,21 +151,21 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
+      {/* Hero */}
       <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950">
         <Particles
           className="absolute inset-0 z-0 opacity-85 pointer-events-none"
-          particleCount={420}
+          particleCount={380}
           particleColors={["#9bd9ff", "#7dd3fc", "#a5b4fc", "#e0f2fe"]}
-          particleSpread={14}
-          particleBaseSize={140}
-          sizeRandomness={1.0}
+          particleSpread={12}
+          particleBaseSize={120}
+          sizeRandomness={0.9}
           cameraDistance={20}
-          speed={0.08}
+          speed={0.06}
           alphaParticles
         />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 pt-28 pb-24 text-center sm:pt-32 sm:pb-28 lg:pt-36 lg:pb-32">
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 pt-32 pb-28 text-center sm:pt-36 sm:pb-32 lg:pt-40 lg:pb-36">
           <div className="space-y-7" ref={heroRef}>
             <span className="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-700 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200 shadow-sm shadow-sky-900/40 backdrop-blur">
               Eligibility • Claims • Status • Appeals

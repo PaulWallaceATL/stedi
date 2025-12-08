@@ -17,7 +17,8 @@
     "ogl": "^1.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "three": "^0.181.2"
+    "three": "^0.181.2",
+    "@supabase/supabase-js": "^2.45.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

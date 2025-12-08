@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
-import CardNav from "./components/CardNav";
+import TopNav from "./components/TopNav";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -55,15 +55,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${manrope.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
-        <CardNav
-          logo="/logo.png"
-          logoAlt="Clinix AI"
-          items={navItems}
-          baseColor="#0b1324"
-          menuColor="#e2e8f0"
-          buttonBgColor="#0ea5e9"
-          buttonTextColor="#0b1224"
-        />
+        <TopNav />
         {children}
       </body>
     </html>
