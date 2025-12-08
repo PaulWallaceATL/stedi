@@ -152,16 +152,16 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
-      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-transparent">
+      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950">
         <Particles
-          className="absolute inset-0 z-0 opacity-90 pointer-events-none"
-          particleCount={520}
-          particleColors={["#7dd3fc", "#38bdf8", "#a5b4fc", "#ffffff"]}
-          particleSpread={18}
-          particleBaseSize={200}
-          sizeRandomness={1.3}
-          cameraDistance={22}
-          speed={0.12}
+          className="absolute inset-0 z-0 opacity-85 pointer-events-none"
+          particleCount={420}
+          particleColors={["#9bd9ff", "#7dd3fc", "#a5b4fc", "#e0f2fe"]}
+          particleSpread={14}
+          particleBaseSize={140}
+          sizeRandomness={1.0}
+          cameraDistance={20}
+          speed={0.08}
           alphaParticles
         />
 

@@ -101,15 +101,15 @@ const fragment = /* glsl */ `
 `;
 
 const Particles: React.FC<ParticlesProps> = ({
-  particleCount = 480,
+  particleCount = 420,
   particleSpread = 14,
-  speed = 0.1,
+  speed = 0.08,
   particleColors,
   moveParticlesOnHover = true,
   particleHoverFactor = 1,
   alphaParticles = true,
-  particleBaseSize = 180,
-  sizeRandomness = 1.15,
+  particleBaseSize = 140,
+  sizeRandomness = 1.0,
   cameraDistance = 18,
   disableRotation = false,
   pixelRatio = typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1,
@@ -129,7 +129,6 @@ const Particles: React.FC<ParticlesProps> = ({
     canvas.style.left = "0";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    canvas.style.mixBlendMode = "screen";
     container.appendChild(canvas);
     gl.clearColor(0, 0, 0, 0);
     const camera = new Camera(gl, { fov: 15 });
