@@ -152,7 +152,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
-      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950">
+      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-transparent">
         <Particles
           className="absolute inset-0 z-0 opacity-90 pointer-events-none"
           particleCount={520}
@@ -194,23 +194,17 @@ export default function LandingPage() {
               ref={statsRef}
               className="mx-auto grid max-w-4xl grid-cols-1 gap-4 text-sm text-slate-200 sm:grid-cols-3"
             >
-              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 shadow-md shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60">
+              <div className="rounded-xl border border-slate-600/60 bg-slate-900/40 backdrop-blur p-5 shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-400/70">
                 <p className="text-2xl font-semibold text-white">270/271</p>
-                <p className="text-xs uppercase tracking-wide text-sky-200">
-                  Eligibility guardrails
-                </p>
+                <p className="text-xs uppercase tracking-wide text-sky-100">Eligibility guardrails</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 shadow-md shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60">
+              <div className="rounded-xl border border-slate-600/60 bg-slate-900/40 backdrop-blur p-5 shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-400/70">
                 <p className="text-2xl font-semibold text-white">837P</p>
-                <p className="text-xs uppercase tracking-wide text-sky-200">
-                  Clean claim automation
-                </p>
+                <p className="text-xs uppercase tracking-wide text-sky-100">Clean claim automation</p>
               </div>
-              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4 shadow-md shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60">
+              <div className="rounded-xl border border-slate-600/60 bg-slate-900/40 backdrop-blur p-5 shadow-lg shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-400/70">
                 <p className="text-2xl font-semibold text-white">835</p>
-                <p className="text-xs uppercase tracking-wide text-sky-200">
-                  Remits & appeals
-                </p>
+                <p className="text-xs uppercase tracking-wide text-sky-100">Remits & appeals</p>
               </div>
             </div>
           </div>

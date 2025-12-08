@@ -129,6 +129,7 @@ const Particles: React.FC<ParticlesProps> = ({
     canvas.style.left = "0";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
+    canvas.style.mixBlendMode = "screen";
     container.appendChild(canvas);
     gl.clearColor(0, 0, 0, 0);
     const camera = new Camera(gl, { fov: 15 });
