@@ -5,6 +5,7 @@ const navItems = [
   { href: "/api", label: "API Workbench" },
   { href: "/rag", label: "RAG" },
   { href: "/mocks", label: "Mocks" },
+  { href: "/analytics", label: "Analytics" },
 ];
 
 export default function NavBar() {
