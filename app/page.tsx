@@ -153,7 +153,7 @@ export default function LandingPage() {
     <main className="min-h-screen bg-slate-950 text-slate-100">
       {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
       <section
-        className="relative overflow-hidden border-b border-slate-900"
+        className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px]"
         style={{
           background:
             "radial-gradient(140% 120% at 0% 0%, rgba(59,130,246,0.20), rgba(5,7,12,0)), radial-gradient(120% 120% at 100% 20%, rgba(14,165,233,0.18), rgba(5,7,12,0)), radial-gradient(120% 120% at 70% 80%, rgba(6,182,212,0.12), rgba(5,7,12,0)), #05070c",
@@ -412,7 +412,7 @@ export default function LandingPage() {
             {spotlight.map((item, idx) => (
               <div
                 key={item.label}
-                className={`rounded-2xl border p-6 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 min-h-[180px] ${
+                className={`rounded-2xl border p-6 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 min-h-[220px] ${
                   idx % 2 === 0 ? "border-sky-500/30 bg-slate-900/80" : "border-emerald-500/30 bg-slate-900/75"
                 }`}
               >
@@ -434,7 +434,7 @@ export default function LandingPage() {
             ].map((copy, i) => (
               <div
                 key={copy}
-                className={`rounded-xl border p-6 text-base shadow-md shadow-black/30 min-h-[140px] ${
+                className={`rounded-xl border p-6 text-base shadow-md shadow-black/30 min-h-[160px] ${
                   i % 2 === 0 ? "border-sky-500/25 bg-slate-900/70" : "border-emerald-500/25 bg-slate-900/70"
                 }`}
               >
