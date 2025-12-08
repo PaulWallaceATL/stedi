@@ -152,26 +152,18 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       {/* Hero with animated dark veil background (React Bits dark-veil inspired) */}
-      <section
-        className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px]"
-        style={{
-          background:
-            "radial-gradient(140% 120% at 0% 0%, rgba(59,130,246,0.20), rgba(5,7,12,0)), radial-gradient(120% 120% at 100% 20%, rgba(14,165,233,0.18), rgba(5,7,12,0)), radial-gradient(120% 120% at 70% 80%, rgba(6,182,212,0.12), rgba(5,7,12,0)), #05070c",
-        }}
-      >
+      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950">
         <Particles
-          className="absolute inset-0 z-0 opacity-70 pointer-events-none"
-          particleCount={260}
+          className="absolute inset-0 z-0 opacity-80 pointer-events-none"
+          particleCount={320}
           particleColors={["#7dd3fc", "#38bdf8", "#a5b4fc", "#ffffff"]}
-          particleSpread={12}
-          particleBaseSize={120}
-          sizeRandomness={1.1}
-          cameraDistance={22}
-          speed={0.12}
+          particleSpread={14}
+          particleBaseSize={140}
+          sizeRandomness={1.2}
+          cameraDistance={24}
+          speed={0.14}
           alphaParticles
         />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_32%),radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.04),transparent_30%)] mix-blend-screen opacity-80 veil-animate" />
-        <div className="pointer-events-none veil-animate-slow absolute inset-0 bg-[conic-gradient(from_120deg_at_30%_40%,rgba(59,130,246,0.08),transparent_30%),conic-gradient(from_240deg_at_70%_60%,rgba(14,165,233,0.06),transparent_32%)]" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 py-18 text-center sm:py-20 lg:py-24">
           <div className="space-y-7" ref={heroRef}>
