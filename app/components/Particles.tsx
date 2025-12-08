@@ -240,7 +240,13 @@ const Particles: React.FC<ParticlesProps> = ({
     particleColors,
   ]);
 
-  return <div ref={containerRef} className={`relative w-full h-full ${className || ""}`} />;
+  return (
+    <div
+      ref={containerRef}
+      className={`relative w-full h-full ${className || ""}`}
+      style={{ width: "100%", height: "100%" }}
+    />
+  );
 };
 
 export default Particles;

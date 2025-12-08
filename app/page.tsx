@@ -160,7 +160,7 @@ export default function LandingPage() {
         }}
       >
         <Particles
-          className="absolute inset-0 z-0 opacity-70"
+          className="absolute inset-0 z-0 opacity-70 pointer-events-none"
           particleCount={260}
           particleColors={["#7dd3fc", "#38bdf8", "#a5b4fc", "#ffffff"]}
           particleSpread={12}
@@ -372,7 +372,7 @@ export default function LandingPage() {
             {["Front desk guardrails", "Coder QA boosts", "Appeal accelerators"].map((label, i) => (
               <div
                 key={label}
-                className={`rounded-xl border p-4 text-sm shadow-md shadow-black/30 ${
+                className={`rounded-xl border p-6 text-base shadow-md shadow-black/30 min-h-[150px] ${
                   i % 2 === 0 ? "border-sky-500/30 bg-slate-900/70" : "border-emerald-500/30 bg-slate-900/70"
                 }`}
               >
@@ -412,7 +412,7 @@ export default function LandingPage() {
             {spotlight.map((item, idx) => (
               <div
                 key={item.label}
-                className={`rounded-2xl border p-5 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 ${
+                className={`rounded-2xl border p-6 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 min-h-[180px] ${
                   idx % 2 === 0 ? "border-sky-500/30 bg-slate-900/80" : "border-emerald-500/30 bg-slate-900/75"
                 }`}
               >
@@ -434,7 +434,7 @@ export default function LandingPage() {
             ].map((copy, i) => (
               <div
                 key={copy}
-                className={`rounded-xl border p-4 text-sm shadow-md shadow-black/30 ${
+                className={`rounded-xl border p-6 text-base shadow-md shadow-black/30 min-h-[140px] ${
                   i % 2 === 0 ? "border-sky-500/25 bg-slate-900/70" : "border-emerald-500/25 bg-slate-900/70"
                 }`}
               >
