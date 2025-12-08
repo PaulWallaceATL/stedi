@@ -152,7 +152,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950">
+      <section className="relative overflow-hidden border-b border-slate-900 min-h-[720px] sm:min-h-[760px] lg:min-h-[820px] bg-slate-950 pt-10">
         <Particles
           className="absolute inset-0 z-0 opacity-85 pointer-events-none"
           particleCount={380}
