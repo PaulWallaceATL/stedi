@@ -220,8 +220,9 @@ const Particles: React.FC<ParticlesProps> = ({
         container.removeEventListener("mousemove", handleMouseMove);
       }
       cancelAnimationFrame(animationFrameId);
-      if (container.contains(gl.canvas)) {
-        container.removeChild(gl.canvas);
+      const cleanupCanvas = gl.canvas as unknown as HTMLCanvasElement;
+      if (container.contains(cleanupCanvas)) {
+        container.removeChild(cleanupCanvas);
       }
     };
   }, [
