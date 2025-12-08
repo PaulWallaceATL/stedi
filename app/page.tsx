@@ -4,6 +4,7 @@ import gsap from "gsap";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ScrollStack, { ScrollStackItem } from "./components/ScrollStack";
+import Particles from "./components/Particles";
 
 const bullets = [
   "Real-time eligibility (270/271) with payer guardrails and plan rules",
@@ -158,10 +159,21 @@ export default function LandingPage() {
             "radial-gradient(140% 120% at 0% 0%, rgba(59,130,246,0.20), rgba(5,7,12,0)), radial-gradient(120% 120% at 100% 20%, rgba(14,165,233,0.18), rgba(5,7,12,0)), radial-gradient(120% 120% at 70% 80%, rgba(6,182,212,0.12), rgba(5,7,12,0)), #05070c",
         }}
       >
+        <Particles
+          className="absolute inset-0 z-0 opacity-70"
+          particleCount={260}
+          particleColors={["#7dd3fc", "#38bdf8", "#a5b4fc", "#ffffff"]}
+          particleSpread={12}
+          particleBaseSize={120}
+          sizeRandomness={1.1}
+          cameraDistance={22}
+          speed={0.12}
+          alphaParticles
+        />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.06),transparent_32%),radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.04),transparent_30%)] mix-blend-screen opacity-80 veil-animate" />
         <div className="pointer-events-none veil-animate-slow absolute inset-0 bg-[conic-gradient(from_120deg_at_30%_40%,rgba(59,130,246,0.08),transparent_30%),conic-gradient(from_240deg_at_70%_60%,rgba(14,165,233,0.06),transparent_32%)]" />
 
-        <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 py-18 text-center sm:py-20 lg:py-24">
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 py-18 text-center sm:py-20 lg:py-24">
           <div className="space-y-7" ref={heroRef}>
             <span className="mx-auto inline-flex items-center gap-2 rounded-full border border-slate-700 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sky-200 shadow-sm shadow-sky-900/40 backdrop-blur">
               Eligibility • Claims • Status • Appeals
@@ -324,6 +336,10 @@ export default function LandingPage() {
             <h3 className="text-3xl font-semibold text-white sm:text-4xl">
               Denials, cash flow, and appeals—handled by design
             </h3>
+            <p className="max-w-3xl text-slate-300 text-lg">
+              Layered guidance for front-desk, coding, and revenue ops. Each playbook couples payer
+              rules, ML risk, and attachment prompts so teams ship cleaner claims without extra clicks.
+            </p>
           </div>
           <div
             ref={playbookRef}
@@ -334,7 +350,7 @@ export default function LandingPage() {
                 key={pb.title}
                 className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
               >
-                <h4 className="text-lg font-semibold text-white">{pb.title}</h4>
+                <h4 className="text-xl font-semibold text-white">{pb.title}</h4>
                 <ul className="mt-3 space-y-2 text-base text-slate-200">
                   {pb.points.map((p) => (
                     <li key={p} className="flex items-start gap-2">
@@ -343,6 +359,27 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
+                <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+                  <span>Live rules + prompts</span>
+                  <Link href="/analytics" className="text-sky-300 underline underline-offset-4">
+                    View signals
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {["Front desk guardrails", "Coder QA boosts", "Appeal accelerators"].map((label, i) => (
+              <div
+                key={label}
+                className={`rounded-xl border p-4 text-sm shadow-md shadow-black/30 ${
+                  i % 2 === 0 ? "border-sky-500/30 bg-slate-900/70" : "border-emerald-500/30 bg-slate-900/70"
+                }`}
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-300">{label}</p>
+                <p className="mt-2 text-slate-200">
+                  Surface payer edits, modifier hints, and attachment asks at the moment of data entry.
+                </p>
               </div>
             ))}
           </div>
@@ -364,22 +401,44 @@ export default function LandingPage() {
             </h3>
             <p className="max-w-3xl text-lg text-slate-200">
               Clinix AI combines Stedi rails, payer-specific rules, and ML signals from eligibility,
-              status, and remits. The result: fewer reworks, cleaner cash, and faster appeals.
+              status, and remits. The result: fewer reworks, cleaner cash, and faster appeals—with
+              traceability from 270 through 835.
             </p>
           </div>
           <div
             ref={spotlightRef}
             className="grid grid-cols-1 gap-4 md:grid-cols-2"
           >
-            {spotlight.map((item) => (
+            {spotlight.map((item, idx) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:border-sky-500/60"
+                className={`rounded-2xl border p-5 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 ${
+                  idx % 2 === 0 ? "border-sky-500/30 bg-slate-900/80" : "border-emerald-500/30 bg-slate-900/75"
+                }`}
               >
                 <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
                   {item.label}
                 </p>
                 <p className="mt-2 text-base text-slate-200">{item.copy}</p>
+                <p className="mt-3 text-xs text-slate-400">
+                  AI-backed guardrails, payer playbooks, and attachment prompts reduce back-and-forth.
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {[
+              "Audit trail: every ML prompt and payer rule is logged for compliance.",
+              "Attachment readiness: capture 275 artifacts before payer asks.",
+              "Revenue clarity: expected vs paid tracked with CARC/RARC clustering.",
+            ].map((copy, i) => (
+              <div
+                key={copy}
+                className={`rounded-xl border p-4 text-sm shadow-md shadow-black/30 ${
+                  i % 2 === 0 ? "border-sky-500/25 bg-slate-900/70" : "border-emerald-500/25 bg-slate-900/70"
+                }`}
+              >
+                {copy}
               </div>
             ))}
           </div>
