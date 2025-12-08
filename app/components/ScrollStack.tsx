@@ -40,9 +40,9 @@ interface ScrollStackProps {
 const ScrollStack: React.FC<ScrollStackProps> = ({
   children,
   className = "",
-  itemDistance = 100,
-  itemScale = 0.03,
-  itemStackDistance = 30,
+  itemDistance = 70,
+  itemScale = 0.02,
+  itemStackDistance = 50,
   stackPosition = "20%",
   scaleEndPosition = "10%",
   baseScale = 0.85,
@@ -102,7 +102,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 
       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
       const targetScale = baseScale + i * itemScale;
-      const scale = 1 - scaleProgress * (1 - targetScale);
+      const scale = Math.max(0.72, 1 - scaleProgress * (1 - targetScale));
       const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
 
       let blur = 0;
@@ -126,9 +126,9 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
 
       if (isPinned) {
-        translateY = scrollTop - cardTop + stackPositionPx + itemStackDistance * i;
+        translateY = (scrollTop - cardTop + stackPositionPx + itemStackDistance * i) * 0.92;
       } else if (scrollTop > pinEnd) {
-        translateY = pinEnd - cardTop + stackPositionPx + itemStackDistance * i;
+        translateY = (pinEnd - cardTop + stackPositionPx + itemStackDistance * i) * 0.92;
       }
 
       const newTransform = {

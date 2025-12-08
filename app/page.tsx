@@ -231,12 +231,19 @@ export default function LandingPage() {
             {workflow.map((item, idx) => (
               <ScrollStackItem
                 key={item}
-                itemClassName="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 md:p-7 min-h-[200px] md:min-h-[220px] text-left shadow-lg shadow-black/40"
+                itemClassName={`rounded-2xl border p-7 md:p-8 min-h-[230px] md:min-h-[250px] text-left shadow-lg shadow-black/40 ${
+                  idx % 2 === 0
+                    ? "border-sky-500/30 bg-slate-900/80"
+                    : "border-emerald-500/25 bg-slate-900/70"
+                }`}
               >
-                <p className="text-xs font-semibold uppercase tracking-wide text-sky-200">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-200">
                   Step {idx + 1}
                 </p>
-                <p className="mt-2 text-base text-slate-200">{item}</p>
+                <p className="mt-3 text-xl font-semibold text-white">{item}</p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Upstream validation, payer-specific rules, and ML prompts keep this step clean.
+                </p>
               </ScrollStackItem>
             ))}
           </ScrollStack>
