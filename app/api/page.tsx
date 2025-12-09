@@ -1,4 +1,3 @@
-export { default } from "../workbench/page";
 "use client";
 
 import Link from "next/link";
