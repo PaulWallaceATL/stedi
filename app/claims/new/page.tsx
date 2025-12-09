@@ -210,6 +210,14 @@ export default function NewClaimPage() {
       return;
     }
 
+    const patientName = (draft.patient.name || "").trim() || null;
+    const payerName = (draft.insurance.payerName || "").trim() || null;
+    const dateOfService =
+      draft.serviceLines.find((l) => l.from)?.from ||
+      draft.serviceLines[0]?.from ||
+      draft.serviceLines[0]?.to ||
+      null;
+
     const payload = {
       patient: draft.patient,
       insurance: draft.insurance,
@@ -222,10 +230,15 @@ export default function NewClaimPage() {
 
     const { error: err } = await supabase.from("claims").insert({
       user_id: userId,
+      patient_name: patientName,
+      payer_name: payerName,
+      date_of_service: dateOfService,
       trading_partner_name: draft.provider.billingProvider,
       trading_partner_service_id: draft.provider.billingNpi,
       claim_charge_amount: totalCharge || null,
+      total_charge: totalCharge || null,
       status: "draft",
+      service_line_count: draft.serviceLines.length || null,
       payload,
     });
     if (err) setError(err.message);

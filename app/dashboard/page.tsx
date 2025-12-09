@@ -6,10 +6,15 @@ import { supabase } from "@/lib/supabaseClient";
 
 type ClaimRow = {
   id: string;
+  patient_name?: string | null;
+  payer_name?: string | null;
   trading_partner_name?: string | null;
   trading_partner_service_id?: string | null;
   status?: string | null;
   claim_charge_amount?: number | null;
+  total_charge?: number | null;
+  date_of_service?: string | null;
+  service_line_count?: number | null;
   created_at?: string | null;
   payload?: any;
 };
@@ -20,6 +25,7 @@ function currency(value?: number | null) {
 }
 
 function derivePatientName(claim: ClaimRow) {
+  if (claim.patient_name) return claim.patient_name;
   const payload = claim.payload || {};
   const patient = payload.patient;
   const subscriber = payload.subscriber;
@@ -33,10 +39,12 @@ function derivePatientName(claim: ClaimRow) {
 }
 
 function deriveDateOfService(claim: ClaimRow) {
+  const date = claim.date_of_service;
   const payload = claim.payload || {};
   const firstLine = payload.claim?.serviceLines?.[0];
-  const date = firstLine?.serviceDate || payload.date_of_service || claim.created_at;
-  return date ? new Date(date).toLocaleDateString() : "—";
+  const fallback = firstLine?.serviceDate || payload.date_of_service || claim.created_at;
+  const value = date || fallback;
+  return value ? new Date(value).toLocaleDateString() : "—";
 }
 
 function deriveStatusMeta(status?: string | null) {
@@ -91,7 +99,9 @@ export default function DashboardPage() {
       }
       const { data: rows, error } = await supabase
         .from("claims")
-        .select("id, user_id, trading_partner_name, trading_partner_service_id, status, claim_charge_amount, created_at, payload")
+        .select(
+          "id, user_id, patient_name, payer_name, trading_partner_name, trading_partner_service_id, status, claim_charge_amount, total_charge, date_of_service, service_line_count, created_at, payload",
+        )
         .eq("user_id", uid)
         .order("created_at", { ascending: false });
       if (!mounted) return;
@@ -122,7 +132,7 @@ export default function DashboardPage() {
         needsAttention: 0,
       };
     }
-    const totalCharges = claims.reduce((sum, c) => sum + (Number(c.claim_charge_amount) || 0), 0);
+    const totalCharges = claims.reduce((sum, c) => sum + (Number(c.total_charge ?? c.claim_charge_amount) || 0), 0);
     const accepted = claims.filter((c) => deriveStatusMeta(c.status).tone === "success").length;
     const submitted = claims.filter((c) => deriveStatusMeta(c.status).tone === "primary").length;
     const deniedOrAttention = claims.filter((c) => deriveStatusMeta(c.status).tone === "danger").length;
