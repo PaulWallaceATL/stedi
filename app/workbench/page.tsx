@@ -228,6 +228,68 @@ export default function Workbench() {
     }));
   };
 
+  const updateLinkedFromClaim = (claimPayload: any) => {
+    const firstLine = claimPayload?.claimInformation?.serviceLines?.[0];
+    const svcDate = firstLine?.serviceDate;
+    setPayloads((prev) => {
+      const next = { ...prev };
+      // Claim Status v2 auto-fill
+      try {
+        const baseStatus =
+          (prev.claimstatusv2 && JSON.parse(prev.claimstatusv2)) || sampleClaimStatusV2;
+        next.claimstatusv2 = toPretty({
+          ...baseStatus,
+          tradingPartnerServiceId:
+            claimPayload?.tradingPartnerServiceId || baseStatus.tradingPartnerServiceId,
+          providers: [
+            {
+              ...(baseStatus.providers?.[0] || {}),
+              npi: claimPayload?.billing?.npi || baseStatus.providers?.[0]?.npi,
+              organizationName:
+                claimPayload?.billing?.organizationName || baseStatus.providers?.[0]?.organizationName,
+              providerType: "BillingProvider",
+            },
+          ],
+          subscriber: {
+            ...(baseStatus.subscriber || {}),
+            memberId: claimPayload?.subscriber?.memberId || baseStatus.subscriber?.memberId,
+            firstName: claimPayload?.subscriber?.firstName || baseStatus.subscriber?.firstName,
+            lastName: claimPayload?.subscriber?.lastName || baseStatus.subscriber?.lastName,
+            dateOfBirth:
+              (claimPayload?.subscriber?.dateOfBirth || "").replace(/-/g, "") ||
+              baseStatus.subscriber?.dateOfBirth,
+          },
+          encounter: {
+            ...(baseStatus.encounter || {}),
+            beginningDateOfService: svcDate || baseStatus.encounter?.beginningDateOfService,
+            endDateOfService: svcDate || baseStatus.encounter?.endDateOfService,
+          },
+        });
+      } catch {
+        // ignore auto-fill errors
+      }
+
+      // Attachments v3 auto-fill
+      try {
+        next.attachments = toPretty({
+          ...(JSON.parse(prev.attachments || "{}") || sampleAttachment275),
+          tradingPartnerServiceId:
+            claimPayload?.tradingPartnerServiceId || sampleAttachment275.tradingPartnerServiceId,
+          claim: {
+            patientControlNumber:
+              claimPayload?.claimInformation?.patientControlNumber ||
+              sampleAttachment275.claim.patientControlNumber,
+            payerClaimControlNumber: sampleAttachment275.claim.payerClaimControlNumber,
+          },
+        });
+      } catch {
+        // ignore auto-fill errors
+      }
+
+      return next;
+    });
+  };
+
   const callProxy = async (panelId: string) => {
     try {
       updateResult(panelId, { loading: true, error: undefined, response: null });
@@ -259,6 +321,10 @@ export default function Workbench() {
         response: toPretty(data),
         error: res.ok ? undefined : "Stedi returned an error (see payload)",
       });
+
+      if (res.ok && panelId === "claim") {
+        updateLinkedFromClaim(parsed);
+      }
     } catch (error) {
       updateResult(panelId, {
         loading: false,
