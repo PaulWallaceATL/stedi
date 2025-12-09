@@ -289,6 +289,11 @@ export default function Workbench() {
 
   const proxyBase = process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "") || "";
   const usingProxy = Boolean(proxyBase);
+  const proxyAwarePanels: Record<string, string> = {
+    attachments: "/attachments",
+    ack277: "/transactions",
+    era835: "/transactions",
+  };
 
   const callProxy = async (panelId: string) => {
     try {
@@ -296,18 +301,23 @@ export default function Workbench() {
       const parsed = JSON.parse(payloads[panelId] || "{}");
 
       const endpoint = proxyBase ? `${proxyBase}/proxy` : "/api/stedi/proxy";
+      const directProxyPath = usingProxy ? proxyAwarePanels[panelId] : undefined;
+      const pathToUse = directProxyPath || paths[panelId];
+      const endpointToUse = directProxyPath ? `${proxyBase}${directProxyPath}` : endpoint;
 
       const panel = panelOrder.find((p) => p.id === panelId);
       const method = (panel?.method || "POST") as ProxyPayload["method"];
 
-      const payload: ProxyPayload = {
-        path: paths[panelId],
-        method,
-        idempotencyKey: idempotencyKey.trim() || undefined,
-        body: parsed,
-      };
+      const payload: ProxyPayload = directProxyPath
+        ? (parsed as any)
+        : {
+            path: pathToUse,
+            method,
+            idempotencyKey: idempotencyKey.trim() || undefined,
+            body: parsed,
+          };
 
-      const res = await fetch(endpoint, {
+      const res = await fetch(endpointToUse, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

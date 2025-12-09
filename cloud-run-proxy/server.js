@@ -172,6 +172,172 @@ Rules:
   }
 });
 
+// Core transactions list (server-side key)
+app.get("/transactions/list", async (_req, res) => {
+  try {
+    const apiKey = process.env.STEDI_API_KEY?.trim();
+    if (!apiKey) return res.status(500).json({ error: "STEDI_API_KEY not set" });
+
+    const url = "https://core.us.stedi.com/2023-08-01/transactions";
+    const upstream = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: apiKey, "User-Agent": "clinix-ai-stedi-proxy/1.0" },
+    });
+
+    const raw = await upstream.text();
+    let data = raw;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = raw || null;
+    }
+
+    return res.status(upstream.status).json({
+      ok: upstream.ok,
+      status: upstream.status,
+      statusText: upstream.statusText,
+      headers: Object.fromEntries(upstream.headers.entries()),
+      data,
+      raw,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || "Unexpected error" });
+  }
+});
+
+// Core transactions output (277/835) by transactionId
+app.post("/transactions", async (req, res) => {
+  try {
+    const { transactionId } = req.body || {};
+    if (!transactionId) return res.status(400).json({ error: "transactionId is required" });
+
+    const apiKey = process.env.STEDI_API_KEY?.trim();
+    if (!apiKey) return res.status(500).json({ error: "STEDI_API_KEY not set" });
+
+    const url = `https://core.us.stedi.com/2023-08-01/transactions/${transactionId}/output`;
+    const upstream = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: apiKey, "User-Agent": "clinix-ai-stedi-proxy/1.0" },
+      redirect: "manual",
+    });
+
+    const location = upstream.headers.get("location") || upstream.headers.get("Location");
+    if (upstream.status === 302 && location) {
+      return res.status(302).json({ documentDownloadUrl: location });
+    }
+
+    const raw = await upstream.text();
+    let data = raw;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = raw || null;
+    }
+
+    return res.status(upstream.status).json({
+      ok: upstream.ok,
+      status: upstream.status,
+      statusText: upstream.statusText,
+      headers: Object.fromEntries(upstream.headers.entries()),
+      data,
+      raw,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || "Unexpected error" });
+  }
+});
+
+// Attachments two-step helper (275)
+app.post("/attachments", async (req, res) => {
+  try {
+    const {
+      tradingPartnerServiceId,
+      controlNumber,
+      submitter,
+      receiver,
+      claim,
+      contentType,
+      fileName,
+      fileContent,
+      description,
+      type,
+    } = req.body || {};
+
+    const apiKey = process.env.STEDI_API_KEY?.trim();
+    if (!apiKey) return res.status(500).json({ error: "STEDI_API_KEY not set" });
+
+    if (!tradingPartnerServiceId || !controlNumber || !contentType || !fileName || !fileContent) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Step 1: create attachment metadata
+    const createRes = await fetch("https://claims.us.stedi.com/2025-03-07/claim-attachments/file", {
+      method: "POST",
+      headers: {
+        Authorization: apiKey,
+        "Content-Type": "application/json",
+        "User-Agent": "clinix-ai-stedi-proxy/1.0",
+      },
+      body: JSON.stringify({
+        tradingPartnerServiceId,
+        controlNumber,
+        submitter,
+        receiver,
+        claim,
+        contentType,
+        fileName,
+        description,
+        type,
+      }),
+    });
+
+    const createText = await createRes.text();
+    let createJson = createText;
+    try {
+      createJson = createText ? JSON.parse(createText) : null;
+    } catch {
+      createJson = createText || null;
+    }
+
+    if (!createRes.ok) {
+      return res.status(createRes.status).json({
+        error: "Create attachment failed",
+        status: createRes.status,
+        details: createJson,
+      });
+    }
+
+    const uploadUrl = createJson?.uploadUrl;
+    if (!uploadUrl) {
+      return res.status(500).json({ error: "Missing uploadUrl from attachment create response" });
+    }
+
+    // Step 2: upload file content to presigned URL
+    const uploadRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: Buffer.from(fileContent, "base64"),
+    });
+
+    if (!uploadRes.ok) {
+      const uploadText = await uploadRes.text();
+      return res.status(uploadRes.status).json({
+        error: "Upload failed",
+        status: uploadRes.status,
+        statusText: uploadRes.statusText,
+        details: uploadText,
+      });
+    }
+
+    return res.json({
+      attachmentId: createJson?.attachmentId,
+      upload: { status: uploadRes.status, statusText: uploadRes.statusText },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err?.message || "Unexpected error" });
+  }
+});
+
 app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
