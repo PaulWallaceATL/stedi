@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 
 type CardNavLink = {
@@ -201,13 +202,13 @@ const CardNav: React.FC<CardNavProps> = ({
             <span className="text-sm font-semibold text-slate-200">Clinix AI</span>
           </div>
 
-          <button
-            type="button"
+          <Link
+            href="/login"
             className="card-nav-cta-button hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
             style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
           >
             Get Started
-          </button>
+          </Link>
         </div>
 
         <div

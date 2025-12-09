@@ -72,10 +72,15 @@ export default function DashboardPage() {
   const [claims, setClaims] = useState<ClaimRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabaseMissing = !supabase;
 
   useEffect(() => {
     let mounted = true;
     const load = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data } = await supabase.auth.getSession();
       const uid = data.session?.user?.id || null;
       if (!mounted) return;
@@ -95,13 +100,13 @@ export default function DashboardPage() {
       setLoading(false);
     };
     load();
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+    const { data: sub } = supabase?.auth.onAuthStateChange((_evt, session) => {
       const uid = session?.user?.id || null;
       setUserId(uid);
       if (!uid) {
         setClaims([]);
       }
-    });
+    }) || { subscription: { unsubscribe: () => undefined } };
     return () => {
       mounted = false;
       sub?.subscription.unsubscribe();
@@ -128,6 +133,17 @@ export default function DashboardPage() {
       needsAttention: deniedOrAttention,
     };
   }, [claims]);
+
+  if (supabaseMissing) {
+    return (
+      <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-6">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-black/40 text-center space-y-4">
+          <p className="text-lg font-semibold text-white">Supabase environment variables are missing.</p>
+          <p className="text-sm text-slate-300">Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to view the dashboard.</p>
+        </div>
+      </main>
+    );
+  }
 
   if (!userId) {
     return (
