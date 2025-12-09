@@ -27,19 +27,19 @@ const sampleEligibility = {
 };
 
 const sampleClaim837Pv3 = {
-  controlNumber: "CLM-0001",
-  tradingPartnerServiceId: "STEDI",
+  controlNumber: "CLM-AETNA-001",
+  tradingPartnerServiceId: "60054",
   usageIndicator: "T",
   submitter: { organizationName: "Demo Clinic", contactInformation: { phoneNumber: "9999999999" } },
-  receiver: { organizationName: "STEDI" },
+  receiver: { organizationName: "AETNA" },
   billing: {
-    npi: "1234567893",
-    employerId: "111111111",
+    npi: "1999999984",
+    employerId: "123456789",
     organizationName: "Demo Clinic",
     address: { address1: "123 Main St", city: "Nashville", state: "TN", postalCode: "37201" },
   },
   subscriber: {
-    memberId: "W000000000",
+    memberId: "AETNA12345",
     firstName: "JANE",
     lastName: "DOE",
     dateOfBirth: "19700101",
@@ -52,13 +52,10 @@ const sampleClaim837Pv3 = {
     planParticipationCode: "A",
     benefitsAssignmentCertificationIndicator: "Y",
     releaseInformationCode: "Y",
-    patientControlNumber: "PCN-12345",
+    patientControlNumber: "PCN-AETNA-001",
     claimChargeAmount: "240.00",
     placeOfServiceCode: "11",
-    healthCareCodeInformation: [
-      { diagnosisTypeCode: "ABK", diagnosisCode: "M542" },
-      { diagnosisTypeCode: "ABF", diagnosisCode: "R519" },
-    ],
+    healthCareCodeInformation: [{ diagnosisTypeCode: "ABK", diagnosisCode: "M542" }],
     serviceLines: [
       {
         assignedNumber: "1",
@@ -82,7 +79,7 @@ const sampleClaim837Pv3 = {
           lineItemChargeAmount: "60.00",
           measurementUnit: "UN",
           serviceUnitCount: "1",
-          compositeDiagnosisCodePointers: [["2"]],
+          compositeDiagnosisCodePointers: [["1"]],
         },
         serviceDate: "20250105",
       },
@@ -174,7 +171,7 @@ const panelOrder = [
     title: "277 Acknowledgment (transactions API)",
     description: "Fetch 277CA/277 output by transactionId via core transactions API.",
     defaultPath: "/api/stedi/transactions",
-    sample: { transactionId: "dc134bcd-8bc4-4258-abae-aa76156d642a" },
+    sample: { transactionId: "" },
     docHint:
       "Uses server-side STEDI_API_KEY to fetch core transactions output. Replace transactionId as needed. Returns documentDownloadUrl for 302.",
     method: "POST",
@@ -324,6 +321,7 @@ export default function Workbench() {
 
       if (res.ok && panelId === "claim") {
         updateLinkedFromClaim(parsed);
+        await pollTransactions();
       }
     } catch (error) {
       updateResult(panelId, {
@@ -347,6 +345,8 @@ export default function Workbench() {
         era835: toPretty({ transactionId: inbound.transactionId }),
       }));
       updateResult("ack277", { response: toPretty({ info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId }) });
+      updateResult("era835", { response: toPretty({ info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId }) });
+      return inbound.transactionId as string;
     } catch (error) {
       updateResult("ack277", {
         error: error instanceof Error ? error.message : "Failed to poll transactions",
