@@ -350,7 +350,18 @@ export default function Workbench() {
 
       const res = await fetch(listEndpoint, { method: "GET" });
       const data = await res.json();
-      const items = data?.items || [];
+      if (!res.ok) {
+        updateResult("ack277", {
+          error: `Transactions list failed (${res.status})`,
+          response: toPretty(data),
+        });
+        updateResult("era835", {
+          error: `Transactions list failed (${res.status})`,
+          response: toPretty(data),
+        });
+        return;
+      }
+      const items = data?.data?.items || data?.items || [];
       // pick most recent X12->GuideJSON (likely 277/835)
       const inbound = items.find((t: any) => (t?.operation || "").includes("X12->GuideJSON"));
       if (!inbound?.transactionId) return;
@@ -493,10 +504,9 @@ export default function Workbench() {
                     <button
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:border-sky-500/60 disabled:opacity-60"
                       type="button"
-                      disabled={usingProxy}
                       onClick={pollTransactions}
                     >
-                      {usingProxy ? "Transactions polling disabled on proxy" : "Poll latest transactions"}
+                      {"Poll latest transactions"}
                     </button>
                   )}
                   {state?.error && (
