@@ -293,7 +293,7 @@ const CardNav: React.FC<CardNavProps> = ({
                   {initials || "ME"}
                 </button>
                 {profileMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-800 bg-slate-900/95 text-slate-100 shadow-xl shadow-black/40 p-2">
+                  <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-800 bg-slate-900/95 text-slate-100 shadow-xl shadow-black/40 p-2 z-50">
                     <div className="px-3 py-2 text-xs text-slate-300 border-b border-slate-800 mb-1">
                       {profile.full_name || profile.email}
                     </div>
