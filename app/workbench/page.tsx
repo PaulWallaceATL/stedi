@@ -332,9 +332,7 @@ export default function Workbench() {
 
       if (res.ok && panelId === "claim") {
         updateLinkedFromClaim(parsed);
-        if (!usingProxy) {
-          await pollTransactions();
-        }
+        await pollTransactions();
       }
     } catch (error) {
       updateResult(panelId, {
@@ -345,17 +343,12 @@ export default function Workbench() {
   };
 
   const pollTransactions = async () => {
-    if (usingProxy) {
-      updateResult("ack277", {
-        error: "Disabled while using Cloud Run proxy (local Next.js route only).",
-      });
-      updateResult("era835", {
-        error: "Disabled while using Cloud Run proxy (local Next.js route only).",
-      });
-      return;
-    }
     try {
-      const res = await fetch("/api/stedi/transactions/list", { method: "GET" });
+      const listEndpoint = usingProxy
+        ? `${proxyBase}/transactions/list`
+        : "/api/stedi/transactions/list";
+
+      const res = await fetch(listEndpoint, { method: "GET" });
       const data = await res.json();
       const items = data?.items || [];
       // pick most recent X12->GuideJSON (likely 277/835)
@@ -378,7 +371,6 @@ export default function Workbench() {
 
   // Periodic polling for transactions to auto-fill 277/835
   useEffect(() => {
-    if (usingProxy) return;
     const interval = setInterval(() => {
       void pollTransactions();
     }, 30000); // 30s
