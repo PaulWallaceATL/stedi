@@ -10,15 +10,28 @@ export default function ClaimDetailPage() {
   const id = params?.id as string;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const supabaseMissing = !supabase;
 
   useEffect(() => {
     const load = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       const { data: row } = await supabase.from("claims").select("*").eq("id", id).single();
       setData(row);
       setLoading(false);
     };
     if (id) load();
   }, [id]);
+
+  if (supabaseMissing) {
+    return (
+      <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center">
+        <p className="text-slate-300">Supabase environment variables are missing.</p>
+      </main>
+    );
+  }
 
   if (loading) {
     return (

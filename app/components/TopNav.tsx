@@ -13,11 +13,14 @@ type Profile = {
 export default function TopNav() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [open, setOpen] = useState(false);
+  const supabaseMissing = !supabase;
 
   useEffect(() => {
+    const client = supabase;
+    if (!client) return;
     let mounted = true;
     const loadSession = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await client.auth.getSession();
       const user = data.session?.user;
       if (mounted && user) {
         setProfile({
@@ -28,7 +31,7 @@ export default function TopNav() {
       }
     };
     loadSession();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = client.auth.onAuthStateChange((_event, session) => {
       const user = session?.user;
       setProfile(
         user
@@ -64,7 +67,15 @@ export default function TopNav() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          {!profile && (
+          {supabaseMissing && (
+            <Link
+              href="/login"
+              className="rounded-full bg-sky-500 px-4 py-2 text-xs font-semibold text-slate-950 shadow-md shadow-sky-500/40 transition hover:-translate-y-0.5 hover:bg-sky-400"
+            >
+              Get Started
+            </Link>
+          )}
+          {!supabaseMissing && !profile && (
             <Link
               href="/login"
               className="rounded-full bg-sky-500 px-4 py-2 text-xs font-semibold text-slate-950 shadow-md shadow-sky-500/40 transition hover:-translate-y-0.5 hover:bg-sky-400"
@@ -101,7 +112,9 @@ export default function TopNav() {
                     type="button"
                     className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-rose-200 hover:bg-slate-800"
                     onClick={async () => {
-                      await supabase.auth.signOut();
+                      if (supabase) {
+                        await supabase.auth.signOut();
+                      }
                       setOpen(false);
                       setProfile(null);
                     }}
