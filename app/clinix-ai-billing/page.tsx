@@ -1,7 +1,6 @@
 "use client";
 
-// Use explicit alias defined in next.config.ts (turbo.resolveAlias)
-import ClinixBillingApp from "@clinix/App";
+import ClinixBillingApp from "../../clinix-ai-billing/App";
 
 export default function ClinixBillingPage() {
   return <ClinixBillingApp />;
