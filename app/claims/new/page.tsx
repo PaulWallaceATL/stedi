@@ -27,18 +27,19 @@ type ClaimPayload = {
 };
 
 const steps = [
-  { id: 1, label: "Patient Information", status: "complete" as const },
-  { id: 2, label: "Payer & Insurance Details", status: "complete" as const },
-  { id: 3, label: "Provider & Facility", status: "current" as const },
-  { id: 4, label: "Diagnoses (ICD-10)", status: "upcoming" as const },
-  { id: 5, label: "Service Lines (CPT/HCPCS)", status: "upcoming" as const },
-  { id: 6, label: "Claim Summary & Submit", status: "upcoming" as const },
+  { id: 1, label: "Patient Information" },
+  { id: 2, label: "Payer & Insurance Details" },
+  { id: 3, label: "Provider & Facility" },
+  { id: 4, label: "Diagnoses (ICD-10)" },
+  { id: 5, label: "Service Lines (CPT/HCPCS)" },
+  { id: 6, label: "Claim Summary & Submit" },
 ];
 
 export default function NewClaimPage() {
   const [payload, setPayload] = useState<ClaimPayload>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState<number>(3);
   const router = useRouter();
 
   const supabaseMissing = !hasSupabaseEnv || !supabase;
@@ -87,8 +88,8 @@ export default function NewClaimPage() {
 
   return (
     <div className="bg-[#f6f7f8] text-[#111418]">
-      <header className="sticky top-0 z-20 w-full border-b border-gray-200 bg-white/85 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 w-full border-b border-gray-200 bg-white/90 backdrop-blur-md shadow-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center gap-3 py-4 text-gray-900">
             <span className="text-[#137fec]">
               <svg className="h-7 w-7" viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -117,32 +118,42 @@ export default function NewClaimPage() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
             <aside className="lg:col-span-3">
               <div className="sticky top-24 py-2">
-                <div className="flex flex-col gap-1 rounded-xl bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-                  {steps.map((step) => (
-                    <div
-                      key={step.id}
-                      className={`flex items-center gap-4 rounded-lg px-4 py-3 transition-colors duration-200 ${
-                        step.status === "current"
-                          ? "border border-[#137fec] bg-[#137fec]/5 text-[#137fec] font-semibold"
-                          : step.status === "complete"
-                            ? "text-gray-600 hover:bg-gray-50"
-                            : "text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      <span
-                        className={`material-symbols-outlined text-lg ${
-                          step.status === "complete"
-                            ? "text-green-500"
-                            : step.status === "current"
-                              ? "text-[#137fec]"
-                              : "text-gray-400"
+                <div className="flex flex-col gap-2 rounded-xl bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.08)] ring-1 ring-slate-200">
+                  {steps.map((step) => {
+                    const status =
+                      step.id === currentStep
+                        ? "current"
+                        : step.id < currentStep
+                          ? "complete"
+                          : "upcoming";
+                    return (
+                      <button
+                        key={step.id}
+                        type="button"
+                        onClick={() => setCurrentStep(step.id)}
+                        className={`group flex w-full items-center gap-4 rounded-lg px-4 py-3 text-left transition-colors duration-200 ${
+                          status === "current"
+                            ? "border border-[#137fec] bg-[#137fec]/8 text-[#0f3a71] font-semibold"
+                            : status === "complete"
+                              ? "text-gray-600 hover:bg-gray-50"
+                              : "text-gray-600 hover:bg-gray-50"
                         }`}
                       >
-                        {step.status === "complete" ? "check_circle" : `looks_${step.id}`}
-                      </span>
-                      <p className="text-base font-medium">{step.label}</p>
-                    </div>
-                  ))}
+                        <span
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-bold ${
+                            status === "current"
+                              ? "border-[#137fec] bg-white text-[#137fec]"
+                              : status === "complete"
+                                ? "border-green-500 bg-green-50 text-green-600"
+                                : "border-slate-300 bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {step.id}
+                        </span>
+                        <p className="text-base font-medium">{step.label}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </aside>
