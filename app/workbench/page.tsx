@@ -287,13 +287,14 @@ export default function Workbench() {
     });
   };
 
+  const proxyBase = process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "") || "";
+  const usingProxy = Boolean(proxyBase);
+
   const callProxy = async (panelId: string) => {
     try {
       updateResult(panelId, { loading: true, error: undefined, response: null });
       const parsed = JSON.parse(payloads[panelId] || "{}");
 
-      const proxyBase =
-        process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "") || "";
       const endpoint = proxyBase ? `${proxyBase}/proxy` : "/api/stedi/proxy";
 
       const panel = panelOrder.find((p) => p.id === panelId);
@@ -321,7 +322,9 @@ export default function Workbench() {
 
       if (res.ok && panelId === "claim") {
         updateLinkedFromClaim(parsed);
-        await pollTransactions();
+        if (!usingProxy) {
+          await pollTransactions();
+        }
       }
     } catch (error) {
       updateResult(panelId, {
@@ -332,6 +335,15 @@ export default function Workbench() {
   };
 
   const pollTransactions = async () => {
+    if (usingProxy) {
+      updateResult("ack277", {
+        error: "Disabled while using Cloud Run proxy (local Next.js route only).",
+      });
+      updateResult("era835", {
+        error: "Disabled while using Cloud Run proxy (local Next.js route only).",
+      });
+      return;
+    }
     try {
       const res = await fetch("/api/stedi/transactions/list", { method: "GET" });
       const data = await res.json();
@@ -356,11 +368,12 @@ export default function Workbench() {
 
   // Periodic polling for transactions to auto-fill 277/835
   useEffect(() => {
+    if (usingProxy) return;
     const interval = setInterval(() => {
       void pollTransactions();
     }, 30000); // 30s
     return () => clearInterval(interval);
-  }, []);
+  }, [usingProxy]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-50">
@@ -476,11 +489,12 @@ export default function Workbench() {
                   </button>
                   {panel.extraAction === "poll" && (
                     <button
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:border-sky-500/60"
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:border-sky-500/60 disabled:opacity-60"
                       type="button"
+                      disabled={usingProxy}
                       onClick={pollTransactions}
                     >
-                      Poll latest transactions
+                      {usingProxy ? "Transactions polling disabled on proxy" : "Poll latest transactions"}
                     </button>
                   )}
                   {state?.error && (
