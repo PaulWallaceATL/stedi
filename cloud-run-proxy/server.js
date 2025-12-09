@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-
-const seed = { rules: [], exemplars: [] };
+import seed from "./seed.json" assert { type: "json" };
 
 const app = express();
 app.use(cors());

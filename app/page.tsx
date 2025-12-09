@@ -184,6 +184,12 @@ export default function LandingPage() {
                 Launch API Workbench
               </Link>
               <Link
+                href="/workbench"
+                className="rounded-full border border-slate-700 bg-slate-900 px-6 py-3.5 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
+              >
+                Open proxy tester
+              </Link>
+              <Link
                 href="#workflow"
                 className="rounded-full border border-slate-700 bg-slate-900 px-6 py-3.5 text-sm font-semibold text-slate-100 shadow-sm transition hover:-translate-y-1 hover:border-sky-500/60 hover:text-white"
               >
