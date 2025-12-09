@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
-import TopNav from "./components/TopNav";
+import CardNav from "./components/CardNav";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -29,6 +29,7 @@ export default function RootLayout({
         { label: "API Workbench", href: "/api", ariaLabel: "API Workbench" },
         { label: "RAG", href: "/rag", ariaLabel: "RAG" },
         { label: "Mocks", href: "/mocks", ariaLabel: "Mocks" },
+        { label: "Dashboard", href: "/dashboard", ariaLabel: "Dashboard" },
       ],
     },
     {
@@ -36,7 +37,6 @@ export default function RootLayout({
       bgColor: "#0b1b2f",
       textColor: "#e0f2fe",
       links: [
-        { label: "Analytics", href: "/analytics", ariaLabel: "Analytics" },
         { label: "Claims pipeline", href: "/#workflow", ariaLabel: "Workflow" },
         { label: "Playbooks", href: "/#playbooks", ariaLabel: "Playbooks" },
       ],
@@ -47,7 +47,6 @@ export default function RootLayout({
       textColor: "#e2e8f0",
       links: [
         { label: "Docs", href: "/api", ariaLabel: "Docs" },
-        { label: "Status", href: "/analytics", ariaLabel: "Status" },
       ],
     },
   ];
@@ -55,7 +54,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${manrope.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
-        <TopNav />
+        <div className="relative z-40 pt-4">
+          <CardNav
+            logo="/favicon.ico"
+            logoAlt="Clinix AI"
+            items={navItems}
+            baseColor="#0b1324"
+            menuColor="#e2e8f0"
+            buttonBgColor="#0ea5e9"
+            buttonTextColor="#0b1224"
+          />
+        </div>
         {children}
       </body>
     </html>
