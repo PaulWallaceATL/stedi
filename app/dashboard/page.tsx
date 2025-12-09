@@ -181,9 +181,9 @@ export default function DashboardPage() {
 
   if (claims.length === 0) {
     return (
-      <main className="min-h-screen bg-[#f9f9f8] text-gray-900">
+      <main className="min-h-screen bg-[#f9f9f8] text-gray-900 pt-12">
         <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-16 text-center mt-6">
             <div className="space-y-3">
               <h1 className="text-4xl md:text-5xl font-black leading-tight tracking-tight text-gray-900">Create or Import a Claim</h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">

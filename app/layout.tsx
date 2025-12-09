@@ -26,6 +26,7 @@ export default function RootLayout({
       bgColor: "#0f172a",
       textColor: "#e2e8f0",
       links: [
+        { label: "Clinix Billing UI", href: "/clinix-ai-billing", ariaLabel: "Clinix billing experience" },
         { label: "API Workbench", href: "/api", ariaLabel: "API Workbench" },
         { label: "RAG", href: "/rag", ariaLabel: "RAG" },
         { label: "Mocks", href: "/mocks", ariaLabel: "Mocks" },
@@ -53,6 +54,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200"
+        />
+      </head>
       <body className={`${manrope.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
         <div className="relative z-40 pt-4">
           <CardNav

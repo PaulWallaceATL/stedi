@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
+import { hasSupabaseEnv, supabase } from "@/lib/supabaseClient";
 
 type CardNavLink = {
   label: string;
@@ -29,6 +30,12 @@ export interface CardNavProps {
   buttonTextColor?: string;
 }
 
+type Profile = {
+  id: string;
+  email?: string;
+  full_name?: string;
+};
+
 const ArrowIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path
@@ -52,11 +59,74 @@ const CardNav: React.FC<CardNavProps> = ({
   buttonBgColor = "#0ea5e9",
   buttonTextColor = "#0b1224",
 }) => {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setHydrated(true);
+    if (!supabase) return;
+
+    let active = true;
+    const load = async () => {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (!active) return;
+      setProfile(
+        user
+          ? {
+              id: user.id,
+              email: user.email || undefined,
+              full_name: user.user_metadata?.full_name,
+            }
+          : null,
+      );
+    };
+
+    load();
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setProfile(
+        user
+          ? {
+              id: user.id,
+              email: user.email || undefined,
+              full_name: user.user_metadata?.full_name,
+            }
+          : null,
+      );
+    });
+
+    return () => {
+      active = false;
+      sub?.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!dropdownRef.current) return;
+      if (!dropdownRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const initials = useMemo(() => {
+    if (!profile) return "";
+    const name = profile.full_name || profile.email || "";
+    const parts = name.trim().split(" ").filter(Boolean);
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }, [profile]);
 
   const calculateHeight = () => {
     const navEl = navRef.current;
@@ -202,13 +272,62 @@ const CardNav: React.FC<CardNavProps> = ({
             <span className="text-sm font-semibold text-slate-200">Clinix AI</span>
           </div>
 
-          <Link
-            href="/login"
-            className="card-nav-cta-button hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
-            style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
-          >
-            Get Started
-          </Link>
+          <div className="flex items-center gap-3 pr-1">
+            {(!hydrated || !hasSupabaseEnv || !profile) && (
+              <Link
+                href="/login"
+                className="card-nav-cta-button hidden md:inline-flex border-0 rounded-[calc(0.75rem-0.2rem)] px-4 items-center h-full font-medium cursor-pointer transition-colors duration-300"
+                style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+              >
+                Get Started
+              </Link>
+            )}
+            {hasSupabaseEnv && profile && (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((v) => !v)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-900 font-semibold shadow-md shadow-black/20 hover:shadow-lg transition"
+                >
+                  {initials || "ME"}
+                </button>
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-800 bg-slate-900/95 text-slate-100 shadow-xl shadow-black/40 p-2">
+                    <div className="px-3 py-2 text-xs text-slate-300 border-b border-slate-800 mb-1">
+                      {profile.full_name || profile.email}
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-800"
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/account"
+                      className="block rounded-lg px-3 py-2 text-sm hover:bg-slate-800"
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
+                      Account
+                    </Link>
+                    <button
+                      type="button"
+                      className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm text-rose-200 hover:bg-slate-800"
+                      onClick={async () => {
+                        if (supabase) {
+                          await supabase.auth.signOut();
+                        }
+                        setProfile(null);
+                        setProfileMenuOpen(false);
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div
