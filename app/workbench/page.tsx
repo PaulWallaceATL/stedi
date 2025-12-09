@@ -324,10 +324,13 @@ export default function Workbench() {
       });
 
       const data = await res.json();
+      const isRedirectWithDoc =
+        res.status === 302 && typeof data === "object" && data !== null && data.documentDownloadUrl;
+
       updateResult(panelId, {
         loading: false,
         response: toPretty(data),
-        error: res.ok ? undefined : "Stedi returned an error (see payload)",
+        error: res.ok || isRedirectWithDoc ? undefined : "Stedi returned an error (see payload)",
       });
 
       if (res.ok && panelId === "claim") {
