@@ -174,21 +174,21 @@ const panelOrder = [
     id: "ack277",
     title: "277 Acknowledgment (transactions API)",
     description: "Fetch 277CA/277 output by transactionId via core transactions API.",
-    defaultPath:
-      "https://core.us.stedi.com/2023-08-01/transactions/{transactionId}/output",
-    sample: {},
-    docHint: "Replace {transactionId} with the 837 transactionId; method is GET.",
-    method: "GET",
+    defaultPath: "/api/stedi/transactions",
+    sample: { transactionId: "dc134bcd-8bc4-4258-abae-aa76156d642a" },
+    docHint:
+      "Uses server-side STEDI_API_KEY to fetch core transactions output. Replace transactionId as needed. Returns documentDownloadUrl for 302.",
+    method: "POST",
   },
   {
     id: "era835",
     title: "835 ERA (transactions API)",
     description: "Fetch ERA output by transactionId via core transactions API.",
-    defaultPath:
-      "https://core.us.stedi.com/2023-08-01/transactions/{transactionId}/output",
-    sample: {},
-    docHint: "Use transactionId for the ERA; method is GET. Run after mock ERA is available.",
-    method: "GET",
+    defaultPath: "/api/stedi/transactions",
+    sample: { transactionId: "{transactionId}" },
+    docHint:
+      "Uses server-side STEDI_API_KEY to fetch ERA output. Replace transactionId with the ERA transactionId. Returns documentDownloadUrl for 302.",
+    method: "POST",
   },
 ];
 
