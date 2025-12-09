@@ -136,7 +136,10 @@ export default function NewClaimPage() {
   );
 
   const updateNested = <K extends keyof ClaimDraft>(section: K, key: keyof ClaimDraft[K], value: any) => {
-    setDraft((prev) => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
+    setDraft((prev) => {
+      const prevSection = (prev[section] as Record<string, unknown>) || {};
+      return { ...prev, [section]: { ...prevSection, [key]: value } };
+    });
   };
 
   const addDiagnosis = () => {
