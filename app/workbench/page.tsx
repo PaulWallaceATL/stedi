@@ -112,25 +112,23 @@ const sampleClaimStatusV2 = {
 };
 
 const sampleAttachment275 = {
-  tradingPartnerServiceId: "STEDI",
-  controlNumber: "ATT-0001",
+  tradingPartnerServiceId: "STEDITEST",
+  controlNumber: "ATT-ERA-001",
   submitter: {
-    organizationName: "Demo Clinic",
+    organizationName: "Mock ERA Clinic",
     contactInformation: { phoneNumber: "9999999999" },
   },
-  receiver: { organizationName: "STEDI" },
+  receiver: { organizationName: "STEDITEST" },
   claim: {
-    patientControlNumber: "PCN-12345",
-    payerClaimControlNumber: "PAYER-CTRL-999",
+    patientControlNumber: "PCN-ERA-001",
+    payerClaimControlNumber: "PAYER-CTRL-TEST",
   },
-  attachments: [
-    {
-      type: "EB",
-      description: "Clinical note (placeholder)",
-      contentType: "text/plain",
-      content: "VGVzdCBhdHRhY2htZW50IGNvbnRlbnQ=", // base64 placeholder
-    },
-  ],
+  // file fields required at root for claim-attachments/file
+  contentType: "application/pdf",
+  fileName: "note.pdf",
+  fileContent: "JVBERi0xLjQKJcTl8uXrp/Og0MTGCjEgMCBvYmoKPDwgL1R5cGUgL0NhdGFsb2cgL1BhZ2VzIDIgMCBSID4+CmVuZG9iagoyIDAgb2JqCjw8IC9UeXBlIC9QYWdlcyAvQ291bnQgMSAvS2lkcyBbIDMgMCBSIF0gPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWyAwIDAgNjEyIDc5MiBdIC9Db250ZW50cyA0IDAgUiA+PgplbmRvYmoKNCAwIG9iago8PCAvTGVuZ3RoIDEyID4+CnN0cmVhbQpCT1ggMTAwIDEwMCAxMDAgNDAwIG5cblBERiBwbGFjZWhvbGRlciB0ZXh0Ci9FTkQgQk9YCmVuZHN0cmVhbQplbmRvYmoKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKc3RhcnR4cmVmCjE2NQolJUVPRg==", // small PDF placeholder base64
+  description: "Clinical note (placeholder)",
+  type: "EB",
 };
 
 const panelOrder = [
@@ -165,9 +163,10 @@ const panelOrder = [
     id: "attachments",
     title: "Attachments (275) v3",
     description: "Send narratives or documents for appeals/secondary billing.",
-    defaultPath: "/2024-04-01/change/medicalnetwork/attachments/v3/submit",
+    defaultPath: "/api/stedi/attachments",
     sample: sampleAttachment275,
-    docHint: "Most payers expect PDF; include context in description.",
+    docHint:
+      "One-click: posts and uploads file via server route using STEDI_API_KEY. Provide base64 fileContent and PDF contentType.",
     method: "POST",
   },
   {
@@ -462,3 +461,4 @@ export default function Workbench() {
     </div>
   );
 }
+
