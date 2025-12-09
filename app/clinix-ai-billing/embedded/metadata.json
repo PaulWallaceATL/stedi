@@ -1,0 +1,5 @@
+{
+  "name": "Clinix AI Billing",
+  "description": "A comprehensive medical billing prototype featuring intelligent prioritization, denial management, claim creation wizards, and practice settings.",
+  "requestFramePermissions": []
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import ClinixBillingApp from "../../clinix-ai-billing/App.tsx";
+import ClinixBillingApp from "./embedded/App";
 
 export default function ClinixBillingPage() {
   return <ClinixBillingApp />;
