@@ -71,11 +71,12 @@ const CardNav: React.FC<CardNavProps> = ({
 
   useEffect(() => {
     setHydrated(true);
-    if (!supabase) return;
+    const client = supabase;
+    if (!client) return;
 
     let active = true;
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await client.auth.getSession();
       const user = data.session?.user;
       if (!active) return;
       setProfile(
@@ -90,7 +91,7 @@ const CardNav: React.FC<CardNavProps> = ({
     };
 
     load();
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = client.auth.onAuthStateChange((_event, session) => {
       const user = session?.user;
       setProfile(
         user
