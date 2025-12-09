@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type PanelState = {
   loading: boolean;
@@ -92,23 +92,23 @@ const sampleClaim837Pv3 = {
 
 const sampleClaimStatusV2 = {
   encounter: {
-    beginningDateOfService: "20250630",
-    endDateOfService: "20250702",
+    beginningDateOfService: "20250105",
+    endDateOfService: "20250105",
   },
   providers: [
     {
       npi: "1999999984",
-      organizationName: "Provider Name",
+      organizationName: "Demo Clinic",
       providerType: "BillingProvider",
     },
   ],
   subscriber: {
-    dateOfBirth: "19710101",
-    firstName: "Jane",
-    lastName: "Doe",
-    memberId: "UHC123456",
+    dateOfBirth: "19700101",
+    firstName: "JANE",
+    lastName: "DOE",
+    memberId: "AETNA12345",
   },
-  tradingPartnerServiceId: "87726",
+  tradingPartnerServiceId: "60054", // Aetna; swap to 62308 for Cigna if needed
 };
 
 const sampleAttachment275 = {
@@ -188,6 +188,7 @@ const panelOrder = [
     docHint:
       "Uses server-side STEDI_API_KEY to fetch ERA output. Replace transactionId with the ERA transactionId. Returns documentDownloadUrl for 302.",
     method: "POST",
+    extraAction: "poll",
   },
 ];
 
@@ -332,6 +333,35 @@ export default function Workbench() {
     }
   };
 
+  const pollTransactions = async () => {
+    try {
+      const res = await fetch("/api/stedi/transactions/list", { method: "GET" });
+      const data = await res.json();
+      const items = data?.items || [];
+      // pick most recent X12->GuideJSON (likely 277/835)
+      const inbound = items.find((t: any) => (t?.operation || "").includes("X12->GuideJSON"));
+      if (!inbound?.transactionId) return;
+      setPayloads((prev) => ({
+        ...prev,
+        ack277: toPretty({ transactionId: inbound.transactionId }),
+        era835: toPretty({ transactionId: inbound.transactionId }),
+      }));
+      updateResult("ack277", { response: toPretty({ info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId }) });
+    } catch (error) {
+      updateResult("ack277", {
+        error: error instanceof Error ? error.message : "Failed to poll transactions",
+      });
+    }
+  };
+
+  // Periodic polling for transactions to auto-fill 277/835
+  useEffect(() => {
+    const interval = setInterval(() => {
+      void pollTransactions();
+    }, 30000); // 30s
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-50">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
@@ -444,6 +474,15 @@ export default function Workbench() {
                   >
                     {state?.loading ? "Sending..." : "Send to Stedi"}
                   </button>
+                  {panel.extraAction === "poll" && (
+                    <button
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:border-sky-500/60"
+                      type="button"
+                      onClick={pollTransactions}
+                    >
+                      Poll latest transactions
+                    </button>
+                  )}
                   {state?.error && (
                     <p className="text-xs text-rose-300">Error: {state.error}</p>
                   )}
