@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import { useParams, useRouter } from "next/navigation";
-import { claimStatus, listTransactions, getTransactionOutput, createAttachment } from "@/lib/stediClient";
+import { claimStatus, listTransactions, getTransactionOutput, createAttachment } from "../../lib/stediClient";
 
 export default function ClaimDetailPage() {
   const params = useParams();
