@@ -19,6 +19,14 @@ type ClaimRow = {
   payload?: any;
 };
 
+type ClaimEvent = {
+  id: string;
+  claim_id: string;
+  type: string | null;
+  payload?: any;
+  created_at?: string | null;
+};
+
 function currency(value?: number | null) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value));
@@ -81,6 +89,7 @@ export default function DashboardPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const supabaseMissing = !supabase;
+  const [events, setEvents] = useState<ClaimEvent[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -107,6 +116,18 @@ export default function DashboardPage() {
       if (!mounted) return;
       if (rows) setClaims(rows as ClaimRow[]);
       if (error) console.error(error);
+      if (rows && rows.length) {
+        const ids = rows.map((r) => r.id);
+        const { data: evts, error: evtErr } = await supabase
+          .from("claim_events")
+          .select("id, claim_id, type, payload, created_at")
+          .in("claim_id", ids)
+          .order("created_at", { ascending: false })
+          .limit(50);
+        if (!mounted) return;
+        if (evts) setEvents(evts as ClaimEvent[]);
+        if (evtErr) console.error(evtErr);
+      }
       setLoading(false);
     };
     load();
@@ -143,6 +164,13 @@ export default function DashboardPage() {
       needsAttention: deniedOrAttention,
     };
   }, [claims]);
+
+  const denialClaims = useMemo(
+    () => claims.filter((c) => deriveStatusMeta(c.status).tone === "danger").slice(0, 5),
+    [claims],
+  );
+
+  const recentEvents = useMemo(() => events.slice(0, 8), [events]);
 
   if (supabaseMissing) {
     return (
@@ -346,6 +374,61 @@ export default function DashboardPage() {
                 <p className="text-sm mt-1">Rejected or denied</p>
               </div>
             </div>
+
+            {(denialClaims.length > 0 || recentEvents.length > 0) && (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="rounded-xl border border-rose-100 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-rose-700">Denials / Needs Attention</h3>
+                    <Link href="/denials" className="text-sm font-medium text-rose-700 hover:underline">
+                      View all
+                    </Link>
+                  </div>
+                  {denialClaims.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-500">No denials yet.</p>
+                  ) : (
+                    <ul className="mt-3 divide-y divide-slate-200">
+                      {denialClaims.map((c) => (
+                        <li key={c.id} className="py-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900">{derivePatientName(c)}</p>
+                              <p className="text-xs text-slate-500">
+                                {c.payer_name || "—"} · {deriveDateOfService(c)}
+                              </p>
+                            </div>
+                            <Link href={`/claims/${c.id}`} className="text-sm font-medium text-[#137fec] hover:underline">
+                              View
+                            </Link>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">Status: {c.status || "denied"}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-slate-900">Recent Activity</h3>
+                  </div>
+                  {recentEvents.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-500">No recent claim activity.</p>
+                  ) : (
+                    <ul className="mt-3 divide-y divide-slate-200">
+                      {recentEvents.map((ev) => (
+                        <li key={ev.id} className="py-3">
+                          <p className="text-sm font-semibold text-slate-900 capitalize">{ev.type || "event"}</p>
+                          <p className="text-xs text-slate-500">
+                            Claim {ev.claim_id} · {ev.created_at ? new Date(ev.created_at).toLocaleString() : ""}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
