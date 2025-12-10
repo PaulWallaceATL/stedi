@@ -116,8 +116,14 @@ export default function PerformancePage() {
               Back to dashboard
             </Link>
           </div>
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            No claims found. Submit a claim while signed in to populate performance metrics.
+          <div className="space-y-3">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+              No claims found. Submit a claim while signed in to populate performance metrics.
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+              Quick check: after submitting, confirm the claim appears in Supabase (`claims` table) and on the dashboard. If not, ensure you are signed in and that
+              NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your environment.
+            </div>
           </div>
         </div>
       </main>

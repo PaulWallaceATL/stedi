@@ -148,8 +148,6 @@ export default function NewClaimPage() {
               total_charge: Number(payload.claimInformation.claimChargeAmount),
               service_line_count: payload.claimInformation.serviceLines.length,
               payload,
-              stedi_correlation_id: res.data?.claimReference?.correlationId || null,
-              stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
             });
           } else {
             setSupabaseNote("Not signed in — claim saved to Stedi; skipped Supabase insert.");
