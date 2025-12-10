@@ -119,24 +119,28 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
       setSubmitResult(res.data);
       // persist to supabase if available and user is logged in
       if (supabase) {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const userId = sessionData?.session?.user?.id || null;
-        if (userId) {
-          await supabase.from("claims").insert({
-            user_id: userId,
-            patient_name: draft.patientName,
-            payer_name: payload.receiver?.organizationName || null,
-            trading_partner_service_id: payload.tradingPartnerServiceId,
-            status: res.data?.status || null,
-            claim_charge_amount: Number(payload.claimInformation?.claimChargeAmount) || null,
-            total_charge: Number(payload.claimInformation?.claimChargeAmount) || null,
-            service_line_count: payload.claimInformation?.serviceLines?.length || null,
-            payload,
-            stedi_correlation_id: res.data?.claimReference?.correlationId || null,
-            stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
-          });
-        } else {
-          setSubmitError("Not signed in — claim saved to Stedi but not persisted to Supabase.");
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const userId = sessionData?.session?.user?.id || null;
+          if (userId) {
+            await supabase.from("claims").insert({
+              user_id: userId,
+              patient_name: draft.patientName,
+              payer_name: payload.receiver?.organizationName || null,
+              trading_partner_service_id: payload.tradingPartnerServiceId,
+              status: res.data?.status || null,
+              claim_charge_amount: Number(payload.claimInformation?.claimChargeAmount) || null,
+              total_charge: Number(payload.claimInformation?.claimChargeAmount) || null,
+              service_line_count: payload.claimInformation?.serviceLines?.length || null,
+              payload,
+              stedi_correlation_id: res.data?.claimReference?.correlationId || null,
+              stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
+            });
+          } else {
+            setSubmitError("Not signed in — claim saved to Stedi but not persisted to Supabase.");
+          }
+        } catch (e: any) {
+          setSubmitError(`Saved to Stedi, but Supabase insert failed: ${e?.message || "unknown error"}`);
         }
       }
       setView(ViewState.SUCCESS);
@@ -339,17 +343,17 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                                 <div className="space-y-6">
                                     <h4 className="text-lg font-semibold text-[#111418] dark:text-gray-100">Provider Information</h4>
                                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
-                                        <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Billing Provider</span><div className="relative"><span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Search by name or NPI"/></div></label></div>
-                                        <div><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">NPI</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Auto-populated"/></label></div>
-                                        <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Rendering Provider</span><div className="relative"><span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Search for a provider"/></div></label></div>
+                                        <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Billing Provider</span><div className="relative"><span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Search by name or NPI" defaultValue="Demo Clinic"/></div></label></div>
+                                        <div><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">NPI</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Auto-populated" defaultValue="1999999984"/></label></div>
+                                        <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Rendering Provider</span><div className="relative"><span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Search for a provider" defaultValue="Dr. Demo"/></div></label></div>
                                     </div>
                                 </div>
                                 <hr className="border-gray-200 dark:border-gray-700"/>
                                 <div className="space-y-6">
                                     <h4 className="text-lg font-semibold text-[#111418] dark:text-gray-100">Facility / Place of Service</h4>
                                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
-                                         <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Facility Name <span className="text-gray-400">(Optional)</span></span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Enter facility name"/></label></div>
-                                         <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Place of Service (POS Code)</span><select className="form-select block h-12 w-full appearance-none rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary sm:max-w-xs"><option>11 - Office</option><option>22 - Hospital Outpatient</option><option>21 - Hospital Inpatient</option></select></label></div>
+                                         <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Facility Name <span className="text-gray-400">(Optional)</span></span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Enter facility name" defaultValue="Demo Clinic Facility"/></label></div>
+                                         <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Place of Service (POS Code)</span><select className="form-select block h-12 w-full appearance-none rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary sm:max-w-xs" defaultValue="11 - Office"><option>11 - Office</option><option>22 - Hospital Outpatient</option><option>21 - Hospital Inpatient</option></select></label></div>
                                     </div>
                                 </div>
                             </div>
@@ -398,9 +402,9 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                                         <button className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-100 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-900/50 dark:hover:text-red-400"><span className="material-symbols-outlined text-lg">delete</span></button>
                                     </div>
                                     <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-12">
-                                        <div className="sm:col-span-3"><label className="flex flex-col gap-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-300">CPT / HCPCS</span><input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white px-3 text-base text-[#111418] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100" defaultValue="99213"/></label></div>
+                                    <div className="sm:col-span-3"><label className="flex flex-col gap-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-300">CPT / HCPCS</span><input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white px-3 text-base text-[#111418] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100" defaultValue="99213"/></label></div>
                                         <div className="sm:col-span-9"><label className="flex flex-col gap-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-300">Description</span><input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white/50 px-3 text-base text-[#111418] dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-100" readOnly defaultValue="Office or other outpatient visit"/></label></div>
-                                        <div className="sm:col-span-4"><label className="flex flex-col gap-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-300">Charge</span><div className="relative"><span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">$</span><input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white pl-7 pr-3 text-base text-[#111418] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100" defaultValue="150.00"/></div></label></div>
+                                        <div className="sm:col-span-4"><label className="flex flex-col gap-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-300">Charge</span><div className="relative"><span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">$</span><input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white pl-7 pr-3 text-base text-[#111418] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100" defaultValue="180.00"/></div></label></div>
                                     </div>
                                 </div>
                             </div>
