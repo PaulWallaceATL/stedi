@@ -117,20 +117,27 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
       setSubmitResult(null);
       const res = await submitClaim(payload);
       setSubmitResult(res.data);
-      // persist to supabase if available
+      // persist to supabase if available and user is logged in
       if (supabase) {
-        await supabase.from("claims").insert({
-          patient_name: draft.patientName,
-          payer_name: payload.receiver?.organizationName || null,
-          trading_partner_service_id: payload.tradingPartnerServiceId,
-          status: res.data?.status || null,
-          claim_charge_amount: Number(payload.claimInformation?.claimChargeAmount) || null,
-          total_charge: Number(payload.claimInformation?.claimChargeAmount) || null,
-          service_line_count: payload.claimInformation?.serviceLines?.length || null,
-          payload,
-          stedi_correlation_id: res.data?.claimReference?.correlationId || null,
-          stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
-        });
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id || null;
+        if (userId) {
+          await supabase.from("claims").insert({
+            user_id: userId,
+            patient_name: draft.patientName,
+            payer_name: payload.receiver?.organizationName || null,
+            trading_partner_service_id: payload.tradingPartnerServiceId,
+            status: res.data?.status || null,
+            claim_charge_amount: Number(payload.claimInformation?.claimChargeAmount) || null,
+            total_charge: Number(payload.claimInformation?.claimChargeAmount) || null,
+            service_line_count: payload.claimInformation?.serviceLines?.length || null,
+            payload,
+            stedi_correlation_id: res.data?.claimReference?.correlationId || null,
+            stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
+          });
+        } else {
+          setSubmitError("Not signed in — claim saved to Stedi but not persisted to Supabase.");
+        }
       }
       setView(ViewState.SUCCESS);
     } catch (err: any) {
