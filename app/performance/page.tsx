@@ -106,6 +106,24 @@ export default function PerformancePage() {
     );
   }
 
+  if (claims.length === 0) {
+    return (
+      <main className="min-h-screen bg-[#f6f7f8] text-slate-900">
+        <div className="mx-auto flex max-w-4xl flex-col gap-6 px-6 py-10">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-slate-900">Performance</h1>
+            <Link href="/dashboard" className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 hover:bg-slate-200">
+              Back to dashboard
+            </Link>
+          </div>
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            No claims found. Submit a claim while signed in to populate performance metrics.
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#f6f7f8] text-slate-900">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10">

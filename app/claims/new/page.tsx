@@ -110,6 +110,20 @@ export default function NewClaimPage() {
       setError("Patient name, DOB, and Member ID are required.");
       return;
     }
+
+    // Require Supabase session to ensure claim is persisted and visible on dashboards.
+    if (supabase && hasSupabaseEnv) {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id || null;
+      if (!userId) {
+        setError("Please sign in to save and track claims.");
+        return;
+      }
+    } else {
+      setError("Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
