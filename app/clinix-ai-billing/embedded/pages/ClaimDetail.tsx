@@ -1,11 +1,91 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ViewState } from '../types';
+import { claimStatus, listTransactions, getTransactionOutput } from '../stediClient';
+import { supabase } from '../supabaseClient';
 
 interface Props {
   setView: (view: ViewState) => void;
 }
 
 export const ClaimDetail: React.FC<Props> = ({ setView }) => {
+  const [statusResult, setStatusResult] = useState<any>(null);
+  const [txnResult, setTxnResult] = useState<any>(null);
+  const [txnId, setTxnId] = useState<string>("");
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [loadingTxn, setLoadingTxn] = useState(false);
+
+  const sampleStatusPayload = {
+    encounter: { beginningDateOfService: "20250105", endDateOfService: "20250105" },
+    providers: [{ npi: "1999999984", organizationName: "Demo Clinic", providerType: "BillingProvider" }],
+    subscriber: {
+      dateOfBirth: "19700101",
+      firstName: "JANE",
+      lastName: "DOE",
+      memberId: "AETNA12345",
+    },
+    tradingPartnerServiceId: "60054",
+  };
+
+  const handleStatus = async () => {
+    try {
+      setLoadingStatus(true);
+      const res = await claimStatus(sampleStatusPayload);
+      setStatusResult(res.data);
+      if (supabase) {
+        await supabase.from("claim_events").insert({
+          type: "status",
+          payload: res.data,
+        });
+      }
+    } catch (err: any) {
+      setStatusResult({ error: err?.message, data: err?.data });
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
+  const handlePollTransactions = async () => {
+    try {
+      setLoadingTxn(true);
+      const res = await listTransactions();
+      const items = (res.data?.data?.items || res.data?.items || []) as any[];
+      const inbound = items.find((t) => (t?.operation || "").includes("X12->GuideJSON"));
+      if (inbound?.transactionId) {
+        setTxnId(inbound.transactionId);
+        const info = { info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId };
+        setTxnResult(info);
+        if (supabase) {
+          await supabase.from("claim_events").insert({ type: "transaction_prefill", payload: info });
+        }
+      } else {
+        setTxnResult({ info: "No inbound transactions found" });
+      }
+    } catch (err: any) {
+      setTxnResult({ error: err?.message, data: err?.data });
+    } finally {
+      setLoadingTxn(false);
+    }
+  };
+
+  const handleFetchOutput = async () => {
+    if (!txnId) {
+      setTxnResult({ error: "transactionId is required" });
+      return;
+    }
+    try {
+      setLoadingTxn(true);
+      const res = await getTransactionOutput(txnId);
+      setTxnResult(res.data);
+      if (supabase) {
+        await supabase.from("claim_events").insert({ type: "transaction_output", payload: res.data, transaction_id: txnId });
+      }
+    } catch (err: any) {
+      setTxnResult({ error: err?.message, data: err?.data });
+    } finally {
+      setLoadingTxn(false);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden relative h-full">
       <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-24">
@@ -257,6 +337,55 @@ export const ClaimDetail: React.FC<Props> = ({ setView }) => {
 
             {/* Right Column: Timeline */}
             <div className="flex flex-col gap-6">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="material-symbols-outlined text-slate-500 dark:text-slate-400">cloud_sync</span>
+                    <span>Stedi Proxy</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={handleStatus}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
+                    disabled={loadingStatus}
+                  >
+                    {loadingStatus ? "Checking status…" : "Check claim status"}
+                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={handlePollTransactions}
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                      disabled={loadingTxn}
+                    >
+                      {loadingTxn ? "Polling…" : "Poll transactions"}
+                    </button>
+                    <button
+                      onClick={handleFetchOutput}
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                      disabled={loadingTxn}
+                    >
+                      {loadingTxn ? "Fetching…" : "Get 277/835 output"}
+                    </button>
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    transactionId:{" "}
+                    <span className="font-mono text-slate-800 dark:text-slate-100">
+                      {txnId || "(poll to fill)"}
+                    </span>
+                  </div>
+                  {statusResult && (
+                    <pre className="max-h-40 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-2 text-[11px] text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                      {JSON.stringify(statusResult, null, 2)}
+                    </pre>
+                  )}
+                  {txnResult && (
+                    <pre className="max-h-40 overflow-auto rounded-lg border border-slate-200 bg-slate-50 p-2 text-[11px] text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+                      {JSON.stringify(txnResult, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              </div>
               <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm h-fit">
                 <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/20">
                   <div className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200">

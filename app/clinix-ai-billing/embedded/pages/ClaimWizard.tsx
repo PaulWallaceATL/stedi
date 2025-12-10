@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ViewState } from '../types';
+import { submitClaim } from '../stediClient';
+import { supabase, hasSupabaseEnv } from '../supabaseClient';
 
 interface Props {
   setView: (view: ViewState) => void;
@@ -8,6 +10,14 @@ interface Props {
 export const ClaimWizard: React.FC<Props> = ({ setView }) => {
   const [step, setStep] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitResult, setSubmitResult] = useState<any>(null);
+  const [draft, setDraft] = useState({
+    patientName: "JANE DOE",
+    dob: "1970-01-01",
+    memberId: "AETNA12345",
+  });
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -24,6 +34,112 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
   const prevStep = () => {
     if (step > 1) setStep(step - 1);
     else setView(ViewState.CLAIM_METHOD);
+  };
+
+  const buildPayload = () => {
+    const nameParts = (draft.patientName || "").trim().split(/\s+/);
+    const firstName = nameParts[0] || "JANE";
+    const lastName = nameParts.slice(1).join(" ") || "DOE";
+    const dob = (draft.dob || "1970-01-01").replace(/-/g, "");
+    const memberId = draft.memberId || "AETNA12345";
+
+    return {
+      controlNumber: "CLM-AETNA-UI",
+      tradingPartnerServiceId: "60054",
+      usageIndicator: "T",
+      submitter: { organizationName: "Demo Clinic", contactInformation: { phoneNumber: "9999999999" } },
+      receiver: { organizationName: "AETNA" },
+      billing: {
+        npi: "1999999984",
+        employerId: "123456789",
+        organizationName: "Demo Clinic",
+        address: { address1: "123 Main St", city: "Nashville", state: "TN", postalCode: "37201" },
+      },
+      subscriber: {
+        memberId,
+        firstName,
+        lastName,
+        dateOfBirth: dob,
+        gender: "F",
+      },
+      claimInformation: {
+        claimFilingCode: "CI",
+        claimFrequencyCode: "1",
+        signatureIndicator: "Y",
+        planParticipationCode: "A",
+        benefitsAssignmentCertificationIndicator: "Y",
+        releaseInformationCode: "Y",
+        patientControlNumber: "PCN-AETNA-UI",
+        claimChargeAmount: "240.00",
+        placeOfServiceCode: "11",
+        healthCareCodeInformation: [{ diagnosisTypeCode: "ABK", diagnosisCode: "M542" }],
+        serviceLines: [
+          {
+            assignedNumber: "1",
+            professionalService: {
+              procedureIdentifier: "HC",
+              procedureCode: "99213",
+              procedureModifiers: ["25"],
+              lineItemChargeAmount: "180.00",
+              measurementUnit: "UN",
+              serviceUnitCount: "1",
+              compositeDiagnosisCodePointers: [["1"]],
+            },
+            serviceDate: "20250105",
+          },
+          {
+            assignedNumber: "2",
+            professionalService: {
+              procedureIdentifier: "HC",
+              procedureCode: "97110",
+              procedureModifiers: ["GP"],
+              lineItemChargeAmount: "60.00",
+              measurementUnit: "UN",
+              serviceUnitCount: "1",
+              compositeDiagnosisCodePointers: [["1"]],
+            },
+            serviceDate: "20250105",
+          },
+        ],
+      },
+    };
+  };
+
+  const handleSubmit = async () => {
+    const payload = buildPayload();
+    if (!draft.patientName || !draft.dob || !draft.memberId) {
+      setSubmitError("Patient name, DOB, and Member ID are required.");
+      return;
+    }
+    try {
+      setSubmitting(true);
+      setSubmitError(null);
+      setSubmitResult(null);
+      const res = await submitClaim(payload);
+      setSubmitResult(res.data);
+      // persist to supabase if available
+      if (supabase) {
+        await supabase.from("claims").insert({
+          patient_name: draft.patientName,
+          payer_name: payload.receiver?.organizationName || null,
+          trading_partner_service_id: payload.tradingPartnerServiceId,
+          status: res.data?.status || null,
+          claim_charge_amount: Number(payload.claimInformation?.claimChargeAmount) || null,
+          total_charge: Number(payload.claimInformation?.claimChargeAmount) || null,
+          service_line_count: payload.claimInformation?.serviceLines?.length || null,
+          payload,
+          stedi_correlation_id: res.data?.claimReference?.correlationId || null,
+          stedi_patient_control_number: res.data?.claimReference?.patientControlNumber || null,
+        });
+      }
+      setView(ViewState.SUCCESS);
+    } catch (err: any) {
+      const friendly = err?.data?.message || err?.message || "Submit failed. Please try again or adjust the test data.";
+      setSubmitError(friendly);
+      setSubmitResult(err?.data);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const steps = [
@@ -105,11 +221,16 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                        <div className="space-y-8 animate-in fade-in">
                           <h3 className="text-2xl font-bold text-[#111418] dark:text-gray-100">Patient Information</h3>
                           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                            <div className="sm:col-span-2">
+                                <div className="sm:col-span-2">
                               <label className="flex flex-col">
                                 <p className="pb-2 text-base font-medium text-[#111418] dark:text-gray-200">Patient Name</p>
                                 <div className="relative flex w-full flex-1 items-stretch">
-                                  <input className="form-input block h-12 w-full min-w-0 flex-1 rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Search by name" />
+                                  <input
+                                    className="form-input block h-12 w-full min-w-0 flex-1 rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary"
+                                    placeholder="Search by name"
+                                    value={draft.patientName}
+                                    onChange={(e) => setDraft((prev) => ({ ...prev, patientName: e.target.value }))}
+                                  />
                                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[#617589] dark:text-gray-400">
                                     <span className="material-symbols-outlined">search</span>
                                   </div>
@@ -121,7 +242,13 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                               <label className="flex flex-col">
                                 <p className="pb-2 text-base font-medium text-[#111418] dark:text-gray-200">Date of Birth (DOB)</p>
                                 <div className="relative flex w-full flex-1 items-stretch">
-                                  <input className="form-input block h-12 w-full min-w-0 flex-1 rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="MM/DD/YYYY" type="date" />
+                                  <input
+                                    className="form-input block h-12 w-full min-w-0 flex-1 rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary"
+                                    placeholder="MM/DD/YYYY"
+                                    type="date"
+                                    value={draft.dob}
+                                    onChange={(e) => setDraft((prev) => ({ ...prev, dob: e.target.value }))}
+                                  />
                                 </div>
                               </label>
                             </div>
@@ -180,7 +307,7 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                                         <select className="form-select block h-12 w-full appearance-none rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary"><option>PPO</option><option>HMO</option><option>Medicare</option></select></label>
                                     </div>
                                     <div><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Policy Number</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Enter policy number"/></label></div>
-                                    <div><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Subscriber ID</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Enter subscriber ID"/></label></div>
+                                    <div><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Subscriber ID</span><input className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary" placeholder="Enter subscriber ID" value={draft.memberId} onChange={(e) => setDraft((prev) => ({ ...prev, memberId: e.target.value }))}/></label></div>
                                     <div className="sm:col-span-2"><label className="flex flex-col gap-2"><span className="text-base font-medium text-[#111418] dark:text-gray-200">Relationship to Subscriber</span><select className="form-select block h-12 w-full appearance-none rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-primary sm:max-w-xs"><option>Self</option><option>Spouse</option><option>Child</option></select></label></div>
                                 </div>
                             </div>
@@ -271,17 +398,49 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                     )}
 
                     {step === 6 && (
-                        <div className="space-y-8 animate-in fade-in">
-                            <div className="space-y-2">
-                                <h3 className="col-span-full text-2xl font-bold text-[#111418] dark:text-gray-100">Claim Summary</h3>
-                                <p className="text-base text-gray-600 dark:text-gray-400">Review all details before creating this claim.</p>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/30"><span className="material-symbols-outlined flex-shrink-0 text-2xl text-red-600 dark:text-red-400">error</span><div className="flex-grow"><h4 className="font-semibold text-red-800 dark:text-red-200">Errors (must fix before creation)</h4><ul className="mt-2 list-disc pl-5 text-sm text-red-700 dark:text-red-300"><li>Missing primary diagnosis.</li></ul></div></div>
-                                <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40"><div className="flex items-center justify-between"><h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Patient & Insurance</h4><button className="text-sm font-semibold text-primary hover:underline">Edit</button></div><div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2"><div className="text-sm"><p className="text-gray-500 dark:text-gray-400">Patient</p><p className="font-medium text-gray-900 dark:text-white">Eleanor Vance (MRN: 789123)</p></div><div className="text-sm"><p className="text-gray-500 dark:text-gray-400">Payer</p><p className="font-medium text-gray-900 dark:text-white">Aetna PPO</p></div></div></div>
-                                <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40"><h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Financial Summary</h4><div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3"><div className="text-sm"><p className="text-gray-500 dark:text-gray-400">Total Charges</p><p className="text-lg font-bold text-gray-900 dark:text-white">$150.00</p></div></div></div>
-                            </div>
+                      <div className="space-y-8 animate-in fade-in">
+                        <div className="space-y-2">
+                          <h3 className="col-span-full text-2xl font-bold text-[#111418] dark:text-gray-100">Claim Summary</h3>
+                          <p className="text-base text-gray-600 dark:text-gray-400">
+                            Submit to Stedi via the Cloud Run proxy (uses NEXT_PUBLIC_PROXY_URL). Currently prefilled with test identifiers for safe click-through; replace with real data before production.
+                          </p>
                         </div>
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
+                          Test mode: form is prefilled so you can click through. Update patient, member ID, and dates with real values before live use.
+                        </div>
+                        {submitError && (
+                          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                            {submitError}
+                          </div>
+                        )}
+                        {submitResult && (
+                          <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 overflow-x-auto">
+                            {JSON.stringify(submitResult, null, 2)}
+                          </pre>
+                        )}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="font-semibold text-gray-900 dark:text-gray-100">Next steps</p>
+                            <p>We’ll capture correlationId/rhclaimNumber on success.</p>
+                          </div>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={prevStep}
+                              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                              disabled={submitting}
+                            >
+                              Back
+                            </button>
+                            <button
+                              onClick={handleSubmit}
+                              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-70"
+                              disabled={submitting}
+                            >
+                              {submitting ? "Submitting…" : "Create & Submit"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                   
