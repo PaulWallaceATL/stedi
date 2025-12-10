@@ -142,6 +142,9 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
     }
   };
 
+  // Derived summary from current draft + defaults
+  const summaryPayload = buildPayload();
+
   const steps = [
     { id: 1, label: "Patient Information" },
     { id: 2, label: "Payer & Insurance Details" },
@@ -407,6 +410,89 @@ export const ClaimWizard: React.FC<Props> = ({ setView }) => {
                         </div>
                         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
                           Test mode: form is prefilled so you can click through. Update patient, member ID, and dates with real values before live use.
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Patient & Insurance</h4>
+                            </div>
+                            <div className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2 text-sm text-gray-700 dark:text-gray-200">
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Patient</p>
+                                <p className="font-medium text-gray-900 dark:text-white">
+                                  {summaryPayload.subscriber.firstName} {summaryPayload.subscriber.lastName}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">DOB</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{summaryPayload.subscriber.dateOfBirth}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Member ID</p>
+                                <p className="font-medium font-mono text-gray-900 dark:text-white">{summaryPayload.subscriber.memberId}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Payer</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{summaryPayload.receiver.organizationName}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Provider & Facility</h4>
+                            </div>
+                            <div className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2 text-sm text-gray-700 dark:text-gray-200">
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Billing Provider</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{summaryPayload.billing.organizationName}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Billing NPI</p>
+                                <p className="font-medium font-mono text-gray-900 dark:text-white">{summaryPayload.billing.npi}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">POS</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{summaryPayload.claimInformation.placeOfServiceCode}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 dark:text-gray-400">Charge</p>
+                                <p className="font-medium text-gray-900 dark:text-white">
+                                  ${summaryPayload.claimInformation.claimChargeAmount}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Diagnoses (ICD-10)</h4>
+                            </div>
+                            <ul className="mt-3 space-y-2 text-sm text-gray-800 dark:text-gray-100">
+                              {summaryPayload.claimInformation.healthCareCodeInformation.map((d, idx) => (
+                                <li key={idx} className="flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-sm text-primary">check</span>
+                                  <span className="font-mono font-semibold">{d.diagnosisCode}</span>
+                                  <span className="text-gray-500 dark:text-gray-400">({d.diagnosisTypeCode})</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/40">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">Service Lines (CPT/HCPCS)</h4>
+                            </div>
+                            <ul className="mt-3 space-y-2 text-sm text-gray-800 dark:text-gray-100">
+                              {summaryPayload.claimInformation.serviceLines.map((s, idx) => (
+                                <li key={idx} className="flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-sm text-primary">medical_services</span>
+                                  <span className="font-mono font-semibold">{s.professionalService.procedureCode}</span>
+                                  <span className="text-gray-500 dark:text-gray-400">({s.professionalService.lineItemChargeAmount})</span>
+                                  <span className="text-gray-500 dark:text-gray-400">DOS {s.serviceDate}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
                         {submitError && (
                           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
