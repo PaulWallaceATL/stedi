@@ -144,6 +144,9 @@ export default function NewClaimPage() {
           setSupabaseNote(`Saved to Stedi, but Supabase insert failed: ${e?.message || "unknown error"}`);
         }
       }
+
+      // On successful submit, return to dashboard to view the new claim
+      router.push("/dashboard");
     } catch (err: any) {
       const friendly = err?.data?.message || err?.message || "Submit failed. Please adjust test data and retry.";
       setError(friendly);
