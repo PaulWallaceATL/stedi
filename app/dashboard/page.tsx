@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { claimStatus } from "../lib/stediClient";
 
 type ClaimRow = {
   id: string;
@@ -56,7 +57,7 @@ function deriveDateOfService(claim: ClaimRow) {
 }
 
 function deriveStatusMeta(status?: string | null) {
-  const key = (status || "draft").toLowerCase();
+  const key = (status || "submitted").toLowerCase();
   if (["accepted", "paid", "posted", "success"].includes(key)) {
     return { label: "Accepted", tone: "success" as const };
   }
@@ -90,6 +91,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const supabaseMissing = !supabase;
   const [events, setEvents] = useState<ClaimEvent[]>([]);
+  const [polling, setPolling] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -171,6 +173,89 @@ export default function DashboardPage() {
   );
 
   const recentEvents = useMemo(() => events.slice(0, 8), [events]);
+
+  const buildStatusPayload = (claim: ClaimRow) => {
+    const p = claim.payload || {};
+    const subscriber = p.subscriber || {};
+    const billing = p.billing || p.provider || {};
+    const serviceLine = p.claimInformation?.serviceLines?.[0] || {};
+    const dosRaw =
+      serviceLine.serviceDate ||
+      serviceLine.from ||
+      claim.date_of_service ||
+      p.claimInformation?.dateOfService ||
+      p.date_of_service;
+    const dateClean =
+      typeof dosRaw === "string"
+        ? dosRaw.replace(/-/g, "").replace(/[^\d]/g, "")
+        : "20250105";
+    const dobClean =
+      (subscriber.dateOfBirth || "1970-01-01").toString().replace(/-/g, "").replace(/[^\d]/g, "") ||
+      "19700101";
+
+    return {
+      encounter: {
+        beginningDateOfService: dateClean || "20250105",
+        endDateOfService: dateClean || "20250105",
+      },
+      providers: [
+        {
+          npi: billing.npi || "1999999984",
+          organizationName: billing.organizationName || claim.trading_partner_name || "Demo Clinic",
+          providerType: "BillingProvider",
+        },
+      ],
+      subscriber: {
+        dateOfBirth: dobClean,
+        firstName: subscriber.firstName || "JANE",
+        lastName: subscriber.lastName || "DOE",
+        memberId: subscriber.memberId || p.subscriber?.memberId || "AETNA12345",
+      },
+      tradingPartnerServiceId: p.tradingPartnerServiceId || claim.trading_partner_service_id || "60054",
+    };
+  };
+
+  useEffect(() => {
+    if (supabaseMissing || !claims.length) return;
+    let alive = true;
+
+    const pollStatuses = async () => {
+      if (polling) return;
+      setPolling(true);
+      try {
+        const toUpdate = claims
+          .filter((c) => {
+            const key = (c.status || "").toLowerCase();
+            return !key || ["draft", "submitted", "pending", "success"].includes(key);
+          })
+          .slice(0, 3); // throttle per cycle
+
+        for (const claim of toUpdate) {
+          try {
+            const payload = buildStatusPayload(claim);
+            if (!payload) continue;
+            const res = await claimStatus(payload);
+            const raw = (res.data?.status || "").toString().toLowerCase();
+            const normalized = raw === "success" ? "accepted" : raw || "submitted";
+            await supabase?.from("claims").update({ status: normalized }).eq("id", claim.id);
+          } catch (_err) {
+            // ignore individual failures
+          }
+        }
+      } finally {
+        if (alive) setPolling(false);
+      }
+    };
+
+    const id = setInterval(() => {
+      void pollStatuses();
+    }, 30000);
+
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, [claims, supabaseMissing, polling]);
 
   if (supabaseMissing) {
     return (
