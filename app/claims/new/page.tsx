@@ -132,6 +132,8 @@ export default function NewClaimPage() {
       const payload = buildPayload();
       const res = await submitClaim(payload);
       setResult(res.data);
+      const rawStatus = typeof res.data?.status === "string" ? res.data.status.toLowerCase() : null;
+      const normalizedStatus = rawStatus === "success" ? "accepted" : rawStatus || "submitted";
 
       if (supabase && hasSupabaseEnv) {
         try {
@@ -143,7 +145,7 @@ export default function NewClaimPage() {
               patient_name: `${payload.subscriber.firstName} ${payload.subscriber.lastName}`,
               payer_name: payload.receiver.organizationName,
               trading_partner_service_id: payload.tradingPartnerServiceId,
-              status: res.data?.status || "submitted",
+              status: normalizedStatus,
               claim_charge_amount: Number(payload.claimInformation.claimChargeAmount),
               total_charge: Number(payload.claimInformation.claimChargeAmount),
               service_line_count: payload.claimInformation.serviceLines.length,

@@ -57,7 +57,7 @@ function deriveDateOfService(claim: ClaimRow) {
 
 function deriveStatusMeta(status?: string | null) {
   const key = (status || "draft").toLowerCase();
-  if (["accepted", "paid", "posted"].includes(key)) {
+  if (["accepted", "paid", "posted", "success"].includes(key)) {
     return { label: "Accepted", tone: "success" as const };
   }
   if (["submitted", "sent"].includes(key)) {
