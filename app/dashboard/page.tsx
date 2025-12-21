@@ -114,6 +114,7 @@ export default function DashboardPage() {
   const supabaseMissing = !supabase;
   const [events, setEvents] = useState<ClaimEvent[]>([]);
   const [polling, setPolling] = useState(false);
+  const [expandedClaims, setExpandedClaims] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let mounted = true;
@@ -305,8 +306,6 @@ export default function DashboardPage() {
       </main>
     );
   }
-
-  const [expandedClaims, setExpandedClaims] = useState<Set<string>>(new Set());
 
   const toggleExpandClaim = (claimId: string) => {
     setExpandedClaims((prev) => {
