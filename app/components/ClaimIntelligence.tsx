@@ -37,19 +37,45 @@ export default function ClaimIntelligence({ claim, claimId, onApplySuggestions }
       setError(null);
       setSuggestion(null);
 
-      // Extract tradingPartnerId from various possible locations
-      const tradingPartnerId = claim?.tradingPartnerId || 
-                               claim?.tradingPartnerServiceId ||
-                               claim?.receiver?.organizationName ||
-                               "STEDI"; // default fallback
+      // Transform the claim to the expected RAG format
+      const transformedClaim = {
+        tradingPartnerId: claim?.tradingPartnerServiceId || 
+                          claim?.receiver?.organizationName ||
+                          "STEDI",
+        usageIndicator: "T" as const,
+        billingProvider: claim?.billing || claim?.billingProvider || {
+          npi: claim?.billing?.npi || "1999999984",
+          name: claim?.billing?.organizationName || "Demo Clinic",
+        },
+        subscriber: claim?.subscriber || {
+          firstName: claim?.subscriber?.firstName || "JANE",
+          lastName: claim?.subscriber?.lastName || "DOE",
+          dateOfBirth: claim?.subscriber?.dateOfBirth || "19700101",
+        },
+        claim: claim?.claim || {
+          patientControlNumber: claim?.claim?.patientControlNumber || "PCN-001",
+          totalChargeAmount: claim?.claim?.totalChargeAmount || "240.00",
+          placeOfServiceCode: claim?.claim?.placeOfServiceCode || "11",
+          diagnosisCodes: claim?.claim?.diagnosisCodes || ["R519"],
+          serviceLines: claim?.claim?.serviceLines || [
+            {
+              procedureCode: "99213",
+              diagnosisPointers: [1],
+              unitCount: 1,
+              chargeAmount: "180.00",
+              serviceDate: "2025-01-05",
+            }
+          ],
+        },
+      };
 
       const response = await fetch("/api/rag/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          claim: claim,
-          payerId: tradingPartnerId,
-          specialty: "primary_care", // Could be dynamic based on claim data
+          claim: transformedClaim,
+          payerId: transformedClaim.tradingPartnerId,
+          specialty: "primary_care",
         }),
       });
 
