@@ -453,10 +453,16 @@ function DashboardContent() {
               <Link className="text-sm font-medium text-slate-800" href="/dashboard">
                 Dashboard
               </Link>
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">
+                Upload
+              </Link>
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/denials">
+                Denials
+              </Link>
               <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">
                 Reports
               </Link>
-              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="#">
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/settings">
                 Settings
               </Link>
             </nav>

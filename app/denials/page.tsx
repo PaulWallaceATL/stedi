@@ -113,8 +113,10 @@ export default function DenialsPage() {
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/dashboard">Dashboard</Link>
-              <Link className="text-sm font-medium text-[#137fec] font-semibold" href="/denials">Denial Manager</Link>
-              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">Reporting</Link>
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">Upload</Link>
+              <Link className="text-sm font-medium text-[#137fec] font-semibold" href="/denials">Denials</Link>
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">Reports</Link>
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/settings">Settings</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

@@ -15,10 +15,14 @@ export default function SettingsPage() {
           </svg>
           <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">Clinix AI Billing</h2>
         </div>
-        <div className="flex flex-1 justify-end items-center gap-4">
-          <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-gray-100 text-gray-800">
-            <span className="material-symbols-outlined text-xl">settings</span>
-          </button>
+        <nav className="hidden md:flex items-center gap-8">
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/dashboard">Dashboard</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">Upload</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/denials">Denials</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">Reports</Link>
+          <Link className="text-sm font-medium text-[#137fec] font-semibold" href="/settings">Settings</Link>
+        </nav>
+        <div className="flex items-center gap-4">
           <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-gray-100 text-gray-800">
             <span className="material-symbols-outlined text-xl">notifications</span>
           </button>

@@ -105,7 +105,8 @@ export default function UploadPage() {
         <div className="flex flex-1 justify-end gap-6 items-center">
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/dashboard">Dashboard</Link>
-            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/claims/new">Claims</Link>
+            <Link className="text-[#137fec] font-semibold text-sm leading-normal" href="/upload">Upload</Link>
+            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/denials">Denials</Link>
             <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/performance">Reports</Link>
             <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/settings">Settings</Link>
           </div>

@@ -131,12 +131,34 @@ export default function PerformancePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f7f8] text-slate-900">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10">
+    <div className="min-h-screen bg-[#f6f7f8] text-slate-900">
+      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 px-6 sm:px-10 py-3 bg-white sticky top-0 z-10">
+        <div className="flex items-center gap-4 text-gray-900">
+          <svg className="w-6 h-6 text-[#137fec]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+          </svg>
+          <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">Clinix AI Billing</h2>
+        </div>
+        <nav className="hidden md:flex items-center gap-8">
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/dashboard">Dashboard</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">Upload</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/denials">Denials</Link>
+          <Link className="text-sm font-medium text-[#137fec] font-semibold" href="/performance">Reports</Link>
+          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/settings">Settings</Link>
+        </nav>
+        <div className="flex items-center gap-4">
+          <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-gray-100 text-gray-800">
+            <span className="material-symbols-outlined text-xl">notifications</span>
+          </button>
+          <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAo26DySMBL37uyyFxr2SZsBgv_9bZgBqxg4Hcye7R9T5aR1R4uO2DDnTWYCEPT0KrSg7LkmEh-WjktqZZBOYx7JmuNBHY7Hv3UEYe-aTBBzJ7mwjsUvhp64pCcCEid15VCuLJVK9pRQO3BzCjdj6953fO4SEvGQ_KVbHkuDK4sUN5LlEnBPnBmVfuD2GOMyP1CGZ-wmLx4v0NzlE2GyThneMjSybEVobsNuw1Zk0immZQYf-H__5ROO_WhN2lCwowjtq9tKo3jul4")'}}></div>
+        </div>
+      </header>
+      <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-900">Performance</h1>
-          <Link href="/dashboard" className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 hover:bg-slate-200">
-            Back to dashboard
+          <h1 className="text-2xl font-bold text-slate-900">Performance Reports</h1>
+          <Link href="/claims/new" className="flex items-center gap-2 rounded-lg bg-[#137fec] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#0f6acc]">
+            <span className="material-symbols-outlined text-base">add</span>
+            New Claim
           </Link>
         </div>
 
@@ -171,8 +193,8 @@ export default function PerformancePage() {
             )}
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 

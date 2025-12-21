@@ -23,22 +23,18 @@ function SuccessContent() {
             </div>
             <h2 className="text-lg font-bold tracking-tight">Clinix AI Billing</h2>
           </div>
-          <div className="flex flex-1 justify-end gap-8">
-            <div className="hidden md:flex items-center gap-9">
-              <Link className="text-gray-800 text-sm font-medium leading-normal" href="/dashboard">Dashboard</Link>
-              <Link className="text-gray-800 text-sm font-medium leading-normal" href="/claims/new">Claims</Link>
-              <Link className="text-gray-800 text-sm font-medium leading-normal" href="#">Patients</Link>
-              <Link className="text-gray-800 text-sm font-medium leading-normal" href="/performance">Reports</Link>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-100 text-gray-800 gap-2 text-sm font-bold">
-                <span className="material-symbols-outlined text-xl">settings</span>
-              </button>
-              <button className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-100 text-gray-800 gap-2 text-sm font-bold">
-                <span className="material-symbols-outlined text-xl">notifications</span>
-              </button>
-              <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs2yODZYHNsbsGS70ZzOd_Ktwc1uWgK7u7jrG4F--NOwBFXSxRRK1Y1b2SoRHFKn1D71VBqSJLlrpiLES-UKbkdgXz5caOHnMPz2paxMZoMi6oCQRfJ4PRmfKbnc-pc4GsCieZY8FArqjlCpJYh1McvsadU5_ycytxJjNhgNZ-7W1WVUVHv3o4jh_h8d4BzPkB7L7ib3ojZ0FNQp5cumvTFmSBliFvytjvQ81WHFVRqJT5hVq9kcVDljpDIU_uGul5dO7qHbdBrpM")'}}></div>
-            </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/dashboard">Dashboard</Link>
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">Upload</Link>
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/denials">Denials</Link>
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">Reports</Link>
+            <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/settings">Settings</Link>
+          </nav>
+          <div className="flex items-center gap-2">
+            <button className="flex cursor-pointer items-center justify-center rounded-full h-10 w-10 bg-gray-100 text-gray-800 gap-2 text-sm font-bold">
+              <span className="material-symbols-outlined text-xl">notifications</span>
+            </button>
+            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs2yODZYHNsbsGS70ZzOd_Ktwc1uWgK7u7jrG4F--NOwBFXSxRRK1Y1b2SoRHFKn1D71VBqSJLlrpiLES-UKbkdgXz5caOHnMPz2paxMZoMi6oCQRfJ4PRmfKbnc-pc4GsCieZY8FArqjlCpJYh1McvsadU5_ycytxJjNhgNZ-7W1WVUVHv3o4jh_h8d4BzPkB7L7ib3ojZ0FNQp5cumvTFmSBliFvytjvQ81WHFVRqJT5hVq9kcVDljpDIU_uGul5dO7qHbdBrpM")'}}></div>
           </div>
         </div>
       </header>
