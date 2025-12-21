@@ -319,6 +319,20 @@ function DashboardContent() {
     };
   }, [claims, supabaseMissing, polling]);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowNotifications(false);
+      setShowHelpMenu(false);
+      setShowProfileMenu(false);
+    };
+    
+    if (showNotifications || showHelpMenu || showProfileMenu) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [showNotifications, showHelpMenu, showProfileMenu]);
+
   if (supabaseMissing) {
     return (
       <main className="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-6">
@@ -345,20 +359,6 @@ function DashboardContent() {
       </main>
     );
   }
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setShowNotifications(false);
-      setShowHelpMenu(false);
-      setShowProfileMenu(false);
-    };
-    
-    if (showNotifications || showHelpMenu || showProfileMenu) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }
-  }, [showNotifications, showHelpMenu, showProfileMenu]);
 
   const toggleExpandClaim = (claimId: string) => {
     setExpandedClaims((prev) => {
