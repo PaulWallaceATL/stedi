@@ -122,6 +122,12 @@ function DashboardContent() {
   const [events, setEvents] = useState<ClaimEvent[]>([]);
   const [polling, setPolling] = useState(false);
   const [expandedClaims, setExpandedClaims] = useState<Set<string>>(new Set());
+  
+  // Interactive UI state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showHelpMenu, setShowHelpMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -203,6 +209,32 @@ function DashboardContent() {
   );
 
   const recentEvents = useMemo(() => events.slice(0, 8), [events]);
+  
+  // Filtered claims based on search query
+  const filteredClaims = useMemo(() => {
+    if (!searchQuery.trim()) return claims;
+    const query = searchQuery.toLowerCase();
+    return claims.filter((claim) => {
+      const patientName = derivePatientName(claim).toLowerCase();
+      const payerName = (claim.payer_name || "").toLowerCase();
+      const claimId = (claim.id || "").toLowerCase();
+      const status = (claim.status || "").toLowerCase();
+      return (
+        patientName.includes(query) ||
+        payerName.includes(query) ||
+        claimId.includes(query) ||
+        status.includes(query)
+      );
+    });
+  }, [claims, searchQuery]);
+  
+  // Handle sign out
+  const handleSignOut = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+      window.location.href = "/login";
+    }
+  };
 
   const buildStatusPayload = (claim: ClaimRow) => {
     const p = claim.payload || {};
@@ -313,6 +345,20 @@ function DashboardContent() {
       </main>
     );
   }
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowNotifications(false);
+      setShowHelpMenu(false);
+      setShowProfileMenu(false);
+    };
+    
+    if (showNotifications || showHelpMenu || showProfileMenu) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [showNotifications, showHelpMenu, showProfileMenu]);
 
   const toggleExpandClaim = (claimId: string) => {
     setExpandedClaims((prev) => {
@@ -471,17 +517,123 @@ function DashboardContent() {
             <label className="relative hidden sm:block">
               <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xl" />
               <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="form-input w-full min-w-0 resize-none overflow-hidden rounded-lg bg-slate-100 text-slate-900 focus:outline-0 focus:ring-2 focus:ring-[#137fec]/50 border-transparent h-10 placeholder:text-slate-400 pl-10 pr-4 text-sm"
                 placeholder="Search claims..."
               />
             </label>
-            <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600">
-              <MaterialIcon name="notifications" className="text-xl" />
-            </button>
-            <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600">
-              <MaterialIcon name="help" className="text-xl" />
-            </button>
-            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAo26DySMBL37uyyFxr2SZsBgv_9bZgBqxg4Hcye7R9T5aR1R4uO2DDnTWYCEPT0KrSg7LkmEh-WjktqZZBOYx7JmuNBHY7Hv3UEYe-aTBBzJ7mwjsUvhp64pCcCEid15VCuLJVK9pRQO3BzCjdj6953fO4SEvGQ_KVbHkuDK4sUN5LlEnBPnBmVfuD2GOMyP1CGZ-wmLx4v0NzlE2GyThneMjSybEVobsNuw1Zk0immZQYf-H__5ROO_WhN2lCwowjtq9tKo3jul4")'}}></div>
+            
+            <div className="relative">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowNotifications(!showNotifications);
+                  setShowHelpMenu(false);
+                  setShowProfileMenu(false);
+                }}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors relative"
+              >
+                <MaterialIcon name="notifications" className="text-xl" />
+                {recentEvents.length > 0 && (
+                  <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500"></span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-lg border border-slate-200 z-50 max-h-96 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="p-4 border-b border-slate-200">
+                    <h3 className="font-semibold text-slate-900">Notifications</h3>
+                  </div>
+                  {recentEvents.length === 0 ? (
+                    <div className="p-4 text-sm text-slate-500 text-center">No new notifications</div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {recentEvents.map((evt) => (
+                        <div key={evt.id} className="p-3 hover:bg-slate-50 transition-colors">
+                          <p className="text-sm font-medium text-slate-900">{evt.type || "Event"}</p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {evt.created_at ? new Date(evt.created_at).toLocaleString() : "Recently"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <div className="relative">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowHelpMenu(!showHelpMenu);
+                  setShowNotifications(false);
+                  setShowProfileMenu(false);
+                }}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+              >
+                <MaterialIcon name="help" className="text-xl" />
+              </button>
+              
+              {showHelpMenu && (
+                <div className="absolute right-0 top-12 w-64 bg-white rounded-lg shadow-lg border border-slate-200 z-50" onClick={(e) => e.stopPropagation()}>
+                  <div className="p-2">
+                    <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors" onClick={() => setShowHelpMenu(false)}>
+                      <MaterialIcon name="description" className="text-slate-600" />
+                      <span className="text-sm text-slate-900">Documentation</span>
+                    </Link>
+                    <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors" onClick={() => setShowHelpMenu(false)}>
+                      <MaterialIcon name="support_agent" className="text-slate-600" />
+                      <span className="text-sm text-slate-900">Contact Support</span>
+                    </Link>
+                    <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors" onClick={() => setShowHelpMenu(false)}>
+                      <MaterialIcon name="info" className="text-slate-600" />
+                      <span className="text-sm text-slate-900">About</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowProfileMenu(!showProfileMenu);
+                  setShowNotifications(false);
+                  setShowHelpMenu(false);
+                }}
+                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 hover:ring-2 hover:ring-[#137fec] transition-all cursor-pointer"
+                style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAo26DySMBL37uyyFxr2SZsBgv_9bZgBqxg4Hcye7R9T5aR1R4uO2DDnTWYCEPT0KrSg7LkmEh-WjktqZZBOYx7JmuNBHY7Hv3UEYe-aTBBzJ7mwjsUvhp64pCcCEid15VCuLJVK9pRQO3BzCjdj6953fO4SEvGQ_KVbHkuDK4sUN5LlEnBPnBmVfuD2GOMyP1CGZ-wmLx4v0NzlE2GyThneMjSybEVobsNuw1Zk0immZQYf-H__5ROO_WhN2lCwowjtq9tKo3jul4")'}}
+              ></button>
+              
+              {showProfileMenu && (
+                <div className="absolute right-0 top-12 w-56 bg-white rounded-lg shadow-lg border border-slate-200 z-50" onClick={(e) => e.stopPropagation()}>
+                  <div className="p-3 border-b border-slate-200">
+                    <p className="text-sm font-semibold text-slate-900">Account</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{userId ? `ID: ${userId.slice(0, 8)}...` : "Not signed in"}</p>
+                  </div>
+                  <div className="p-2">
+                    <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors" onClick={() => setShowProfileMenu(false)}>
+                      <MaterialIcon name="person" className="text-slate-600" />
+                      <span className="text-sm text-slate-900">Profile</span>
+                    </Link>
+                    <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors" onClick={() => setShowProfileMenu(false)}>
+                      <MaterialIcon name="settings" className="text-slate-600" />
+                      <span className="text-sm text-slate-900">Settings</span>
+                    </Link>
+                    <button 
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors text-left"
+                    >
+                      <MaterialIcon name="logout" className="text-red-600" />
+                      <span className="text-sm text-red-600">Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -740,7 +892,7 @@ function DashboardContent() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {claims.map((claim) => {
+                    {filteredClaims.map((claim) => {
                       const isExpanded = expandedClaims.has(claim.id);
                       const codes = getClaimCodes(claim);
                       return (
@@ -803,7 +955,12 @@ function DashboardContent() {
                 </table>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200 p-4 text-sm text-slate-600">
-                <span>Showing 1 to {claims.length} of {claims.length} claims</span>
+                <span>
+                  Showing 1 to {filteredClaims.length} of {claims.length} claims
+                  {searchQuery && filteredClaims.length !== claims.length && (
+                    <span className="ml-2 text-[#137fec]">(filtered)</span>
+                  )}
+                </span>
                 <div className="flex gap-2">
                   <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50">
                     <MaterialIcon name="chevron_left" className="text-base" />
