@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -27,6 +28,15 @@ type ClaimEvent = {
   payload?: any;
   created_at?: string | null;
 };
+
+// Material Symbol component for cleaner icon usage
+function MaterialIcon({ name, className = "" }: { name: string; className?: string }) {
+  return (
+    <span className={`material-symbols-outlined ${className}`} style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
+      {name}
+    </span>
+  );
+}
 
 function currency(value?: number | null) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
@@ -82,7 +92,19 @@ function StatusPill({ status }: { status?: string | null }) {
     danger: "bg-rose-100 text-rose-700",
     muted: "bg-slate-100 text-slate-600",
   };
-  return <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium ${toneClasses[meta.tone]}`}>{meta.label}</span>;
+  const iconNames: Record<string, string> = {
+    success: "check_circle",
+    primary: "schedule",
+    warning: "error",
+    danger: "cancel",
+    muted: "draft",
+  };
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium ${toneClasses[meta.tone]}`}>
+      <MaterialIcon name={iconNames[meta.tone]} className="text-xs" />
+      {meta.label}
+    </span>
+  );
 }
 
 export default function DashboardPage() {
@@ -284,6 +306,53 @@ export default function DashboardPage() {
     );
   }
 
+  const [expandedClaims, setExpandedClaims] = useState<Set<string>>(new Set());
+
+  const toggleExpandClaim = (claimId: string) => {
+    setExpandedClaims((prev) => {
+      const next = new Set(prev);
+      if (next.has(claimId)) {
+        next.delete(claimId);
+      } else {
+        next.add(claimId);
+      }
+      return next;
+    });
+  };
+
+  // Sample status codes for demonstration
+  const getClaimCodes = (claim: ClaimRow) => {
+    const status = deriveStatusMeta(claim.status).label;
+    if (status === "Denied") {
+      return {
+        statusCodes: [
+          { code: "D5", description: "Services not covered." },
+          { code: "B2", description: "Duplicate claim." },
+        ],
+        clearinghouse: [{ code: "CLH-REJ-002", description: "Payer rejected claim." }],
+      };
+    }
+    if (status === "Needs Review") {
+      return {
+        statusCodes: [
+          { code: "A1", description: "Patient not found in system." },
+          { code: "M80", description: "Not medically appropriate." },
+        ],
+        clearinghouse: [{ code: "CLH-RJ-001", description: "Invalid Subscriber ID." }],
+      };
+    }
+    if (status === "Accepted") {
+      return {
+        statusCodes: [{ code: "C0", description: "Claim paid." }],
+        clearinghouse: [{ code: "CLH-ACK-001", description: "Final acknowledgment received." }],
+      };
+    }
+    return {
+      statusCodes: [{ code: "P2", description: "Claim Pending Review." }],
+      clearinghouse: [{ code: "CLH-ACC-001", description: "Claim accepted by clearinghouse." }],
+    };
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-100 text-slate-900 flex items-center justify-center">
@@ -363,102 +432,119 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-[#f6f7f8] text-slate-900">
-      <div className="flex min-h-screen flex-col">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
-          <div className="flex items-center gap-3 text-slate-900">
-            <div className="text-[#137fec]">
-              <svg className="h-6 w-6" viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" />
-              </svg>
+      <div className="flex h-screen w-full flex-col">
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-white px-6 py-3 shrink-0">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3 text-slate-900">
+              <div className="text-[#137fec]">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+                </svg>
+              </div>
+              <h2 className="text-lg font-bold tracking-tight">Clinix AI Billing</h2>
             </div>
-            <h2 className="text-lg font-bold tracking-tight">Clinix AI Billing</h2>
-            <nav className="hidden md:flex items-center gap-6 text-sm text-slate-600">
-              <Link className="font-medium text-slate-900" href="/dashboard">
+            <nav className="hidden md:flex items-center gap-8">
+              <Link className="text-sm font-medium text-slate-800" href="/dashboard">
                 Dashboard
               </Link>
-              <Link className="hover:text-slate-900" href="#">
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">
                 Reports
               </Link>
-              <Link className="hover:text-slate-900" href="#">
+              <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="#">
                 Settings
               </Link>
             </nav>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block">
+          <div className="flex items-center gap-4">
+            <label className="relative hidden sm:block">
+              <MaterialIcon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xl" />
               <input
-                className="h-10 rounded-lg border border-slate-200 bg-slate-100 px-4 pr-4 text-sm text-slate-700 outline-none focus:border-[#137fec] focus:ring-2 focus:ring-[#137fec]/30"
+                className="form-input w-full min-w-0 resize-none overflow-hidden rounded-lg bg-slate-100 text-slate-900 focus:outline-0 focus:ring-2 focus:ring-[#137fec]/50 border-transparent h-10 placeholder:text-slate-400 pl-10 pr-4 text-sm"
                 placeholder="Search claims..."
               />
-            </div>
-            <Link
-              href="/claims/new"
-              className="flex items-center justify-center gap-2 rounded-lg bg-[#137fec] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#0f6acc]"
-            >
-              <span>New Claim</span>
-            </Link>
+            </label>
+            <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600">
+              <MaterialIcon name="notifications" className="text-xl" />
+            </button>
+            <button className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-600">
+              <MaterialIcon name="help" className="text-xl" />
+            </button>
+            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAo26DySMBL37uyyFxr2SZsBgv_9bZgBqxg4Hcye7R9T5aR1R4uO2DDnTWYCEPT0KrSg7LkmEh-WjktqZZBOYx7JmuNBHY7Hv3UEYe-aTBBzJ7mwjsUvhp64pCcCEid15VCuLJVK9pRQO3BzCjdj6953fO4SEvGQ_KVbHkuDK4sUN5LlEnBPnBmVfuD2GOMyP1CGZ-wmLx4v0NzlE2GyThneMjSybEVobsNuw1Zk0immZQYf-H__5ROO_WhN2lCwowjtq9tKo3jul4")'}}></div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto p-6 lg:p-8">
-          <div className="mx-auto flex max-w-screen-2xl flex-col gap-6">
-            <div className="flex justify-center">
-              <div className="inline-flex items-center rounded-lg bg-slate-200/70 p-1">
-                <button className="rounded-md bg-[#137fec] px-4 py-1.5 text-sm font-semibold text-white shadow-sm">Billing Ops Manager</button>
-                <button className="rounded-md px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-200">Intelligent Prioritization</button>
-                <button className="rounded-md px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-200">Performance Review</button>
+        <div className="flex-1 overflow-auto p-6 lg:p-8">
+          <div className="mx-auto max-w-screen-2xl">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="flex items-center gap-2 rounded-lg bg-slate-100 p-1 w-fit">
+                  <Link href="/dashboard" className="px-3 py-1 text-sm font-semibold text-[#137fec] bg-white shadow-sm rounded-md">
+                    Billing Ops Manager
+                  </Link>
+                  <Link href="/dashboard" className="px-3 py-1 text-sm font-medium text-slate-600 rounded-md hover:bg-white">
+                    Intelligent Prioritization
+                  </Link>
+                  <Link href="/performance" className="px-3 py-1 text-sm font-medium text-slate-600 rounded-md hover:bg-white">
+                    Performance Review
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <h1 className="text-2xl font-bold text-slate-900">Claim Management Dashboard</h1>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                  <span>More Filters</span>
-                </button>
-                <Link
-                  href="/claims/new"
-                  className="flex items-center justify-center gap-2 rounded-lg bg-[#137fec] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#0f6acc]"
-                >
-                  <span>New Claim</span>
-                </Link>
-              </div>
-            </header>
+              <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-900">Intelligent Prioritization Hub</h1>
+                </div>
+                <div className="flex items-center gap-2 self-start sm:self-center">
+                  <button className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <MaterialIcon name="filter_list" className="text-base" />
+                    <span>More Filters</span>
+                  </button>
+                  <Link
+                    href="/claims/new"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-[#137fec] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#0f6acc]"
+                  >
+                    <MaterialIcon name="add" className="text-base" />
+                    <span>New Claim</span>
+                  </Link>
+                </div>
+              </header>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-500">Total AR</p>
-                  <span className="text-[#137fec]">⦿</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
+                  <MaterialIcon name="error" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                  <p className="text-sm font-medium text-red-800">Needs Attention / Escalation</p>
+                  <p className="text-3xl font-bold mt-1">{summary.needsAttention}</p>
+                  <p className="text-xs text-red-600 mt-0.5">Critical claims requiring immediate action</p>
                 </div>
-                <p className="text-3xl font-bold text-slate-900">{currency(summary.totalCharges)}</p>
-                <p className="text-sm text-slate-600 mt-1">Calculated from claim charge amount</p>
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-500">First Pass Approval</p>
-                  <span className="text-emerald-500">●</span>
+
+                <div className="flex flex-col rounded-xl border border-[#137fec] bg-blue-50 p-4 text-blue-700 relative overflow-hidden">
+                  <MaterialIcon name="calendar_today" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                  <p className="text-sm font-medium text-blue-800">AR Aging (0-30 Days)</p>
+                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.65)}</p>
+                  <p className="text-xs text-blue-600 mt-0.5">Healthy aging claims</p>
                 </div>
-                <p className="text-3xl font-bold text-slate-900">{summary.acceptedRate}%</p>
-                <p className="text-sm text-slate-600 mt-1">Accepted / total claims</p>
-              </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-500">Submitted</p>
-                  <span className="text-amber-500">●</span>
+
+                <div className="flex flex-col rounded-xl border border-amber-500 bg-amber-50 p-4 text-amber-700 relative overflow-hidden">
+                  <MaterialIcon name="watch_later" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                  <p className="text-sm font-medium text-amber-800">AR Aging (30-60 Days)</p>
+                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.25)}</p>
+                  <p className="text-xs text-amber-600 mt-0.5">Monitor closely for potential issues</p>
                 </div>
-                <p className="text-3xl font-bold text-slate-900">{summary.submittedCount}</p>
-                <p className="text-sm text-slate-600 mt-1">Currently in flight</p>
-              </div>
-              <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 shadow-sm text-rose-700">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Needs Attention</p>
-                  <span>!</span>
+
+                <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
+                  <MaterialIcon name="gpp_bad" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                  <p className="text-sm font-medium text-red-800">AR Aging (60+ Days)</p>
+                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.10)}</p>
+                  <p className="text-xs text-red-600 mt-0.5">High priority for follow-up</p>
                 </div>
-                <p className="text-3xl font-bold">{summary.needsAttention}</p>
-                <p className="text-sm mt-1">Rejected or denied</p>
+
+                <div className="flex flex-col rounded-xl border border-emerald-500 bg-emerald-50 p-4 text-emerald-700 relative overflow-hidden">
+                  <MaterialIcon name="verified" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                  <p className="text-sm font-medium text-emerald-800">First-Pass Resolution</p>
+                  <p className="text-3xl font-bold mt-1">{summary.acceptedRate}%</p>
+                  <p className="text-xs text-emerald-600 mt-0.5">Improving efficiency</p>
+                </div>
               </div>
-            </div>
 
             {(denialClaims.length > 0 || recentEvents.length > 0) && (
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -515,54 +601,124 @@ export default function DashboardPage() {
               </div>
             )}
 
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Patient Name</th>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Claim ID</th>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Date of Service</th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          Patient Name 
+                          <MaterialIcon name="unfold_more" className="text-base" />
+                        </div>
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          Claim ID
+                          <MaterialIcon name="unfold_more" className="text-base" />
+                        </div>
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          Date of Service
+                          <MaterialIcon name="unfold_more" className="text-base" />
+                        </div>
+                      </th>
                       <th className="px-6 py-3 text-left font-semibold text-slate-600">Payer</th>
-                      <th className="px-6 py-3 text-right font-semibold text-slate-600">Billed Amount</th>
+                      <th className="px-6 py-3 text-right font-semibold text-slate-600">
+                        <div className="flex items-center justify-end gap-1 cursor-pointer">
+                          Billed Amount
+                          <MaterialIcon name="unfold_more" className="text-base" />
+                        </div>
+                      </th>
                       <th className="px-6 py-3 text-left font-semibold text-slate-600">Status</th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          Codes
+                          <MaterialIcon name="unfold_more" className="text-base" />
+                        </div>
+                      </th>
                       <th className="px-6 py-3 text-left font-semibold text-slate-600">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {claims.map((claim) => (
-                      <tr key={claim.id} className="bg-white">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-800">{derivePatientName(claim)}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-slate-600">{claim.id}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-slate-600">{deriveDateOfService(claim)}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-slate-600">{claim.trading_partner_name || "—"}</td>
-                        <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-slate-800">{currency(claim.claim_charge_amount)}</td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <StatusPill status={claim.status} />
-                        </td>
-                        <td className="whitespace-nowrap px-6 py-4">
-                          <Link
-                            href={`/claims/${claim.id}`}
-                            className="rounded-md bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
-                          >
-                            View Claim Details
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
+                    {claims.map((claim) => {
+                      const isExpanded = expandedClaims.has(claim.id);
+                      const codes = getClaimCodes(claim);
+                      return (
+                        <React.Fragment key={claim.id}>
+                          <tr className="bg-white">
+                            <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-800">{derivePatientName(claim)}</td>
+                            <td className="whitespace-nowrap px-6 py-4 text-slate-600">{claim.id.substring(0, 12)}...</td>
+                            <td className="whitespace-nowrap px-6 py-4 text-slate-600">{deriveDateOfService(claim)}</td>
+                            <td className="whitespace-nowrap px-6 py-4 text-slate-600">{claim.trading_partner_name || claim.payer_name || "—"}</td>
+                            <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-slate-800">{currency(claim.claim_charge_amount)}</td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <StatusPill status={claim.status} />
+                            </td>
+                            <td className="px-6 py-4">
+                              <button
+                                onClick={() => toggleExpandClaim(claim.id)}
+                                className="flex items-center gap-1 text-[#137fec] hover:underline focus:outline-none text-sm"
+                              >
+                                <MaterialIcon name="info" className="text-base" />
+                                View Codes
+                              </button>
+                            </td>
+                            <td className="whitespace-nowrap px-6 py-4">
+                              <Link
+                                href={`/claims/${claim.id}`}
+                                className="rounded-md bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
+                              >
+                                View Claim Details
+                              </Link>
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr>
+                              <td colSpan={8} className="p-4 bg-slate-50 border-t border-slate-200">
+                                <div className="flex flex-col gap-2 text-slate-700 text-xs px-4">
+                                  <p className="font-semibold">Status Codes:</p>
+                                  <ul className="list-disc list-inside ml-4">
+                                    {codes.statusCodes.map((sc, i) => (
+                                      <li key={i}>
+                                        <strong className="text-slate-900">{sc.code}:</strong> {sc.description}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                  <p className="font-semibold mt-2">Clearinghouse Acknowledgment:</p>
+                                  <ul className="list-disc list-inside ml-4">
+                                    {codes.clearinghouse.map((ch, i) => (
+                                      <li key={i}>
+                                        <strong className="text-slate-900">{ch.code}:</strong> {ch.description}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
               <div className="flex items-center justify-between border-t border-slate-200 p-4 text-sm text-slate-600">
-                <span>Showing {claims.length} claim{claims.length === 1 ? "" : "s"}</span>
+                <span>Showing 1 to {claims.length} of {claims.length} claims</span>
                 <div className="flex gap-2">
-                  <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50">‹</button>
-                  <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50">›</button>
+                  <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50">
+                    <MaterialIcon name="chevron_left" className="text-base" />
+                  </button>
+                  <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-slate-50">
+                    <MaterialIcon name="chevron_right" className="text-base" />
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </main>
+        </div>
+        </div>
       </div>
     </main>
   );

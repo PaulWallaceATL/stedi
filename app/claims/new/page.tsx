@@ -159,8 +159,10 @@ export default function NewClaimPage() {
         }
       }
 
-      // On successful submit, return to dashboard to view the new claim
-      router.push("/dashboard");
+      // On successful submit, go to success page with claim details
+      const nameParts = draft.patientName.trim().split(/\s+/);
+      const patientNameForUrl = encodeURIComponent(`${nameParts[0]} ${nameParts.slice(1).join(" ") || "DOE"}`);
+      router.push(`/claims/success?patient=${patientNameForUrl}&payer=${encodeURIComponent(draft.payerName)}&amount=${totalCharge.toFixed(2)}`);
     } catch (err: any) {
       const friendly = err?.data?.message || err?.message || "Submit failed. Please adjust test data and retry.";
       setError(friendly);
@@ -173,157 +175,478 @@ export default function NewClaimPage() {
   const summary = buildPayload();
 
   const steps = [
-    { id: 1 as StepId, label: "Patient Information" },
-    { id: 2 as StepId, label: "Payer & Insurance Details" },
-    { id: 3 as StepId, label: "Provider & Facility" },
-    { id: 4 as StepId, label: "Diagnoses (ICD-10)" },
-    { id: 5 as StepId, label: "Service Lines (CPT/HCPCS)" },
-    { id: 6 as StepId, label: "Claim Summary & Submit" },
+    { id: 1 as StepId, label: "Patient Information", icon: "looks_one" },
+    { id: 2 as StepId, label: "Payer & Insurance Details", icon: "looks_two" },
+    { id: 3 as StepId, label: "Provider & Facility", icon: "looks_3" },
+    { id: 4 as StepId, label: "Diagnoses (ICD-10)", icon: "looks_4" },
+    { id: 5 as StepId, label: "Service Lines (CPT/HCPCS)", icon: "looks_5" },
+    { id: 6 as StepId, label: "Claim Summary & Submit", icon: "looks_6" },
   ];
 
   return (
-    <main className="min-h-screen bg-[#f6f7f8] text-slate-900">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Step {step} of 6</p>
-            <h1 className="text-2xl font-bold text-gray-900">Create Claim From Scratch</h1>
+    <div className="relative flex min-h-screen w-full flex-col bg-[#f6f7f8]">
+      <header className="sticky top-0 z-10 w-full border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 py-4 text-gray-900">
+            <svg className="w-8 h-8 text-[#137fec]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+            </svg>
+            <h2 className="text-lg font-bold">Clinix AI Billing</h2>
           </div>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 border border-slate-200 hover:bg-slate-200"
-          >
-            Back to dashboard
-          </button>
         </div>
+      </header>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-          <aside className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            {steps.map((s) => (
-              <button
-                key={s.id}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-slate-100 ${
-                  step === s.id ? "border border-slate-200 bg-slate-50" : ""
-                }`}
-                onClick={() => setStep(s.id)}
-              >
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                    step > s.id ? "bg-emerald-100 text-emerald-700" : step === s.id ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {s.id}
-                </span>
-                <span className="text-sm font-medium text-slate-700">{s.label}</span>
-              </button>
-            ))}
-          </aside>
+      <main className="flex-grow">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="text-4xl font-black leading-tight tracking-tight text-[#111418]">Create Claim From Scratch</p>
+            <p className="text-lg font-normal leading-normal text-[#617589]">Step {step} of 6: {steps.find(s => s.id === step)?.label}</p>
+          </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            {step === 1 && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-900">Patient Information</h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <FormInput label="Patient Name" value={draft.patientName} onChange={(v) => setDraft((p) => ({ ...p, patientName: v }))} />
-                  <FormInput label="DOB" value={draft.dob} onChange={(v) => setDraft((p) => ({ ...p, dob: v }))} placeholder="YYYY-MM-DD" />
-                  <FormInput label="Member ID" value={draft.memberId} onChange={(v) => setDraft((p) => ({ ...p, memberId: v }))} />
-                  <FormInput label="MRN (optional)" value="MRN-TEST-001" onChange={() => {}} placeholder="MRN" />
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-900">Payer & Insurance</h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <FormInput label="Payer" value={draft.payerName} onChange={(v) => setDraft((p) => ({ ...p, payerName: v }))} />
-                  <FormInput label="Plan Type" value="PPO" onChange={() => {}} />
-                  <FormInput label="Policy Number" value={draft.policyNumber} onChange={(v) => setDraft((p) => ({ ...p, policyNumber: v }))} />
-                  <FormInput label="Group Number" value={draft.groupNumber} onChange={(v) => setDraft((p) => ({ ...p, groupNumber: v }))} />
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-900">Provider & Facility</h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <FormInput label="Billing Provider" value={draft.billingProvider} onChange={(v) => setDraft((p) => ({ ...p, billingProvider: v }))} />
-                  <FormInput label="Billing NPI" value={draft.billingNpi} onChange={(v) => setDraft((p) => ({ ...p, billingNpi: v }))} />
-                  <FormInput label="Rendering Provider" value="Dr. Demo" onChange={() => {}} />
-                  <FormInput label="POS" value={draft.posCode} onChange={(v) => setDraft((p) => ({ ...p, posCode: v }))} />
-                </div>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-900">Diagnoses (ICD-10)</h3>
-                <p className="text-sm text-gray-600">Prefilled for testing: M54.2 (Cervicalgia).</p>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800">
-                  Diagnosis: ABK / M542
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-900">Service Lines (CPT/HCPCS)</h3>
-                <div className="space-y-3">
-                  {draft.serviceLines.map((line, idx) => (
-                    <div key={idx} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-                      <div className="flex justify-between text-sm font-semibold text-slate-800">
-                        <span>{line.code}</span>
-                        <span>${line.charge.toFixed(2)}</span>
-                      </div>
-                      <p className="text-slate-600">{line.description}</p>
-                      <p className="text-slate-500 text-xs">
-                        DOS {line.from} — Modifiers: {line.modifiers.join(", ")}
-                      </p>
-                    </div>
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+            {/* Sidebar */}
+            <aside className="lg:col-span-3">
+              <div className="sticky top-28 py-2">
+                <div className="flex flex-col gap-1 rounded-xl bg-white p-6 shadow-lg">
+                  {steps.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setStep(s.id)}
+                      className={`flex items-center gap-4 rounded-lg px-4 py-3 transition-all duration-200 ${
+                        step === s.id
+                          ? "border border-[#137fec] bg-[#137fec]/5 text-[#137fec]"
+                          : step > s.id
+                          ? "text-gray-600 hover:bg-gray-50"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {step > s.id ? (
+                        <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <span className="text-lg">{s.id}</span>
+                      )}
+                      <p className={`text-base ${step === s.id ? 'font-semibold' : 'font-medium'}`}>{s.label}</p>
+                    </button>
                   ))}
                 </div>
               </div>
-            )}
+            </aside>
 
-            {step === 6 && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-bold text-gray-900">Claim Summary</h3>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                  Test mode: prefilled so you can click through. Update patient/member/dates before production.
+            {/* Main Content */}
+            <div className="lg:col-span-9">
+              <div className="grid grid-cols-1 gap-10 xl:grid-cols-3">
+                <div className="relative rounded-xl bg-white p-8 shadow-lg xl:col-span-2">
+                  {step === 1 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Patient Information</h3>
+                        <p className="text-base text-gray-600">Enter patient demographics and identification.</p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                        <div className="sm:col-span-2">
+                          <label className="flex flex-col gap-2">
+                            <span className="text-base font-medium text-[#111418]">Patient Name</span>
+                            <div className="relative">
+                              <span className="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                              <input
+                                className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20"
+                                placeholder="Search by name"
+                                value={draft.patientName}
+                                onChange={(e) => setDraft((p) => ({ ...p, patientName: e.target.value }))}
+                              />
+                            </div>
+                            <p className="text-sm text-gray-500">Start typing to find an existing patient or create a new one.</p>
+                          </label>
+                        </div>
+                        <FormInput label="Date of Birth (DOB)" value={draft.dob} onChange={(v) => setDraft((p) => ({ ...p, dob: v }))} placeholder="YYYY-MM-DD" />
+                        <FormInput label="MRN / Patient ID" value={draft.memberId} onChange={(v) => setDraft((p) => ({ ...p, memberId: v }))} placeholder="Enter Patient ID" />
+                        <div>
+                          <label className="flex flex-col gap-2">
+                            <span className="text-base font-medium text-[#111418]">Gender <span className="text-gray-400">(Optional)</span></span>
+                            <select className="form-select block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20">
+                              <option>Select Gender</option>
+                              <option>Male</option>
+                              <option>Female</option>
+                              <option>Other</option>
+                            </select>
+                          </label>
+                        </div>
+                        <div>
+                          <label className="flex flex-col gap-2">
+                            <span className="text-base font-medium text-[#111418]">Relationship to Subscriber</span>
+                            <select className="form-select block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20">
+                              <option>Self</option>
+                              <option>Spouse</option>
+                              <option>Child</option>
+                              <option>Other</option>
+                            </select>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 2 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Payer & Insurance Details</h3>
+                        <p className="text-base text-gray-600">Enter insurance plan information for this claim.</p>
+                      </div>
+                      <div className="space-y-6">
+                        <h4 className="text-lg font-semibold text-[#111418]">Primary Payer Information</h4>
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                          <div className="sm:col-span-2">
+                            <label className="flex flex-col gap-2">
+                              <span className="text-base font-medium text-[#111418]">Payer Name</span>
+                              <div className="relative">
+                                <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                                <input
+                                  className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20"
+                                  placeholder="Search for a payer..."
+                                  value={draft.payerName}
+                                  onChange={(e) => setDraft((p) => ({ ...p, payerName: e.target.value }))}
+                                />
+                              </div>
+                            </label>
+                          </div>
+                          <div>
+                            <label className="flex flex-col gap-2">
+                              <span className="text-base font-medium text-[#111418]">Plan Type</span>
+                              <select className="form-select block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20">
+                                <option>PPO</option>
+                                <option>HMO</option>
+                                <option>Medicare</option>
+                                <option>Medicaid</option>
+                                <option>Commercial</option>
+                              </select>
+                            </label>
+                          </div>
+                          <FormInput label="Policy Number" value={draft.policyNumber} onChange={(v) => setDraft((p) => ({ ...p, policyNumber: v }))} placeholder="Enter policy number" />
+                          <FormInput label="Group Number" value={draft.groupNumber} onChange={(v) => setDraft((p) => ({ ...p, groupNumber: v }))} placeholder="Enter group number" />
+                          <FormInput label="Subscriber ID" value={draft.memberId} onChange={(v) => setDraft((p) => ({ ...p, memberId: v }))} placeholder="Enter subscriber ID" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 3 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Provider & Facility</h3>
+                        <p className="text-base text-gray-600">These details determine who is billing for the service and where the patient was treated.</p>
+                      </div>
+                      <div className="space-y-6">
+                        <h4 className="text-lg font-semibold text-[#111418]">Provider Information</h4>
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                          <div className="sm:col-span-2">
+                            <label className="flex flex-col gap-2">
+                              <span className="text-base font-medium text-[#111418]">Billing Provider</span>
+                              <div className="relative">
+                                <span className="material-symbols-outlined pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                                <input
+                                  className="form-input block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white pl-11 pr-4 text-base text-[#111418] placeholder:text-[#617589] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20"
+                                  placeholder="Search by name or NPI"
+                                  value={draft.billingProvider}
+                                  onChange={(e) => setDraft((p) => ({ ...p, billingProvider: e.target.value }))}
+                                />
+                              </div>
+                            </label>
+                          </div>
+                          <FormInput label="Billing NPI" value={draft.billingNpi} onChange={(v) => setDraft((p) => ({ ...p, billingNpi: v }))} placeholder="Auto-populated" />
+                          <FormInput label="Taxonomy Code (Optional)" value="" onChange={() => {}} placeholder="Enter taxonomy code" />
+                        </div>
+                        <hr className="border-gray-200" />
+                        <h4 className="text-lg font-semibold text-[#111418]">Facility / Place of Service</h4>
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                          <FormInput label="Facility Name (Optional)" value="" onChange={() => {}} placeholder="Enter facility name" />
+                          <div>
+                            <label className="flex flex-col gap-2">
+                              <span className="text-base font-medium text-[#111418]">Place of Service (POS Code)</span>
+                              <select 
+                                className="form-select block h-12 w-full rounded-xl border border-[#dbe0e6] bg-white px-4 text-base text-[#111418] focus:border-[#137fec] focus:outline-0 focus:ring-2 focus:ring-[#137fec]/20"
+                                value={draft.posCode}
+                                onChange={(e) => setDraft((p) => ({ ...p, posCode: e.target.value }))}
+                              >
+                                <option value="11">11 - Office</option>
+                                <option value="22">22 - Hospital Outpatient</option>
+                                <option value="21">21 - Hospital Inpatient</option>
+                                <option value="23">23 - Emergency Room</option>
+                              </select>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 4 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Diagnoses (ICD-10)</h3>
+                        <p className="text-base text-gray-600">Add diagnosis codes that support the services being billed.</p>
+                      </div>
+                      <button className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#137fec] px-6 text-base font-semibold text-white shadow-md hover:bg-[#137fec]/90">
+                        <span className="material-symbols-outlined">add</span>
+                        <span>Add Diagnosis</span>
+                      </button>
+                      <div className="rounded-lg bg-gray-50 p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="inline-flex items-center rounded-full bg-[#137fec]/10 px-2 py-1 text-xs font-medium text-[#137fec]">Primary</span>
+                            <p className="mt-2 text-base font-semibold text-gray-900">M54.2 - Cervicalgia</p>
+                            <p className="text-sm text-gray-600">Pain in the cervical spine (neck pain)</p>
+                          </div>
+                          <button className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 hover:bg-red-100 hover:text-red-600">
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 5 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Service Lines (CPT/HCPCS Codes)</h3>
+                        <p className="text-base text-gray-600">Add one or more service lines that describe the procedures performed.</p>
+                      </div>
+                      <button className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#137fec] px-6 text-base font-semibold text-white shadow-md hover:bg-[#137fec]/90">
+                        <span className="material-symbols-outlined">add</span>
+                        <span>Add Service Line</span>
+                      </button>
+                      <div className="space-y-6">
+                        {draft.serviceLines.map((line, idx) => (
+                          <div key={idx} className="rounded-lg bg-gray-50 p-4">
+                            <div className="flex items-start justify-between mb-4">
+                              <h4 className="text-lg font-bold text-gray-800">Service Line {idx + 1}</h4>
+                              <div className="flex items-center gap-1">
+                                <button className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 hover:bg-gray-200">
+                                  <span className="material-symbols-outlined text-lg">content_copy</span>
+                                </button>
+                                <button className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 hover:bg-red-100 hover:text-red-600">
+                                  <span className="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-12 gap-4">
+                              <div className="col-span-3">
+                                <label className="flex flex-col gap-1.5">
+                                  <span className="text-sm font-medium text-gray-700">CPT / HCPCS Code</span>
+                                  <input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white px-3 text-base" value={line.code} readOnly />
+                                </label>
+                              </div>
+                              <div className="col-span-9">
+                                <label className="flex flex-col gap-1.5">
+                                  <span className="text-sm font-medium text-gray-700">Description</span>
+                                  <input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white/50 px-3 text-base" value={line.description} readOnly />
+                                </label>
+                              </div>
+                              <div className="col-span-6">
+                                <label className="flex flex-col gap-1.5">
+                                  <span className="text-sm font-medium text-gray-700">Service Date</span>
+                                  <input type="date" className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white px-3 text-base" value={line.from} readOnly />
+                                </label>
+                              </div>
+                              <div className="col-span-2">
+                                <label className="flex flex-col gap-1.5">
+                                  <span className="text-sm font-medium text-gray-700">Units</span>
+                                  <input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white px-3 text-base" value="1" readOnly />
+                                </label>
+                              </div>
+                              <div className="col-span-4">
+                                <label className="flex flex-col gap-1.5">
+                                  <span className="text-sm font-medium text-gray-700">Charge Amount</span>
+                                  <div className="relative">
+                                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-500">$</span>
+                                    <input className="form-input block h-11 w-full rounded-lg border border-[#dbe0e6] bg-white pl-7 pr-3 text-base" value={line.charge.toFixed(2)} readOnly />
+                                  </div>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-4">
+                        <h4 className="text-lg font-bold text-gray-800">Service Line Summary</h4>
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Total Charges</p>
+                            <p className="text-xl font-bold text-gray-900">${totalCharge.toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Number of Service Lines</p>
+                            <p className="text-xl font-bold text-gray-900">{draft.serviceLines.length}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 6 && (
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-[#111418]">Claim Summary</h3>
+                        <p className="text-base text-gray-600">Review all details before creating this claim.</p>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-4">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+                          <div className="flex items-start gap-2.5">
+                            <span className="material-symbols-outlined mt-0.5 text-lg text-gray-500">person</span>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Patient Name</p>
+                              <p className="font-semibold text-gray-800">{summary.subscriber.firstName} {summary.subscriber.lastName}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <span className="material-symbols-outlined mt-0.5 text-lg text-gray-500">cake</span>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Date of Birth</p>
+                              <p className="font-semibold text-gray-800">{draft.dob}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <span className="material-symbols-outlined mt-0.5 text-lg text-gray-500">shield</span>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Payer & Plan</p>
+                              <p className="font-semibold text-gray-800">{summary.receiver.organizationName}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <span className="material-symbols-outlined mt-0.5 text-lg text-gray-500">medical_services</span>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Total Charges</p>
+                              <p className="font-semibold text-gray-800">${summary.claimInformation.claimChargeAmount}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <span className="material-symbols-outlined mt-0.5 text-lg text-gray-500">calendar_month</span>
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Service Lines</p>
+                              <p className="font-semibold text-gray-800">{draft.serviceLines.length}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-bold text-gray-800">Patient & Insurance</h4>
+                            <button onClick={() => setStep(1)} className="text-sm font-semibold text-[#137fec] hover:underline">Edit in Step 1–2</button>
+                          </div>
+                          <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 text-sm">
+                            <div><p className="text-gray-500">Patient</p><p className="font-medium text-gray-900">{summary.subscriber.firstName} {summary.subscriber.lastName}</p></div>
+                            <div><p className="text-gray-500">Member ID</p><p className="font-medium text-gray-900">{summary.subscriber.memberId}</p></div>
+                            <div><p className="text-gray-500">Payer</p><p className="font-medium text-gray-900">{summary.receiver.organizationName}</p></div>
+                            <div><p className="text-gray-500">Policy #</p><p className="font-medium text-gray-900">{draft.policyNumber}</p></div>
+                          </div>
+                        </div>
+                        <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-bold text-gray-800">Provider & Facility</h4>
+                            <button onClick={() => setStep(3)} className="text-sm font-semibold text-[#137fec] hover:underline">Edit in Step 3</button>
+                          </div>
+                          <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 text-sm">
+                            <div><p className="text-gray-500">Billing Provider</p><p className="font-medium text-gray-900">{summary.billing.organizationName} (NPI: {summary.billing.npi})</p></div>
+                            <div><p className="text-gray-500">Place of Service</p><p className="font-medium text-gray-900">POS {summary.claimInformation.placeOfServiceCode}</p></div>
+                          </div>
+                        </div>
+                        <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-bold text-gray-800">Service Lines</h4>
+                            <button onClick={() => setStep(5)} className="text-sm font-semibold text-[#137fec] hover:underline">Edit in Step 5</button>
+                          </div>
+                          <div className="mt-4 space-y-3 text-sm">
+                            {draft.serviceLines.map((line, idx) => (
+                              <div key={idx} className="rounded-md border border-gray-200 p-3">
+                                <p className="font-semibold text-gray-800">{idx + 1}. <span className="font-mono">{line.code}</span> - {line.description}</p>
+                                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 pl-5 sm:grid-cols-4 text-gray-500">
+                                  <p>DOS: <span className="font-medium text-gray-700">{line.from}</span></p>
+                                  <p>Units: <span className="font-medium text-gray-700">1</span></p>
+                                  <p>Charge: <span className="font-medium text-gray-700">${line.charge.toFixed(2)}</span></p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      {error && <p className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">{error}</p>}
+                      {supabaseNote && <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{supabaseNote}</p>}
+                      {result && (
+                        <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 overflow-auto">
+                          {JSON.stringify(result, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm text-gray-800">
-                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <p className="font-semibold text-gray-900 mb-2">Patient & Insurance</p>
-                    <p>Patient: {summary.subscriber.firstName} {summary.subscriber.lastName}</p>
-                    <p>DOB: {summary.subscriber.dateOfBirth}</p>
-                    <p>Member ID: {summary.subscriber.memberId}</p>
-                    <p>Payer: {summary.receiver.organizationName}</p>
+
+                {/* Quick Tip Panel */}
+                <div className="xl:col-span-1">
+                  <div className="sticky top-28 rounded-xl bg-blue-50 p-6">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-xl text-blue-600" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
+                      <h4 className="text-lg font-semibold text-blue-700">Quick Tip</h4>
+                    </div>
+                    {step === 1 && (
+                      <p className="mt-4 text-base leading-relaxed text-gray-700">You can link to an existing patient by searching their name or create a new one by filling out the form.</p>
+                    )}
+                    {step === 2 && (
+                      <>
+                        <p className="mt-4 text-base leading-relaxed text-gray-700">Choose the payer that matches the patient&apos;s active insurance plan.</p>
+                        <ul className="mt-4 list-disc space-y-2 pl-5 text-base text-gray-700">
+                          <li>Prior auth affects claim acceptance</li>
+                          <li>Group number may be optional</li>
+                          <li>Ensure subscriber ID matches the policy</li>
+                        </ul>
+                      </>
+                    )}
+                    {step === 3 && (
+                      <>
+                        <p className="mt-4 text-base leading-relaxed text-gray-700">Billing and rendering providers aren&apos;t always the same. Select the billing provider that will receive payment.</p>
+                        <ul className="mt-4 list-disc space-y-2 pl-5 text-base text-gray-700">
+                          <li>NPI auto-fills for most providers</li>
+                          <li>POS codes are mandatory for outpatient claims</li>
+                        </ul>
+                      </>
+                    )}
+                    {step === 4 && (
+                      <>
+                        <p className="mt-4 text-base leading-relaxed text-gray-700">List the primary diagnosis first. All diagnoses should support the procedures being performed.</p>
+                        <ul className="mt-4 list-disc space-y-2 pl-5 text-base text-gray-700">
+                          <li>Primary diagnosis determines medical necessity</li>
+                          <li>Up to 12 diagnoses can be added</li>
+                        </ul>
+                      </>
+                    )}
+                    {step === 5 && (
+                      <>
+                        <p className="mt-4 text-base leading-relaxed text-gray-700">Service lines represent the procedures performed. Be sure each CPT/HCPCS code connects to the appropriate diagnosis.</p>
+                        <ul className="mt-4 list-disc space-y-2 pl-5 text-base text-gray-700">
+                          <li>Diagnosis pointers map ICD-10 codes to services</li>
+                          <li>Units affect payment amounts</li>
+                          <li>Modifiers change reimbursement rules</li>
+                        </ul>
+                      </>
+                    )}
+                    {step === 6 && (
+                      <>
+                        <p className="mt-4 text-base leading-relaxed text-gray-700">Use this summary to spot obvious issues before the claim is created.</p>
+                        <ul className="mt-4 list-disc space-y-2 pl-5 text-base text-gray-700">
+                          <li>Click any section&apos;s Edit link to jump back</li>
+                          <li>Review diagnosis-to-service line mapping</li>
+                          <li>Confirm payer and prior auth details</li>
+                        </ul>
+                      </>
+                    )}
                   </div>
-                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <p className="font-semibold text-gray-900 mb-2">Provider & Charge</p>
-                    <p>Billing: {summary.billing.organizationName}</p>
-                    <p>NPI: {summary.billing.npi}</p>
-                    <p>POS: {summary.claimInformation.placeOfServiceCode}</p>
-                    <p>Charge: ${summary.claimInformation.claimChargeAmount}</p>
-                  </div>
                 </div>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-gray-800 max-h-64 overflow-auto">
-                  <p className="font-semibold text-gray-900 mb-2">Payload preview</p>
-                  <pre>{JSON.stringify(summary, null, 2)}</pre>
-                </div>
-                {error && <p className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">{error}</p>}
-                {supabaseNote && <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{supabaseNote}</p>}
-                {result && (
-                  <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 overflow-auto">
-                    {JSON.stringify(result, null, 2)}
-                  </pre>
-                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <footer className="sticky bottom-0 border-t border-slate-200 bg-white/80 backdrop-blur-sm shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -347,7 +670,7 @@ export default function NewClaimPage() {
           </button>
         </div>
       </footer>
-    </main>
+    </div>
   );
 }
 
@@ -374,3 +697,8 @@ function FormInput({
     </label>
   );
 }
+
+
+
+
+
