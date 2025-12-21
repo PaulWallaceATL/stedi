@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { claimStatus } from "../lib/stediClient";
+
+type ViewType = "billing" | "prioritization";
 
 type ClaimRow = {
   id: string;
@@ -107,7 +110,11 @@ function StatusPill({ status }: { status?: string | null }) {
   );
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const currentView: ViewType = viewParam === "billing" ? "billing" : "prioritization";
+  
   const [claims, setClaims] = useState<ClaimRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -477,10 +484,24 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-center mb-4">
                 <div className="flex items-center gap-2 rounded-lg bg-slate-100 p-1 w-fit">
-                  <Link href="/dashboard" className="px-3 py-1 text-sm font-semibold text-[#137fec] bg-white shadow-sm rounded-md">
+                  <Link 
+                    href="/dashboard?view=billing" 
+                    className={`px-3 py-1 text-sm rounded-md transition-all ${
+                      currentView === "billing" 
+                        ? "font-semibold text-[#137fec] bg-white shadow-sm" 
+                        : "font-medium text-slate-600 hover:bg-white"
+                    }`}
+                  >
                     Billing Ops Manager
                   </Link>
-                  <Link href="/dashboard" className="px-3 py-1 text-sm font-medium text-slate-600 rounded-md hover:bg-white">
+                  <Link 
+                    href="/dashboard?view=prioritization" 
+                    className={`px-3 py-1 text-sm rounded-md transition-all ${
+                      currentView === "prioritization" 
+                        ? "font-semibold text-[#137fec] bg-white shadow-sm" 
+                        : "font-medium text-slate-600 hover:bg-white"
+                    }`}
+                  >
                     Intelligent Prioritization
                   </Link>
                   <Link href="/performance" className="px-3 py-1 text-sm font-medium text-slate-600 rounded-md hover:bg-white">
@@ -491,7 +512,9 @@ export default function DashboardPage() {
 
               <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-900">Intelligent Prioritization Hub</h1>
+                  <h1 className="text-2xl font-bold text-slate-900">
+                    {currentView === "prioritization" ? "Intelligent Prioritization Hub" : "Billing Ops Manager"}
+                  </h1>
                 </div>
                 <div className="flex items-center gap-2 self-start sm:self-center">
                   <button className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
@@ -508,42 +531,112 @@ export default function DashboardPage() {
                 </div>
               </header>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
-                  <MaterialIcon name="error" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
-                  <p className="text-sm font-medium text-red-800">Needs Attention / Escalation</p>
-                  <p className="text-3xl font-bold mt-1">{summary.needsAttention}</p>
-                  <p className="text-xs text-red-600 mt-0.5">Critical claims requiring immediate action</p>
-                </div>
+              {currentView === "prioritization" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
+                    <MaterialIcon name="error" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                    <p className="text-sm font-medium text-red-800">Needs Attention / Escalation</p>
+                    <p className="text-3xl font-bold mt-1">{summary.needsAttention}</p>
+                    <p className="text-xs text-red-600 mt-0.5">Critical claims requiring immediate action</p>
+                  </div>
 
-                <div className="flex flex-col rounded-xl border border-[#137fec] bg-blue-50 p-4 text-blue-700 relative overflow-hidden">
-                  <MaterialIcon name="calendar_today" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
-                  <p className="text-sm font-medium text-blue-800">AR Aging (0-30 Days)</p>
-                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.65)}</p>
-                  <p className="text-xs text-blue-600 mt-0.5">Healthy aging claims</p>
-                </div>
+                  <div className="flex flex-col rounded-xl border border-[#137fec] bg-blue-50 p-4 text-blue-700 relative overflow-hidden">
+                    <MaterialIcon name="calendar_today" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                    <p className="text-sm font-medium text-blue-800">AR Aging (0-30 Days)</p>
+                    <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.65)}</p>
+                    <p className="text-xs text-blue-600 mt-0.5">Healthy aging claims</p>
+                  </div>
 
-                <div className="flex flex-col rounded-xl border border-amber-500 bg-amber-50 p-4 text-amber-700 relative overflow-hidden">
-                  <MaterialIcon name="watch_later" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
-                  <p className="text-sm font-medium text-amber-800">AR Aging (30-60 Days)</p>
-                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.25)}</p>
-                  <p className="text-xs text-amber-600 mt-0.5">Monitor closely for potential issues</p>
-                </div>
+                  <div className="flex flex-col rounded-xl border border-amber-500 bg-amber-50 p-4 text-amber-700 relative overflow-hidden">
+                    <MaterialIcon name="watch_later" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                    <p className="text-sm font-medium text-amber-800">AR Aging (30-60 Days)</p>
+                    <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.25)}</p>
+                    <p className="text-xs text-amber-600 mt-0.5">Monitor closely for potential issues</p>
+                  </div>
 
-                <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
-                  <MaterialIcon name="gpp_bad" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
-                  <p className="text-sm font-medium text-red-800">AR Aging (60+ Days)</p>
-                  <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.10)}</p>
-                  <p className="text-xs text-red-600 mt-0.5">High priority for follow-up</p>
-                </div>
+                  <div className="flex flex-col rounded-xl border border-red-500 bg-red-50 p-4 text-red-700 relative overflow-hidden">
+                    <MaterialIcon name="gpp_bad" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                    <p className="text-sm font-medium text-red-800">AR Aging (60+ Days)</p>
+                    <p className="text-3xl font-bold mt-1">{currency(summary.totalCharges * 0.10)}</p>
+                    <p className="text-xs text-red-600 mt-0.5">High priority for follow-up</p>
+                  </div>
 
-                <div className="flex flex-col rounded-xl border border-emerald-500 bg-emerald-50 p-4 text-emerald-700 relative overflow-hidden">
-                  <MaterialIcon name="verified" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
-                  <p className="text-sm font-medium text-emerald-800">First-Pass Resolution</p>
-                  <p className="text-3xl font-bold mt-1">{summary.acceptedRate}%</p>
-                  <p className="text-xs text-emerald-600 mt-0.5">Improving efficiency</p>
+                  <div className="flex flex-col rounded-xl border border-emerald-500 bg-emerald-50 p-4 text-emerald-700 relative overflow-hidden">
+                    <MaterialIcon name="verified" className="text-4xl absolute -right-2 -bottom-2 opacity-20 rotate-12" />
+                    <p className="text-sm font-medium text-emerald-800">First-Pass Resolution</p>
+                    <p className="text-3xl font-bold mt-1">{summary.acceptedRate}%</p>
+                    <p className="text-xs text-emerald-600 mt-0.5">Improving efficiency</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-slate-500">Total AR</p>
+                      <MaterialIcon name="payments" className="text-[#137fec] text-lg" />
+                    </div>
+                    <p className="text-3xl font-bold text-slate-900">{currency(summary.totalCharges)}</p>
+                    <div className="text-sm text-slate-600 mt-1">
+                      <span className="text-green-600 font-semibold">+5.2%</span> last 30 days
+                    </div>
+                    <div className="h-10 bg-slate-100 rounded-md mt-3 flex items-end overflow-hidden gap-px">
+                      <div className="w-1/5 h-2/3 bg-[#137fec]/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-3/4 bg-[#137fec]/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-1/2 bg-[#137fec]/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-4/5 bg-[#137fec]/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-2/4 bg-[#137fec]/70 rounded-t-sm"></div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-slate-500">First Pass Approval</p>
+                      <MaterialIcon name="verified" className="text-emerald-500 text-lg" />
+                    </div>
+                    <p className="text-3xl font-bold text-slate-900">{summary.acceptedRate}%</p>
+                    <div className="text-sm text-slate-600 mt-1">
+                      <span className="text-green-600 font-semibold">+1.2%</span> vs. target
+                    </div>
+                    <div className="w-full bg-slate-100 rounded-full h-2.5 mt-3">
+                      <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: `${summary.acceptedRate}%` }}></div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-slate-500">Appeal Volume</p>
+                      <MaterialIcon name="gavel" className="text-amber-500 text-lg" />
+                    </div>
+                    <p className="text-3xl font-bold text-slate-900">{denialClaims.length || 0}</p>
+                    <div className="text-sm text-slate-600 mt-1">
+                      <span className="text-red-600 font-semibold">+{Math.max(1, Math.floor(denialClaims.length / 3))}</span> this month
+                    </div>
+                    <div className="h-10 bg-slate-100 rounded-md mt-3 flex items-end overflow-hidden gap-px">
+                      <div className="w-1/5 h-1/3 bg-amber-400/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-1/2 bg-amber-400/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-2/3 bg-amber-400/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-3/4 bg-amber-400/70 rounded-t-sm"></div>
+                      <div className="w-1/5 h-4/5 bg-amber-400/70 rounded-t-sm"></div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-red-500 bg-red-50 p-4 shadow-sm text-red-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-red-700">Needs Attention</p>
+                      <MaterialIcon name="crisis_alert" className="text-red-600 text-lg" />
+                    </div>
+                    <p className="text-3xl font-bold">{summary.needsAttention}</p>
+                    <div className="text-sm text-red-600 mt-1">
+                      <span className="font-semibold">{Math.max(1, Math.floor(summary.needsAttention / 4))}</span> critical escalations
+                    </div>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Link href="/denials" className="flex-1 text-center py-1.5 px-3 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">
+                        Review All
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
 
             {(denialClaims.length > 0 || recentEvents.length > 0) && (
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -723,3 +816,14 @@ export default function DashboardPage() {
   );
 }
 
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-slate-100 text-slate-900 flex items-center justify-center">
+        <div className="rounded-xl border border-slate-200 bg-white px-6 py-4 shadow-sm">Loading dashboard…</div>
+      </main>
+    }>
+      <DashboardContent />
+    </Suspense>
+  );
+}

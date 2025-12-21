@@ -26,9 +26,20 @@ export default function ClaimDetailPage() {
         setLoading(false);
         return;
       }
-      const { data: row } = await supabase.from("claims").select("*").eq("id", id).single();
-      setData(row);
-      setLoading(false);
+      try {
+        const { data: row, error } = await supabase.from("claims").select("*").eq("id", id).single();
+        if (error) {
+          console.error("Error loading claim:", error);
+          setData(null);
+        } else {
+          setData(row);
+        }
+      } catch (err) {
+        console.error("Failed to load claim:", err);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
     };
     if (id) load();
   }, [id]);
@@ -60,11 +71,15 @@ export default function ClaimDetailPage() {
       const res = await claimStatus(payload);
       setStatusResult(res.data);
       if (supabase) {
-        await supabase.from("claim_events").insert({
-          claim_id: id,
-          type: "status",
-          payload: res.data,
-        });
+        try {
+          await supabase.from("claim_events").insert({
+            claim_id: id,
+            type: "status",
+            payload: res.data,
+          });
+        } catch (dbErr) {
+          console.error("Failed to save claim event:", dbErr);
+        }
       }
     } catch (err: any) {
       setStatusResult({ error: err?.message, data: err?.data });
@@ -84,7 +99,11 @@ export default function ClaimDetailPage() {
         const info = { info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId };
         setTxnResult(info);
         if (supabase) {
-          await supabase.from("claim_events").insert({ claim_id: id, type: "transaction_prefill", payload: info });
+          try {
+            await supabase.from("claim_events").insert({ claim_id: id, type: "transaction_prefill", payload: info });
+          } catch (dbErr) {
+            console.error("Failed to save claim event:", dbErr);
+          }
         }
       } else {
         setTxnResult({ info: "No inbound transactions found" });
@@ -106,7 +125,11 @@ export default function ClaimDetailPage() {
       const res = await getTransactionOutput(txnId);
       setTxnResult(res.data);
       if (supabase) {
-        await supabase.from("claim_events").insert({ claim_id: id, type: "transaction_output", payload: res.data, transaction_id: txnId });
+        try {
+          await supabase.from("claim_events").insert({ claim_id: id, type: "transaction_output", payload: res.data, transaction_id: txnId });
+        } catch (dbErr) {
+          console.error("Failed to save claim event:", dbErr);
+        }
       }
     } catch (err: any) {
       setTxnResult({ error: err?.message, data: err?.data });
@@ -134,7 +157,11 @@ export default function ClaimDetailPage() {
       const res = await createAttachment(body);
       setAttachmentResult(res.data);
       if (supabase) {
-        await supabase.from("claim_events").insert({ claim_id: id, type: "attachment", payload: res.data });
+        try {
+          await supabase.from("claim_events").insert({ claim_id: id, type: "attachment", payload: res.data });
+        } catch (dbErr) {
+          console.error("Failed to save claim event:", dbErr);
+        }
       }
     } catch (err: any) {
       setAttachmentResult({ error: err?.message, data: err?.data });
