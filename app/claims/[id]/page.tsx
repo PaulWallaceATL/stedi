@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useParams, useRouter } from "next/navigation";
 import { claimStatus, listTransactions, getTransactionOutput, createAttachment } from "../../lib/stediClient";
+import ClaimIntelligence from "../../components/ClaimIntelligence";
 
 export default function ClaimDetailPage() {
   const params = useParams();
@@ -204,12 +205,24 @@ export default function ClaimDetailPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-50">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-10">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
         <div className="space-y-1">
           <p className="text-xs uppercase tracking-[0.22em] text-sky-300">Claim</p>
           <h1 className="text-2xl font-semibold text-white">{data.id}</h1>
           <p className="text-sm text-slate-300">Status: {data.status || "draft"}</p>
         </div>
+        
+        {/* AI Claim Intelligence Component */}
+        <ClaimIntelligence 
+          claim={data.payload} 
+          claimId={data.id}
+          onApplySuggestions={(optimizedClaim) => {
+            console.log("Applying suggestions:", optimizedClaim);
+            // Could update the claim in Supabase here
+            alert("Suggestions applied! In production, this would update the claim.");
+          }}
+        />
+        
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-black/40 space-y-4">
           <p className="text-sm text-slate-300">Trading partner: {data.trading_partner_name || "—"}</p>
           <p className="text-sm text-slate-300">Service ID: {data.trading_partner_service_id || "—"}</p>
