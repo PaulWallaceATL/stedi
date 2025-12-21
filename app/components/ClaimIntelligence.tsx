@@ -37,12 +37,18 @@ export default function ClaimIntelligence({ claim, claimId, onApplySuggestions }
       setError(null);
       setSuggestion(null);
 
+      // Extract tradingPartnerId from various possible locations
+      const tradingPartnerId = claim?.tradingPartnerId || 
+                               claim?.tradingPartnerServiceId ||
+                               claim?.receiver?.organizationName ||
+                               "STEDI"; // default fallback
+
       const response = await fetch("/api/rag/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           claim: claim,
-          payerId: claim?.tradingPartnerId || claim?.payer_id,
+          payerId: tradingPartnerId,
           specialty: "primary_care", // Could be dynamic based on claim data
         }),
       });
