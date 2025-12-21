@@ -69,7 +69,11 @@ export default function ClaimIntelligence({ claim, claimId, onApplySuggestions }
         },
       };
 
-      const response = await fetch("/api/rag/suggest", {
+      // Use proxy URL if available, otherwise fall back to direct API
+      const proxyUrl = process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "");
+      const endpoint = proxyUrl ? `${proxyUrl}/rag/suggest` : "/api/rag/suggest";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -332,3 +336,4 @@ export default function ClaimIntelligence({ claim, claimId, onApplySuggestions }
     </div>
   );
 }
+
