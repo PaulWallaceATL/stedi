@@ -72,13 +72,35 @@ export default function ClaimDetailPage() {
       setLoadingStatus(true);
       const res = await claimStatus(payload);
       setStatusResult(res.data);
-      if (supabase) {
+      
+      // Update claim status in database based on 277 response
+      if (supabase && res.data) {
+        let newStatus = data.status || "submitted";
+        const statusInfo = res.data?.statusInformation?.[0];
+        
+        if (statusInfo) {
+          const code = statusInfo.claimStatusCategoryCode || statusInfo.statusCode;
+          // Map 277 status codes to our statuses
+          if (["1", "2", "20", "22"].includes(code)) {
+            newStatus = "accepted"; // Finalized, forwarded, or acknowledged
+          } else if (["4", "27"].includes(code)) {
+            newStatus = "denied"; // Denied or rejected
+          } else if (["3", "15", "16"].includes(code)) {
+            newStatus = "pending"; // Pending or needs info
+          }
+        }
+        
         try {
+          // Update claim status
+          await supabase.from("claims").update({ status: newStatus }).eq("id", id);
+          // Save event
           await supabase.from("claim_events").insert({
             claim_id: id,
             type: "status",
             payload: res.data,
           });
+          // Refresh local data
+          setData({ ...data, status: newStatus });
         } catch (dbErr) {
           console.error("Failed to save claim event:", dbErr);
         }
@@ -126,9 +148,38 @@ export default function ClaimDetailPage() {
       setLoadingTxn(true);
       const res = await getTransactionOutput(txnId);
       setTxnResult(res.data);
-      if (supabase) {
+      
+      // Update claim status based on 835 (remittance) data
+      if (supabase && res.data) {
+        let newStatus = data?.status || "submitted";
+        
+        // If we have 835 data, it means payer responded
+        if (res.data?.claimPaymentInformation || res.data?.output) {
+          const claimInfo = res.data?.claimPaymentInformation?.[0];
+          
+          if (claimInfo) {
+            const paidAmount = parseFloat(claimInfo.claimPaymentAmount || "0");
+            const billedAmount = parseFloat(claimInfo.chargeAmount || "0");
+            
+            if (paidAmount > 0) {
+              newStatus = "paid"; // Claim was paid
+            } else if (paidAmount === 0 && billedAmount > 0) {
+              newStatus = "denied"; // No payment made
+            } else {
+              newStatus = "accepted"; // Response received
+            }
+          } else {
+            newStatus = "accepted"; // Got response from payer
+          }
+        }
+        
         try {
+          // Update claim status
+          await supabase.from("claims").update({ status: newStatus }).eq("id", id);
+          // Save event
           await supabase.from("claim_events").insert({ claim_id: id, type: "transaction_output", payload: res.data, transaction_id: txnId });
+          // Refresh local data
+          setData({ ...data, status: newStatus });
         } catch (dbErr) {
           console.error("Failed to save claim event:", dbErr);
         }
@@ -231,12 +282,17 @@ export default function ClaimDetailPage() {
           <h1 className="text-3xl font-bold text-slate-900">{data.patient_name || "Claim"}</h1>
           <div className="flex items-center gap-4 mt-2">
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-              data.status === 'accepted' ? 'bg-emerald-100 text-emerald-700' :
-              data.status === 'denied' ? 'bg-red-100 text-red-700' :
-              data.status === 'submitted' ? 'bg-blue-100 text-blue-700' :
-              'bg-slate-100 text-slate-700'
+              ["accepted", "paid", "posted", "success"].includes((data.status || "").toLowerCase()) ? 'bg-emerald-100 text-emerald-700' :
+              ["denied", "rejected"].includes((data.status || "").toLowerCase()) ? 'bg-rose-100 text-rose-700' :
+              ["submitted", "sent"].includes((data.status || "").toLowerCase()) ? 'bg-sky-100 text-sky-700' :
+              ["needs review", "review", "pending"].includes((data.status || "").toLowerCase()) ? 'bg-amber-100 text-amber-700' :
+              'bg-slate-100 text-slate-600'
             }`}>
-              {data.status || "draft"}
+              {["accepted", "paid", "posted", "success"].includes((data.status || "").toLowerCase()) ? "Accepted" :
+               ["denied", "rejected"].includes((data.status || "").toLowerCase()) ? "Denied" :
+               ["submitted", "sent"].includes((data.status || "").toLowerCase()) ? "Submitted" :
+               ["needs review", "review", "pending"].includes((data.status || "").toLowerCase()) ? "Needs Review" :
+               "Draft"}
             </span>
             <span className="text-sm text-slate-600">Claim ID: {data.id}</span>
           </div>
