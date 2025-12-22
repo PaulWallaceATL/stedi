@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ragSuggest } from "../lib/stediClient";
 
 type ClaimSuggestion = {
   claim: any;
@@ -69,26 +70,14 @@ export default function ClaimIntelligence({ claim, claimId, onApplySuggestions }
         },
       };
 
-      // Use proxy URL if available, otherwise fall back to direct API
-      const proxyUrl = process.env.NEXT_PUBLIC_PROXY_URL?.replace(/\/+$/, "");
-      const endpoint = proxyUrl ? `${proxyUrl}/rag/suggest` : "/api/rag/suggest";
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          claim: transformedClaim,
-          payerId: transformedClaim.tradingPartnerId,
-          specialty: "primary_care",
-        }),
+      // Use the proxy's RAG endpoint (already configured with OpenAI key)
+      const result = await ragSuggest({
+        claim: transformedClaim,
+        payerId: transformedClaim.tradingPartnerId,
+        specialty: "primary_care",
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = result.data;
       setSuggestion(data);
       setExpanded(true);
     } catch (err) {

@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useParams, useRouter } from "next/navigation";
 import { claimStatus, listTransactions, getTransactionOutput, createAttachment } from "../../lib/stediClient";
 import ClaimIntelligence from "../../components/ClaimIntelligence";
+import ERAViewer from "../../components/ERAViewer";
 
 export default function ClaimDetailPage() {
   const params = useParams();
@@ -394,6 +395,9 @@ export default function ClaimDetailPage() {
             </div>
           </div>
         )}
+
+        {/* ERA PDF Viewer - Shows payment details */}
+        <ERAViewer transactionId={txnId} claimId={data.id} />
 
         {/* Raw Payload (Collapsible) */}
         <details className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
