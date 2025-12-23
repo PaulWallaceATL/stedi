@@ -680,6 +680,14 @@ function DashboardContent() {
                     <span>More Filters</span>
                   </button>
                   <Link
+                    href="/admin/fix-statuses"
+                    className="flex items-center justify-center gap-2 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-100"
+                    title="Fix claims with missing or incorrect statuses"
+                  >
+                    <MaterialIcon name="build" className="text-base" />
+                    <span>Fix Statuses</span>
+                  </Link>
+                  <Link
                     href="/claims/new"
                     className="flex items-center justify-center gap-2 rounded-lg bg-[#137fec] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#0f6acc]"
                   >

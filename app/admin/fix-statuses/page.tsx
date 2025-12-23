@@ -19,11 +19,11 @@ export default function FixStatusesPage() {
       setLoading(true);
       setResult("Starting status fix...\n");
 
-      // Get all claims with null or empty status
+      // Get all claims with null, empty, or "draft" status
       const { data: claims, error } = await supabase
         .from("claims")
-        .select("id, status, created_at")
-        .or("status.is.null,status.eq.");
+        .select("id, patient_name, status, created_at")
+        .or("status.is.null,status.eq.,status.ilike.draft");
 
       if (error) {
         setResult((prev) => prev + `Error fetching claims: ${error.message}\n`);
@@ -31,17 +31,21 @@ export default function FixStatusesPage() {
       }
 
       if (!claims || claims.length === 0) {
-        setResult((prev) => prev + "No claims with missing status found!\n");
+        setResult((prev) => prev + "✅ All claims already have valid statuses!\n");
         return;
       }
 
-      setResult((prev) => prev + `Found ${claims.length} claims with missing status\n`);
+      setResult((prev) => prev + `Found ${claims.length} claims needing status fix:\n`);
+      claims.forEach((c) => {
+        setResult((prev) => prev + `  - ${c.patient_name || "Unknown"} (${c.status || "null"})\n`);
+      });
+      setResult((prev) => prev + "\nUpdating all to 'submitted'...\n");
 
       // Update all to "submitted" as default
       const { error: updateError } = await supabase
         .from("claims")
         .update({ status: "submitted" })
-        .or("status.is.null,status.eq.");
+        .or("status.is.null,status.eq.,status.ilike.draft");
 
       if (updateError) {
         setResult((prev) => prev + `Error updating claims: ${updateError.message}\n`);
@@ -91,12 +95,14 @@ export default function FixStatusesPage() {
         setResult((prev) => prev + `  ${status}: ${count}\n`);
       });
 
-      setResult((prev) => prev + "\nRecent Claims:\n");
+      setResult((prev) => prev + "\nRecent Claims (showing first 10):\n");
       claims?.slice(0, 10).forEach((claim) => {
+        const needsFix = !claim.status || claim.status === "" || claim.status.toLowerCase() === "draft";
+        const indicator = needsFix ? "⚠️ NEEDS FIX" : "✓";
         setResult(
           (prev) =>
             prev +
-            `  ${claim.patient_name} - ${claim.status || "null"} (${new Date(claim.created_at).toLocaleDateString()})\n`,
+            `  ${indicator} ${claim.patient_name} - ${claim.status || "null"} (${new Date(claim.created_at).toLocaleDateString()})\n`,
         );
       });
     } catch (err) {
@@ -173,9 +179,13 @@ export default function FixStatusesPage() {
             <div className="text-sm text-blue-800">
               <p className="font-semibold mb-1">What this does:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Finds claims with null or empty status</li>
-                <li>Sets them to "submitted" by default</li>
-                <li>Status will auto-update when you check claim status or poll transactions</li>
+                <li>Finds claims with null, empty, or "Draft" status</li>
+                <li>Sets them all to "submitted" (blue) by default</li>
+                <li>Status will auto-update to accurate values when you:</li>
+                <ul className="list-circle list-inside ml-6 mt-1">
+                  <li>Click "Check Status" on individual claims</li>
+                  <li>Click "Get 277/835" to fetch payment data</li>
+                </ul>
               </ul>
               <p className="mt-3 font-semibold">Valid statuses:</p>
               <ul className="list-disc list-inside space-y-1">
