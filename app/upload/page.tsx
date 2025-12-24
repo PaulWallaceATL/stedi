@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 type ValidationRow = {
   row: number;
@@ -28,6 +29,55 @@ type FieldMapping = {
   mapped: boolean;
 };
 
+// Animated background
+function AnimatedBackground() {
+  return (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 bg-[#0a0a0f]" />
+      <motion.div
+        className="absolute top-1/4 left-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-violet-600/10 via-purple-600/10 to-indigo-600/10 blur-3xl"
+        animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-1/4 right-0 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-cyan-500/10 via-blue-500/10 to-indigo-500/10 blur-3xl"
+        animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  );
+}
+
+// Stat card component
+function StatCard({ title, value, icon, color, delay = 0 }: { title: string; value: string | number; icon: string; color: string; delay?: number }) {
+  const colorClasses: Record<string, { bg: string; icon: string; text: string }> = {
+    blue: { bg: "from-sky-500/10 to-sky-600/5", icon: "text-sky-400", text: "text-sky-400" },
+    red: { bg: "from-rose-500/10 to-rose-600/5", icon: "text-rose-400", text: "text-rose-400" },
+    green: { bg: "from-emerald-500/10 to-emerald-600/5", icon: "text-emerald-400", text: "text-emerald-400" },
+    amber: { bg: "from-amber-500/10 to-amber-600/5", icon: "text-amber-400", text: "text-amber-400" },
+  };
+  const classes = colorClasses[color] || colorClasses.blue;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className={`rounded-2xl bg-gradient-to-br ${classes.bg} border border-slate-800 p-5`}
+    >
+      <div className="flex items-center gap-4">
+        <div className={`w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center ${classes.icon}`}>
+          <span className="material-symbols-outlined text-2xl">{icon}</span>
+        </div>
+        <div>
+          <p className="text-sm text-slate-300">{title}</p>
+          <p className={`text-2xl font-bold ${classes.text}`}>{value}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -40,42 +90,46 @@ export default function UploadPage() {
   const [previewData, setPreviewData] = useState<ValidationRow[]>([]);
   const [errorDetails, setErrorDetails] = useState<ErrorDetail[]>([]);
   const [fieldMappings, setFieldMappings] = useState<FieldMapping[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      // Simulate validation
-      setTimeout(() => {
-        simulateValidation();
-      }, 1000);
+      setTimeout(() => simulateValidation(), 1000);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile?.type === "text/csv" || droppedFile?.name.endsWith(".csv")) {
+      setFile(droppedFile);
+      setTimeout(() => simulateValidation(), 1000);
     }
   };
 
   const simulateValidation = () => {
     setValidating(true);
     setTimeout(() => {
-      // Simulate validation results
       setTotalRows(1520);
       setValidRows(1508);
       setErrorRows(12);
       setWarningRows(3);
       
-      // Simulate error details
       setErrorDetails([
         { row: 25, column: "Date of Service", message: "Invalid date format. Expected 'YYYY-MM-DD'." },
         { row: 42, column: "CPT Code", message: "Missing required value." },
         { row: 117, column: "Payer ID", message: "Payer ID 'X1234' not found in our system." },
       ]);
 
-      // Simulate field mappings
       setFieldMappings([
         { source: "PatientID", target: "Patient ID", mapped: true },
         { source: "ServiceDate", target: "Date of Service", mapped: true },
         { source: "Patient_Name", target: "Unmapped", mapped: false },
       ]);
       
-      // Simulate preview data
       setPreviewData([
         { row: 25, patientName: "P0025", payerId: "PAY123", serviceDate: "2023.08.15", cptCode: "99213", billedAmount: "$125.00", hasError: true, errorField: "serviceDate", errorMessage: "Invalid date format" },
         { row: 42, patientName: "P0042", payerId: "PAY456", serviceDate: "2023-08-16", cptCode: "", billedAmount: "$250.50", hasError: true, errorField: "cptCode", errorMessage: "Missing CPT Code" },
@@ -92,138 +146,166 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#f6f7f8]">
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-gray-200 px-10 py-3 bg-white sticky top-0 z-10">
-        <div className="flex items-center gap-4 text-gray-800">
-          <div className="size-6 text-[#137fec]">
-            <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z"></path>
-            </svg>
-          </div>
-          <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">Clinix AI Billing</h2>
-        </div>
-        <div className="flex flex-1 justify-end gap-6 items-center">
-          <div className="hidden md:flex items-center gap-8">
-            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/dashboard">Dashboard</Link>
-            <Link className="text-[#137fec] font-semibold text-sm leading-normal" href="/upload">Upload</Link>
-            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/denials">Denials</Link>
-            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/performance">Reports</Link>
-            <Link className="text-gray-700 hover:text-[#137fec] text-sm font-medium leading-normal" href="/settings">Settings</Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/claims/new"
-              className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#137fec] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#0f6acc] gap-2"
-            >
-              <span className="truncate">Create Claim</span>
-            </Link>
-            <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 bg-gray-100 text-gray-900 text-sm font-bold min-w-0 px-2.5">
-              <span className="material-symbols-outlined text-xl">notifications</span>
-            </button>
-            <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 bg-gray-100 text-gray-900 text-sm font-bold min-w-0 px-2.5">
-              <span className="material-symbols-outlined text-xl">help</span>
-            </button>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <AnimatedBackground />
+      
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
+                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-white">Clinix AI</h1>
+                <p className="text-xs text-slate-400">Bulk Upload</p>
+              </div>
+            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              {[
+                { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+                { href: "/claims/new", label: "New Claim", icon: "add_circle" },
+                { href: "/denials", label: "Denials", icon: "error" },
+                { href: "/performance", label: "Reports", icon: "analytics" },
+                { href: "/settings", label: "Settings", icon: "settings" },
+              ].map((item) => (
+                <Link key={item.href} href={item.href} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800/50 transition-colors">
+                  <span className="material-symbols-outlined text-lg" style={{ color: '#ffffff' }}>{item.icon}</span>
+                  <span style={{ color: '#ffffff' }}>{item.label}</span>
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-3">
+              <button className="p-2 rounded-xl hover:bg-slate-800 text-white hover:text-white transition-colors">
+                <span className="material-symbols-outlined">notifications</span>
+              </button>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                C
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 px-4 sm:px-6 lg:px-10 py-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-4 mb-8">
-            <h1 className="text-gray-900 text-3xl font-bold leading-tight tracking-[-0.033em]">Review Uploaded Claims</h1>
-            <p className="text-gray-600 text-base font-normal leading-normal">
-              Validate your data before generating claims. {file && <span className="font-medium text-gray-700">File: {file.name}</span>}
-            </p>
-          </div>
+      {/* Main */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white">Upload Claims</h2>
+          <p className="text-slate-400 mt-1">
+            Validate and import claims from CSV files
+            {file && <span className="text-[#137fec] ml-2">• {file.name}</span>}
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 flex flex-col gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main content */}
+          <div className="lg:col-span-2 space-y-6">
+            <AnimatePresence mode="wait">
               {!validated ? (
-                <div className="flex flex-col gap-6 p-8 bg-white rounded-xl shadow-sm border border-gray-200">
-                  <div className="flex flex-col items-center justify-center gap-6 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-16 text-center">
-                    <div className="rounded-full bg-[#137fec]/10 p-4 text-[#137fec]">
-                      <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <p className="text-gray-900 text-xl font-bold leading-tight tracking-[-0.015em]">Upload CSV File</p>
-                      <p className="text-gray-500 text-sm font-normal leading-normal">
-                        {validating ? "Validating your file..." : "Drag & drop your file here or click to browse."}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                >
+                  <div
+                    className={`p-8 border-2 border-dashed m-6 rounded-xl transition-all ${
+                      isDragging 
+                        ? "border-[#137fec] bg-[#137fec]/5" 
+                        : "border-slate-700 hover:border-slate-600"
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <motion.div
+                        animate={validating ? { rotate: 360 } : {}}
+                        transition={validating ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
+                        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#137fec]/20 to-indigo-500/20 flex items-center justify-center mb-6"
+                      >
+                        <span className="material-symbols-outlined text-4xl text-[#137fec]">
+                          {validating ? "sync" : "cloud_upload"}
+                        </span>
+                      </motion.div>
+                      
+                      <h3 className="text-xl font-bold text-white mb-2">
+                        {validating ? "Validating your file..." : "Upload CSV File"}
+                      </h3>
+                      <p className="text-slate-300 text-sm mb-6 max-w-md">
+                        {validating 
+                          ? "We're checking your data for errors and mapping fields automatically." 
+                          : "Drag & drop your file here or click to browse. We'll validate ICD-10, CPT, and payer IDs automatically."}
                       </p>
+
+                      {!validating && (
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept=".csv"
+                            onChange={handleFileSelect}
+                            disabled={validating}
+                          />
+                          <motion.span
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+                          >
+                            <span className="material-symbols-outlined">folder_open</span>
+                            Select CSV File
+                          </motion.span>
+                        </label>
+                      )}
                     </div>
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept=".csv"
-                        onChange={handleFileSelect}
-                        disabled={validating}
-                      />
-                      <span className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-[#137fec] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0f6acc] transition-colors shadow-sm">
-                        {validating ? "Validating..." : "Select CSV File"}
-                      </span>
-                    </label>
                   </div>
-                  <div className="flex flex-col items-center gap-4">
-                    <p className="text-gray-500 text-xs font-normal">Accepted format: .csv · Max file size: 5MB · Use our template for fastest onboarding.</p>
-                    <div className="flex justify-center items-center gap-6">
-                      <a className="text-[#137fec] hover:text-[#0f6acc] text-sm font-medium leading-normal underline" href="#">Download CSV Template</a>
-                      <a className="text-[#137fec] hover:text-[#0f6acc] text-sm font-medium leading-normal underline" href="#">See Required Fields</a>
+
+                  <div className="px-6 pb-6 flex flex-col items-center gap-4">
+                    <p className="text-xs text-slate-400">Accepted format: .csv · Max file size: 5MB</p>
+                    <div className="flex items-center gap-4">
+                      <a className="text-sm text-[#137fec] hover:underline" href="#">Download CSV Template</a>
+                      <span className="text-slate-500">•</span>
+                      <a className="text-sm text-[#137fec] hover:underline" href="#">View Required Fields</a>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ) : (
-                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 md:p-8 space-y-8">
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-gray-50">
-                      <div className="flex items-center justify-center size-12 rounded-full bg-blue-100">
-                        <span className="material-symbols-outlined text-blue-600 text-2xl">list_alt</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Total Rows Uploaded</p>
-                        <p className="text-2xl font-bold text-gray-900">{totalRows.toLocaleString()}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-red-50">
-                      <div className="flex items-center justify-center size-12 rounded-full bg-red-100">
-                        <span className="material-symbols-outlined text-red-600 text-2xl">error</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Rows with Errors</p>
-                        <p className="text-2xl font-bold text-red-600">{errorRows}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 rounded-lg bg-green-50">
-                      <div className="flex items-center justify-center size-12 rounded-full bg-green-100">
-                        <span className="material-symbols-outlined text-green-600 text-2xl">check_circle</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Rows Ready for Import</p>
-                        <p className="text-2xl font-bold text-green-600">{validRows.toLocaleString()}</p>
-                      </div>
-                    </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  {/* Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <StatCard title="Total Rows" value={totalRows.toLocaleString()} icon="list_alt" color="blue" delay={0} />
+                    <StatCard title="Rows with Errors" value={errorRows} icon="error" color="red" delay={0.1} />
+                    <StatCard title="Ready to Import" value={validRows.toLocaleString()} icon="check_circle" color="green" delay={0.2} />
                   </div>
 
                   {/* Error Details */}
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">Error Details</h2>
-                    <div className="mt-4 overflow-hidden rounded-lg border border-gray-200">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Row</th>
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Column</th>
-                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Error Message</th>
+                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+                    <div className="p-6 border-b border-slate-800">
+                      <h3 className="text-lg font-semibold text-white">Error Details</h3>
+                      <p className="text-sm text-slate-300">{errorRows} rows need attention</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-slate-800">
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Row</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Column</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Error</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 bg-white">
+                        <tbody className="divide-y divide-slate-800">
                           {errorDetails.map((err, idx) => (
-                            <tr key={idx}>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{err.row}</td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{err.column}</td>
-                              <td className="whitespace-nowrap px-3 py-4 text-sm text-red-600">{err.message}</td>
+                            <tr key={idx} className="hover:bg-slate-800/30">
+                              <td className="px-6 py-4 text-sm font-mono text-slate-300">{err.row}</td>
+                              <td className="px-6 py-4 text-sm text-slate-300">{err.column}</td>
+                              <td className="px-6 py-4 text-sm text-rose-400">{err.message}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -231,122 +313,138 @@ export default function UploadPage() {
                     </div>
                   </div>
 
-                  {/* Field Mapping */}
-                  <div className="border-t border-gray-200 pt-8">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold text-gray-900">Map Fields</h2>
-                      <button className="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-gray-100 text-gray-800 text-sm font-medium hover:bg-gray-200 transition-colors">
-                        <span className="material-symbols-outlined text-base">swap_horiz</span>
-                        <span>Map Fields</span>
+                  {/* Field Mappings */}
+                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+                    <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-white">Field Mappings</h3>
+                        <p className="text-sm text-slate-300">We detected some columns that need mapping</p>
+                      </div>
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">
+                        <span className="material-symbols-outlined text-lg">swap_horiz</span>
+                        Map Fields
                       </button>
                     </div>
-                    <p className="text-sm text-gray-500 mt-2">We&apos;ve detected some mismatched columns. Please map them to the correct Clinix AI fields.</p>
-                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                      {fieldMappings.map((mapping, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <span className={`font-medium ${mapping.mapped ? 'text-gray-700' : 'text-red-600'} w-1/3`}>{mapping.source}</span>
-                          <span className="material-symbols-outlined text-gray-400">arrow_right_alt</span>
-                          <span className={`font-medium ${mapping.mapped ? 'text-green-600' : 'text-red-600'}`}>{mapping.target}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Data Preview */}
-                  <div className="border-t border-gray-200 pt-8">
-                    <h2 className="text-xl font-bold text-gray-900">Data Preview</h2>
-                    <div className="mt-4 overflow-hidden rounded-lg border border-gray-200">
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Patient ID</th>
-                              <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date of Service</th>
-                              <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Payer ID</th>
-                              <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">CPT Code</th>
-                              <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Charge</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200 bg-white">
-                            {previewData.map((row) => (
-                              <tr key={row.row}>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{row.patientName}</td>
-                                <td className={`whitespace-nowrap px-3 py-4 text-sm ${row.errorField === 'serviceDate' ? 'bg-red-50 text-red-700' : 'text-gray-500'}`}>
-                                  {row.serviceDate}
-                                </td>
-                                <td className={`whitespace-nowrap px-3 py-4 text-sm ${row.errorField === 'payerId' ? 'bg-red-50 text-red-700' : 'text-gray-500'}`}>
-                                  {row.payerId}
-                                </td>
-                                <td className={`whitespace-nowrap px-3 py-4 text-sm ${row.errorField === 'cptCode' ? 'bg-red-50 text-red-700' : 'text-gray-500'}`}>
-                                  {row.cptCode || ''}
-                                </td>
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{row.billedAmount}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                    <div className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {fieldMappings.map((mapping, idx) => (
+                          <div key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-slate-800/30">
+                            <span className={`font-medium ${mapping.mapped ? "text-slate-300" : "text-rose-400"}`}>{mapping.source}</span>
+                            <span className="material-symbols-outlined text-slate-400">arrow_forward</span>
+                            <span className={`font-medium ${mapping.mapped ? "text-emerald-400" : "text-rose-400"}`}>{mapping.target}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-gray-200 pt-8">
-                    <button className="flex w-full sm:w-auto cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-gray-200 text-gray-800 text-sm font-bold hover:bg-gray-300 transition-colors">
-                      Cancel Upload
-                    </button>
-                    <button className="flex w-full sm:w-auto cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-gray-200 text-gray-800 text-sm font-bold hover:bg-gray-300 transition-colors">
-                      Fix Errors
-                    </button>
-                    <button
-                      onClick={handleImport}
-                      className="flex w-full sm:w-auto cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-[#137fec] text-white text-sm font-bold hover:bg-[#137fec]/90 transition-colors"
-                    >
-                      Proceed to Claim Generation
-                    </button>
+                  {/* Data Preview */}
+                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+                    <div className="p-6 border-b border-slate-800">
+                      <h3 className="text-lg font-semibold text-white">Data Preview</h3>
+                      <p className="text-sm text-slate-300">Showing rows with errors</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-slate-800">
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Patient ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Service Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Payer ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">CPT Code</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Charge</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800">
+                          {previewData.map((row) => (
+                            <tr key={row.row} className="hover:bg-slate-800/30">
+                              <td className="px-6 py-4 text-sm text-slate-300">{row.patientName}</td>
+                              <td className={`px-6 py-4 text-sm ${row.errorField === "serviceDate" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                                {row.serviceDate}
+                              </td>
+                              <td className={`px-6 py-4 text-sm ${row.errorField === "payerId" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                                {row.payerId}
+                              </td>
+                              <td className={`px-6 py-4 text-sm font-mono ${row.errorField === "cptCode" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                                {row.cptCode || "—"}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-slate-300">{row.billedAmount}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
+          </div>
 
-            <div className="lg:col-span-1">
-              <div className="sticky top-28 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="bg-[#137fec]/10 text-[#137fec] p-2 rounded-lg mt-1">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+          {/* Sidebar */}
+          <aside className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              <div className="rounded-2xl bg-gradient-to-br from-[#137fec]/10 to-violet-500/10 border border-[#137fec]/20 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#137fec]/20 flex items-center justify-center text-[#137fec]">
+                    <span className="material-symbols-outlined">verified</span>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">Before You Upload</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Our system auto-validates ICD-10, CPT, and payer IDs to help you avoid denied claims.
-                    </p>
-                  </div>
+                  <h3 className="text-white font-semibold">Before You Upload</h3>
                 </div>
-                <ul className="space-y-4 text-sm text-gray-600 pl-2">
-                  <li className="flex items-start gap-3">
-                    <span className="text-[#137fec] mt-0.5">✓</span>
-                    <span>Use our CSV template for fastest setup.</span>
+                <p className="text-sm text-slate-300 mb-4">
+                  Our system auto-validates ICD-10, CPT, and payer IDs to help you avoid denied claims.
+                </p>
+                <ul className="space-y-3 text-sm text-slate-300">
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5">check_circle</span>
+                    Use our CSV template for fastest setup
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-[#137fec] mt-0.5">✓</span>
-                    <span>Field names must match exactly.</span>
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5">check_circle</span>
+                    Field names must match exactly
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-[#137fec] mt-0.5">✓</span>
-                    <span>Multi-line claims should share the same claim ID.</span>
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5">check_circle</span>
+                    Multi-line claims share the same claim ID
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-[#137fec] mt-0.5">ⓘ</span>
-                    <span>ICD-10 and CPT codes are auto-validated.</span>
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-[#137fec] text-lg mt-0.5">info</span>
+                    ICD-10 and CPT codes are auto-validated
                   </li>
                 </ul>
               </div>
+
+              {validated && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 space-y-4"
+                >
+                  <h3 className="text-white font-semibold">Actions</h3>
+                  <div className="space-y-2">
+                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">
+                      <span className="material-symbols-outlined text-lg">cancel</span>
+                      Cancel Upload
+                    </button>
+                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">
+                      <span className="material-symbols-outlined text-lg">build</span>
+                      Fix Errors
+                    </button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleImport}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+                    >
+                      <span className="material-symbols-outlined text-lg">check_circle</span>
+                      Proceed to Import
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
             </div>
-          </div>
+          </aside>
         </div>
       </main>
     </div>
   );
 }
-

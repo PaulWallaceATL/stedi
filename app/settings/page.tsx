@@ -2,210 +2,358 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
-export default function SettingsPage() {
-  const [activeSection, setActiveSection] = useState("practice-profile");
-
+// Animated background
+function AnimatedBackground() {
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#f6f7f8]">
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 px-6 sm:px-10 py-3 bg-white">
-        <div className="flex items-center gap-4 text-gray-900">
-          <svg className="w-6 h-6 text-[#137fec]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
-          </svg>
-          <h2 className="text-gray-900 text-lg font-bold leading-tight tracking-[-0.015em]">Clinix AI Billing</h2>
-        </div>
-        <nav className="hidden md:flex items-center gap-8">
-          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/dashboard">Dashboard</Link>
-          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/upload">Upload</Link>
-          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/denials">Denials</Link>
-          <Link className="text-sm font-medium text-slate-500 hover:text-slate-800" href="/performance">Reports</Link>
-          <Link className="text-sm font-medium text-[#137fec] font-semibold" href="/settings">Settings</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-gray-100 text-gray-800">
-            <span className="material-symbols-outlined text-xl">notifications</span>
-          </button>
-          <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAy8k5E8Bn77IkBWUbc5CYDAlJLGiyGbKc1Cs93iNvWVxRbeI2XLIUg9V1j2NJC0FjoF0u80-NzpZT8wkyFQfGiD-A0JcnF63I4SHwpS6KVbKZ0aUJnbgDOO358KfIxyaHVTDgQSdWB6p1lUe1gNytj4Qb0Wur6i3TEeolibpRyE9oex71UTQpBBa8C1QBJuwZKmlf0LhpKLO78Ll9laRSZTaHHr04Xc4HwA6qYTb5_1-AFHZCcY22Grx6snM0zWQFc5IEC3Xx-TcQ")'}}></div>
-        </div>
-      </header>
-
-      <div className="flex flex-1">
-        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white p-4">
-          <div className="flex h-full flex-col justify-between">
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-3 items-center">
-                <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqYiOucAxvSzyaKApSZK90BMVhlsy9SbXv_v9OECakVH1nccf-dywhpmG-_R3bdKErZDAm4roH2KmggT4stOb8_AbMplXFPmclulWnGyRjQJiwAuF1YVXfmah-SqgL1vggtZS4inyXdiszfPPS7qN0PAmsDxv7hoxWG-JpWXJ4rDtnqiKYc32oAdEPBXIfwU46lTwfOO8eZxSaVmkzfhKP89wWUgAafCprEDTQkNPbkiyWlyy-PmuiNjHs6Vr0ZuJCSaihc8uZAB4")'}}></div>
-                <div className="flex flex-col">
-                  <h1 className="text-gray-900 text-base font-medium leading-normal">Clinix AI</h1>
-                  <p className="text-gray-500 text-sm font-normal leading-normal">Admin Hub</p>
-                </div>
-              </div>
-              <nav className="flex flex-col gap-1 mt-4">
-                <button 
-                  onClick={() => setActiveSection("practice-profile")}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg ${activeSection === "practice-profile" ? "bg-[#137fec]/10 text-[#137fec]" : "text-gray-700 hover:bg-gray-100"}`}
-                >
-                  <span className="material-symbols-outlined text-xl">account_circle</span>
-                  <p className="text-sm font-semibold leading-normal">Practice Profile</p>
-                </button>
-                <button 
-                  onClick={() => setActiveSection("billing-tax")}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg ${activeSection === "billing-tax" ? "bg-[#137fec]/10 text-[#137fec]" : "text-gray-700 hover:bg-gray-100"}`}
-                >
-                  <span className="material-symbols-outlined text-xl">credit_card</span>
-                  <p className="text-sm font-medium leading-normal">Billing & Tax Info</p>
-                </button>
-                <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
-                  <span className="material-symbols-outlined text-xl">business</span>
-                  <p className="text-sm font-medium leading-normal">Locations & POS</p>
-                </Link>
-                <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
-                  <span className="material-symbols-outlined text-xl">group</span>
-                  <p className="text-sm font-medium leading-normal">Providers & Defaults</p>
-                </Link>
-              </nav>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
-                <span className="material-symbols-outlined text-xl">help</span>
-                <p className="text-sm font-medium leading-normal">Help</p>
-              </Link>
-              <Link href="/login" className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
-                <span className="material-symbols-outlined text-xl">logout</span>
-                <p className="text-sm font-medium leading-normal">Logout</p>
-              </Link>
-            </div>
-          </div>
-        </aside>
-
-        <main className="flex-1 p-6 lg:p-10 grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 flex flex-col gap-6">
-            <header>
-              <h1 className="text-gray-900 text-4xl font-black leading-tight tracking-[-0.033em]">Practice Settings</h1>
-              <p className="text-gray-500 text-base font-normal leading-normal mt-2">
-                Configure practice-level information to auto-populate claims and streamline your billing workflow.
-              </p>
-              <p className="text-gray-500 text-sm font-normal leading-normal pt-3">
-                Last updated: {new Date().toLocaleDateString()} by Admin User
-              </p>
-            </header>
-
-            <div className="flex flex-col gap-4">
-              {activeSection === "practice-profile" && (
-                <details className="flex flex-col rounded-xl border border-gray-200 bg-white group" open>
-                  <summary className="flex cursor-pointer items-center justify-between gap-6 p-4">
-                    <p className="text-gray-900 text-lg font-semibold leading-normal">Practice Profile</p>
-                    <span className="material-symbols-outlined text-gray-600 group-open:rotate-180 transition-transform">expand_more</span>
-                  </summary>
-                  <div className="p-4 pt-0 border-t border-gray-200">
-                    <p className="text-gray-500 text-sm font-normal leading-normal pb-4">
-                      Used as the primary practice identity on claims and communications.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Practice Legal Name</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" defaultValue="Demo Medical Group" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">DBA Name (optional)</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" defaultValue="Demo Clinic" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Organization Type</label>
-                        <select className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]">
-                          <option>Solo Practice</option>
-                          <option selected>Group Practice</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Main Phone</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="tel" defaultValue="(555) 123-4567" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Main Email</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="email" defaultValue="billing@democlinic.com" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Website (optional)</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="url" defaultValue="https://democlinic.com" />
-                      </div>
-                    </div>
-                  </div>
-                </details>
-              )}
-
-              {activeSection === "billing-tax" && (
-                <details className="flex flex-col rounded-xl border border-gray-200 bg-white group" open>
-                  <summary className="flex cursor-pointer items-center justify-between gap-6 p-4">
-                    <p className="text-gray-900 text-lg font-semibold leading-normal">Billing Entity & Tax Information</p>
-                    <span className="material-symbols-outlined text-gray-600 group-open:rotate-180 transition-transform">expand_more</span>
-                  </summary>
-                  <div className="p-4 pt-0 border-t border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Tax ID (EIN / SSN)</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" defaultValue="12-3456789" />
-                        <p className="mt-1 text-xs text-gray-500">Used for claim adjudication and 1099 reporting.</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Organizational NPI (Type 2)</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" defaultValue="1999999984" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Default Taxonomy Code</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" defaultValue="207Q00000X - Family Medicine" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">CLIA Number (optional, for labs)</label>
-                        <input className="mt-1 block w-full rounded border-gray-300 bg-white text-gray-900 shadow-sm focus:border-[#137fec] focus:ring-[#137fec]" type="text" />
-                      </div>
-                    </div>
-                  </div>
-                </details>
-              )}
-            </div>
-          </div>
-
-          <aside className="hidden xl:block">
-            <div className="sticky top-10 bg-blue-50 rounded-xl p-6 border border-blue-100">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[#137fec] text-2xl" style={{fontVariationSettings: "'FILL' 1"}}>lightbulb</span>
-                <h3 className="text-lg font-semibold text-blue-700">Quick Tip</h3>
-              </div>
-              <p className="mt-3 text-sm text-gray-600">
-                Practice-level settings are applied automatically whenever you create a new claim, upload claims via CSV/JSON, or integrate an EHR. You can override most values at the individual claim level.
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-gray-600">
-                <li className="flex gap-2">
-                  <span className="text-gray-500">•</span>
-                  The Default Taxonomy Code populates Box 24j.
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-gray-500">•</span>
-                  The Pay-To Address populates Box 33.
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-gray-500">•</span>
-                  Assignment of Benefits populates Box 13.
-                </li>
-              </ul>
-            </div>
-          </aside>
-        </main>
-      </div>
-
-      <footer className="sticky bottom-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 p-4">
-        <div className="max-w-7xl mx-auto flex justify-end items-center gap-3">
-          <Link href="/dashboard" className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">
-            Discard Changes
-          </Link>
-          <button className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#137fec] hover:bg-[#0f6acc]">
-            Save Settings
-          </button>
-        </div>
-      </footer>
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 bg-[#0a0a0f]" />
+      <motion.div
+        className="absolute top-0 right-0 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-violet-600/10 via-purple-600/10 to-indigo-600/10 blur-3xl"
+        animate={{ x: [0, -50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 blur-3xl"
+        animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+      />
     </div>
   );
 }
 
+type Section = "practice" | "billing" | "locations" | "providers" | "integrations";
+
+const menuItems: { id: Section; label: string; icon: string; description: string }[] = [
+  { id: "practice", label: "Practice Profile", icon: "business", description: "Organization details and branding" },
+  { id: "billing", label: "Billing & Tax Info", icon: "receipt_long", description: "NPI, Tax ID, and payment settings" },
+  { id: "locations", label: "Locations & POS", icon: "location_on", description: "Service locations and place of service" },
+  { id: "providers", label: "Providers", icon: "group", description: "Rendering providers and defaults" },
+  { id: "integrations", label: "Integrations", icon: "hub", description: "API keys and third-party connections" },
+];
+
+function SettingsInput({ label, value, description, type = "text" }: { label: string; value: string; description?: string; type?: string }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-slate-300">{label}</label>
+      <input
+        type={type}
+        defaultValue={value}
+        className="w-full h-12 rounded-xl border border-slate-700 bg-slate-800/50 px-4 text-white placeholder-slate-500 outline-none focus:border-[#137fec] focus:ring-2 focus:ring-[#137fec]/20 transition-all"
+      />
+      {description && <p className="text-xs text-slate-400">{description}</p>}
+    </div>
+  );
+}
+
+export default function SettingsPage() {
+  const [activeSection, setActiveSection] = useState<Section>("practice");
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <AnimatedBackground />
+      
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
+                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-white">Clinix AI</h1>
+                <p className="text-xs text-slate-400">Settings</p>
+              </div>
+            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              {[
+                { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+                { href: "/claims/new", label: "New Claim", icon: "add_circle" },
+                { href: "/upload", label: "Upload", icon: "upload_file" },
+                { href: "/denials", label: "Denials", icon: "error" },
+                { href: "/performance", label: "Reports", icon: "analytics" },
+              ].map((item) => (
+                <Link key={item.href} href={item.href} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800/50 transition-colors">
+                  <span className="material-symbols-outlined text-lg" style={{ color: '#ffffff' }}>{item.icon}</span>
+                  <span style={{ color: '#ffffff' }}>{item.label}</span>
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-3">
+              <button className="p-2 rounded-xl hover:bg-slate-800 text-white hover:text-white transition-colors">
+                <span className="material-symbols-outlined">notifications</span>
+              </button>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                C
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Practice Settings</h2>
+            <p className="text-slate-400 mt-1">Configure your practice to auto-populate claims and streamline workflows</p>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+          >
+            <span className="material-symbols-outlined text-lg">save</span>
+            Save Changes
+          </motion.button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <aside className="lg:col-span-1">
+            <div className="sticky top-24 space-y-2">
+              {menuItems.map((item) => (
+                <motion.button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  whileHover={{ x: 4 }}
+                  className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    activeSection === item.id
+                      ? "bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec]"
+                      : "bg-slate-800/30 border border-slate-700/50 text-white hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-xl">{item.icon}</span>
+                  <div>
+                    <p className={`text-sm ${activeSection === item.id ? "font-semibold" : "font-medium"}`}>{item.label}</p>
+                    <p className="text-xs text-slate-400 hidden lg:block">{item.description}</p>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </aside>
+
+          {/* Content */}
+          <div className="lg:col-span-3 space-y-6">
+            {activeSection === "practice" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+              >
+                <div className="p-6 border-b border-slate-800">
+                  <h3 className="text-lg font-semibold text-white">Practice Profile</h3>
+                  <p className="text-sm text-slate-300">Primary practice identity on claims and communications</p>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <SettingsInput label="Practice Legal Name" value="Demo Medical Group" />
+                    <SettingsInput label="DBA Name (optional)" value="Demo Clinic" />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-300">Organization Type</label>
+                      <select className="w-full h-12 rounded-xl border border-slate-700 bg-slate-800/50 px-4 text-white outline-none focus:border-[#137fec]">
+                        <option>Solo Practice</option>
+                        <option selected>Group Practice</option>
+                        <option>Hospital</option>
+                      </select>
+                    </div>
+                    <SettingsInput label="Main Phone" value="(555) 123-4567" type="tel" />
+                    <SettingsInput label="Main Email" value="billing@democlinic.com" type="email" />
+                    <SettingsInput label="Website (optional)" value="https://democlinic.com" type="url" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeSection === "billing" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+              >
+                <div className="p-6 border-b border-slate-800">
+                  <h3 className="text-lg font-semibold text-white">Billing & Tax Information</h3>
+                  <p className="text-sm text-slate-300">Tax IDs, NPIs, and billing credentials</p>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <SettingsInput label="Tax ID (EIN / SSN)" value="12-3456789" description="Used for claim adjudication and 1099 reporting" />
+                    <SettingsInput label="Organizational NPI (Type 2)" value="1999999984" />
+                    <SettingsInput label="Default Taxonomy Code" value="207Q00000X - Family Medicine" />
+                    <SettingsInput label="CLIA Number (optional)" value="" description="Required for lab billing" />
+                  </div>
+                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-400">info</span>
+                      <div>
+                        <p className="text-sm text-amber-300 font-medium">Important</p>
+                        <p className="text-xs text-amber-200/70 mt-1">These identifiers are used for all claim submissions. Ensure they are accurate to avoid rejections.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeSection === "locations" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+              >
+                <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Service Locations</h3>
+                    <p className="text-sm text-slate-300">Manage where services are rendered</p>
+                  </div>
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec] font-medium text-sm">
+                    <span className="material-symbols-outlined text-lg">add</span>
+                    Add Location
+                  </button>
+                </div>
+                <div className="p-6 space-y-4">
+                  {[
+                    { name: "Main Office", address: "123 Main St, Nashville, TN 37201", pos: "11", default: true },
+                    { name: "Downtown Clinic", address: "456 Broadway, Nashville, TN 37203", pos: "11", default: false },
+                  ].map((loc, idx) => (
+                    <div key={idx} className="rounded-xl bg-slate-800/30 border border-slate-700/50 p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#137fec]/10 flex items-center justify-center text-[#137fec]">
+                            <span className="material-symbols-outlined">location_on</span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-semibold">{loc.name}</p>
+                              {loc.default && (
+                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">Default</span>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-300">{loc.address}</p>
+                            <p className="text-xs text-slate-400 mt-1">POS Code: {loc.pos}</p>
+                          </div>
+                        </div>
+                        <button className="p-2 rounded-lg hover:bg-slate-700 text-white hover:text-white transition-colors">
+                          <span className="material-symbols-outlined">edit</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {activeSection === "providers" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+              >
+                <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Providers</h3>
+                    <p className="text-sm text-slate-300">Rendering and referring provider profiles</p>
+                  </div>
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec] font-medium text-sm">
+                    <span className="material-symbols-outlined text-lg">add</span>
+                    Add Provider
+                  </button>
+                </div>
+                <div className="p-6 space-y-4">
+                  {[
+                    { name: "Dr. Sarah Johnson", npi: "1234567890", specialty: "Family Medicine", default: true },
+                    { name: "Dr. Michael Chen", npi: "0987654321", specialty: "Internal Medicine", default: false },
+                  ].map((provider, idx) => (
+                    <div key={idx} className="rounded-xl bg-slate-800/30 border border-slate-700/50 p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center text-violet-400 font-semibold">
+                            {provider.name.split(" ").map((n) => n[0]).join("")}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-semibold">{provider.name}</p>
+                              {provider.default && (
+                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">Default</span>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-300">{provider.specialty}</p>
+                            <p className="text-xs text-slate-400 mt-1 font-mono">NPI: {provider.npi}</p>
+                          </div>
+                        </div>
+                        <button className="p-2 rounded-lg hover:bg-slate-700 text-white hover:text-white transition-colors">
+                          <span className="material-symbols-outlined">edit</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {activeSection === "integrations" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-6"
+              >
+                <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+                  <div className="p-6 border-b border-slate-800">
+                    <h3 className="text-lg font-semibold text-white">Stedi Integration</h3>
+                    <p className="text-sm text-slate-300">Healthcare clearinghouse connection</p>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                        <span className="material-symbols-outlined text-2xl">check_circle</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">Connected</p>
+                        <p className="text-sm text-slate-300">Stedi API is active and operational</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <SettingsInput label="API Key" value="••••••••••••••••" type="password" description="Contact support to rotate API keys" />
+                      <SettingsInput label="Proxy URL" value="https://stedi-proxy-*.run.app" description="Cloud Run proxy endpoint" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+                  <div className="p-6 border-b border-slate-800">
+                    <h3 className="text-lg font-semibold text-white">AI Services</h3>
+                    <p className="text-sm text-slate-300">AI-powered claim optimization</p>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center text-violet-400">
+                        <span className="material-symbols-outlined text-2xl">psychology</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">AI Claim Intelligence</p>
+                        <p className="text-sm text-slate-300">RAG-powered optimization engine</p>
+                      </div>
+                    </div>
+                    <div className="rounded-xl bg-[#137fec]/5 border border-[#137fec]/20 p-4">
+                      <div className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-[#137fec]">auto_awesome</span>
+                        <div>
+                          <p className="text-sm text-[#137fec] font-medium">AI Features Active</p>
+                          <p className="text-xs text-slate-400 mt-1">Claim scrubbing, denial prediction, and optimization suggestions are enabled.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

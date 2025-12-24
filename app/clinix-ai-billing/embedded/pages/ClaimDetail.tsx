@@ -32,10 +32,12 @@ export const ClaimDetail: React.FC<Props> = ({ setView }) => {
       const res = await claimStatus(sampleStatusPayload);
       setStatusResult(res.data);
       if (supabase) {
-        await supabase.from("claim_events").insert({
-          type: "status",
-          payload: res.data,
-        });
+        try {
+          await supabase.from("claim_status_events").insert({
+            type: "status",
+            payload: res.data,
+          });
+        } catch (e) { console.warn("Event insert failed:", e); }
       }
     } catch (err: any) {
       setStatusResult({ error: err?.message, data: err?.data });
@@ -55,7 +57,9 @@ export const ClaimDetail: React.FC<Props> = ({ setView }) => {
         const info = { info: "Prefilled from latest inbound transaction", transactionId: inbound.transactionId };
         setTxnResult(info);
         if (supabase) {
-          await supabase.from("claim_events").insert({ type: "transaction_prefill", payload: info });
+          try {
+            await supabase.from("claim_status_events").insert({ type: "transaction_prefill", payload: info });
+          } catch (e) { console.warn("Event insert failed:", e); }
         }
       } else {
         setTxnResult({ info: "No inbound transactions found" });
@@ -77,7 +81,9 @@ export const ClaimDetail: React.FC<Props> = ({ setView }) => {
       const res = await getTransactionOutput(txnId);
       setTxnResult(res.data);
       if (supabase) {
-        await supabase.from("claim_events").insert({ type: "transaction_output", payload: res.data, transaction_id: txnId });
+        try {
+          await supabase.from("claim_status_events").insert({ type: "transaction_output", payload: res.data, transaction_id: txnId });
+        } catch (e) { console.warn("Event insert failed:", e); }
       }
     } catch (err: any) {
       setTxnResult({ error: err?.message, data: err?.data });

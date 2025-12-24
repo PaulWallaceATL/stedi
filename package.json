@@ -9,17 +9,28 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "clinix-ai-billing": "file:./clinix-ai-billing",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "class-variance-authority": "^0.7.1",
+    "clinix-ai-billing": "file:./clinix-ai-billing",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.26",
     "gsap": "^3.13.0",
     "lenis": "^1.1.10",
     "next": "16.0.7",
     "ogl": "^1.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "three": "^0.181.2",
-    "@supabase/supabase-js": "^2.45.4"
+    "react-hot-toast": "^2.6.0",
+    "recharts": "^3.6.0",
+    "tailwind-merge": "^3.4.0",
+    "three": "^0.181.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -19,40 +19,58 @@ export default function FixStatusesPage() {
       setLoading(true);
       setResult("Starting status fix...\n");
 
-      // Get all claims with null, empty, or "draft" status
+      // Pull recent claims and fix statuses client-side (more reliable than PostgREST OR filters for empty strings)
       const { data: claims, error } = await supabase
         .from("claims")
         .select("id, patient_name, status, created_at")
-        .or("status.is.null,status.eq.,status.ilike.draft");
+        .order("created_at", { ascending: false })
+        .limit(500);
 
       if (error) {
         setResult((prev) => prev + `Error fetching claims: ${error.message}\n`);
         return;
       }
 
-      if (!claims || claims.length === 0) {
-        setResult((prev) => prev + "✅ All claims already have valid statuses!\n");
+      const toFix =
+        (claims || []).filter((c) => {
+          const s = String(c.status ?? "").trim().toLowerCase();
+          const known = new Set([
+            "accepted",
+            "paid",
+            "posted",
+            "success",
+            "submitted",
+            "sent",
+            "denied",
+            "rejected",
+            "pending",
+            "needs review",
+            "review",
+          ]);
+          // Fix: blank, draft, numeric HTTP codes, or any unknown values.
+          return !s || s === "draft" || /^\d+$/.test(s) || !known.has(s);
+        }) || [];
+
+      if (toFix.length === 0) {
+        setResult((prev) => prev + "✅ No claims found with missing/blank/Draft status (checked last 500).\n");
         return;
       }
 
-      setResult((prev) => prev + `Found ${claims.length} claims needing status fix:\n`);
-      claims.forEach((c) => {
+      setResult((prev) => prev + `Found ${toFix.length} claims needing status fix (last 500):\n`);
+      toFix.forEach((c) => {
         setResult((prev) => prev + `  - ${c.patient_name || "Unknown"} (${c.status || "null"})\n`);
       });
       setResult((prev) => prev + "\nUpdating all to 'submitted'...\n");
 
-      // Update all to "submitted" as default
-      const { error: updateError } = await supabase
-        .from("claims")
-        .update({ status: "submitted" })
-        .or("status.is.null,status.eq.,status.ilike.draft");
+      const ids = toFix.map((c) => c.id);
+      const { error: updateError } = await supabase.from("claims").update({ status: "submitted" }).in("id", ids);
 
       if (updateError) {
         setResult((prev) => prev + `Error updating claims: ${updateError.message}\n`);
         return;
       }
 
-      setResult((prev) => prev + `✅ Successfully updated ${claims.length} claims to "submitted" status\n`);
+      setResult((prev) => prev + `✅ Successfully updated ${toFix.length} claims to "submitted" status\n`);
       setResult((prev) => prev + "\nStatus fix complete! All claims now have proper status values.\n");
     } catch (err) {
       setResult((prev) => prev + `Error: ${err instanceof Error ? err.message : String(err)}\n`);
@@ -202,3 +220,4 @@ export default function FixStatusesPage() {
     </div>
   );
 }
+
