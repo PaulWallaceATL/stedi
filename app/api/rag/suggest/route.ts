@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import seed from "@/rag/corpus/seed.json";
-import { validateClaim } from "@/rag/schema/claim";
-import { RAG_API_KEY, RAG_MODEL, RAG_PROVIDER } from "@/rag/config";
+import seed from "../../../../rag/corpus/seed.json";
+import { validateClaim } from "../../../../rag/schema/claim";
+import { RAG_API_KEY, RAG_MODEL, RAG_PROVIDER } from "../../../../rag/config";
 
 type SuggestRequest = {
   payerId?: string;
