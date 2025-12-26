@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { AuroraBackground } from "@/components/ui/AuroraBackground";
+import { ModernNav } from "@/components/ui/ModernNav";
 
 type ValidationRow = {
   row: number;
@@ -29,24 +31,6 @@ type FieldMapping = {
   mapped: boolean;
 };
 
-// Animated background
-function AnimatedBackground() {
-  return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-[#0a0a0f]" />
-      <motion.div
-        className="absolute top-1/4 left-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-violet-600/10 via-purple-600/10 to-indigo-600/10 blur-3xl"
-        animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-1/4 right-0 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-cyan-500/10 via-blue-500/10 to-indigo-500/10 blur-3xl"
-        animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </div>
-  );
-}
 
 // Stat card component
 function StatCard({ title, value, icon, color, delay = 0 }: { title: string; value: string | number; icon: string; color: string; delay?: number }) {
@@ -146,49 +130,8 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
-      <AnimatedBackground />
-      
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
-                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
-                </svg>
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-white">Clinix AI</h1>
-                <p className="text-xs text-slate-400">Bulk Upload</p>
-              </div>
-            </div>
-            <nav className="hidden md:flex items-center gap-1">
-              {[
-                { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-                { href: "/claims/new", label: "New Claim", icon: "add_circle" },
-                { href: "/denials", label: "Denials", icon: "error" },
-                { href: "/performance", label: "Reports", icon: "analytics" },
-                { href: "/settings", label: "Settings", icon: "settings" },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800/50 transition-colors">
-                  <span className="material-symbols-outlined text-lg" style={{ color: '#ffffff' }}>{item.icon}</span>
-                  <span style={{ color: '#ffffff' }}>{item.label}</span>
-                </Link>
-              ))}
-            </nav>
-            <div className="flex items-center gap-3">
-              <button className="p-2 rounded-xl hover:bg-slate-800 text-white hover:text-white transition-colors">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
-                C
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <AuroraBackground>
+      <ModernNav />
 
       {/* Main */}
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -445,6 +388,7 @@ export default function UploadPage() {
           </aside>
         </div>
       </main>
-    </div>
+    </AuroraBackground>
   );
 }
+

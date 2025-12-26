@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { motion, AnimatePresence } from "framer-motion";
+import { AuroraBackground } from "@/components/ui/AuroraBackground";
+import { ModernNav } from "@/components/ui/ModernNav";
 
 type ClaimRow = {
   id: string;
@@ -18,25 +20,6 @@ type ClaimRow = {
 function currency(value?: number | null) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "—";
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value));
-}
-
-// Animated background
-function AnimatedBackground() {
-  return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-[#0a0a0f]" />
-      <motion.div
-        className="absolute top-0 left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-rose-600/10 via-pink-600/10 to-red-600/10 blur-3xl"
-        animate={{ x: [0, -50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-violet-500/10 via-purple-500/10 to-indigo-500/10 blur-3xl"
-        animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </div>
-  );
 }
 
 export default function DenialsPage() {
@@ -81,8 +64,7 @@ export default function DenialsPage() {
 
   if (supabaseMissing) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-6">
-        <AnimatedBackground />
+      <AuroraBackground className="flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -92,14 +74,13 @@ export default function DenialsPage() {
           <p className="text-lg font-semibold text-white">Database Not Connected</p>
           <p className="text-sm text-slate-300">Configure Supabase environment variables to view denials.</p>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   if (!userId && !loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-6">
-        <AnimatedBackground />
+      <AuroraBackground className="flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -120,13 +101,13 @@ export default function DenialsPage() {
             <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <AuroraBackground className="flex items-center justify-center">
         <motion.div className="flex flex-col items-center gap-4">
           <motion.div
             className="w-12 h-12 border-3 border-rose-500 border-t-transparent rounded-full"
@@ -135,59 +116,13 @@ export default function DenialsPage() {
           />
           <p className="text-slate-300">Loading denials...</p>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
-      <AnimatedBackground />
-      
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-full mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
-                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
-                </svg>
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-white">Denial Manager</h1>
-                <p className="text-xs text-slate-400">AI-Powered Resolution</p>
-              </div>
-            </div>
-            <nav className="hidden md:flex items-center gap-1">
-              {[
-                { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-                { href: "/claims/new", label: "New Claim", icon: "add_circle" },
-                { href: "/upload", label: "Upload", icon: "upload_file" },
-                { href: "/performance", label: "Reports", icon: "analytics" },
-                { href: "/settings", label: "Settings", icon: "settings" },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800/50 transition-colors">
-                  <span className="material-symbols-outlined text-lg" style={{ color: '#ffffff' }}>{item.icon}</span>
-                  <span style={{ color: '#ffffff' }}>{item.label}</span>
-                </Link>
-              ))}
-            </nav>
-            <div className="flex items-center gap-3">
-              <div className="relative hidden lg:block">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-                <input
-                  type="text"
-                  placeholder="Search claims..."
-                  className="w-64 pl-10 pr-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#137fec] transition-colors"
-                />
-              </div>
-              <button className="p-2 rounded-xl hover:bg-slate-800 text-white hover:text-white transition-colors">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <AuroraBackground>
+      <ModernNav />
 
       {/* Main */}
       <main className="h-[calc(100vh-73px)] grid grid-cols-1 lg:grid-cols-[280px_1fr_400px]">
@@ -443,6 +378,7 @@ export default function DenialsPage() {
           </motion.button>
         </div>
       </footer>
-    </div>
+    </AuroraBackground>
   );
 }
+
