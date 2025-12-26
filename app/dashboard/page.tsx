@@ -10,7 +10,8 @@ import { AuroraBackground } from "@/components/ui/AuroraBackground";
 import { ModernNav } from "@/components/ui/ModernNav";
 import { GlassCard, MetricCard } from "@/components/ui/GlassCard";
 import { ModernTable } from "@/components/ui/ModernTable";
-import { AIOrb, AIAssistantPanel } from "@/components/ui/AIOrb";
+import { AIOrb } from "@/components/ui/AIOrb";
+import { AIAssistant } from "@/components/ui/AIAssistant";
 
 type ClaimRow = {
   id: string;
@@ -223,30 +224,8 @@ function DashboardContent() {
     <AuroraBackground>
       <ModernNav />
 
-      {/* AI Assistant Panel */}
-      <AIAssistantPanel isOpen={showAI} onClose={() => setShowAI(false)}>
-        <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-            <p className="text-sm text-slate-300">
-              Hello! I&apos;m your AI billing assistant. I can help you:
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-400 text-sm">check_circle</span>
-                Analyze claim denials and suggest fixes
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-400 text-sm">check_circle</span>
-                Optimize coding for maximum reimbursement
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-blue-400 text-sm">check_circle</span>
-                Predict approval likelihood before submission
-              </li>
-            </ul>
-          </div>
-        </div>
-      </AIAssistantPanel>
+      {/* AI Assistant */}
+      <AIAssistant isOpen={showAI} onClose={() => setShowAI(false)} claims={claims} />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}

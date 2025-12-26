@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
+import { AuroraBackground } from "@/components/ui/AuroraBackground";
+import { ModernNav } from "@/components/ui/ModernNav";
 
 type ClaimRow = {
   id: string;
@@ -18,24 +20,6 @@ function currency(value?: number | null) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(value));
 }
 
-// Animated background
-function AnimatedBackground() {
-  return (
-    <div className="fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-[#0a0a0f]" />
-      <motion.div
-        className="absolute top-0 right-0 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-emerald-600/10 via-teal-600/10 to-cyan-600/10 blur-3xl"
-        animate={{ x: [0, -50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-indigo-500/10 blur-3xl"
-        animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </div>
-  );
-}
 
 // Metric card
 function MetricCard({ title, value, subtitle, icon, color, delay = 0 }: { title: string; value: string; subtitle?: string; icon: string; color: string; delay?: number }) {
@@ -154,8 +138,7 @@ export default function PerformancePage() {
 
   if (supabaseMissing) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-6">
-        <AnimatedBackground />
+      <AuroraBackground className="flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -165,14 +148,13 @@ export default function PerformancePage() {
           <p className="text-lg font-semibold text-white">Database Not Connected</p>
           <p className="text-sm text-slate-300">Configure Supabase environment variables to view reports.</p>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   if (!userId && !loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-6">
-        <AnimatedBackground />
+      <AuroraBackground className="flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -193,13 +175,13 @@ export default function PerformancePage() {
             <span className="material-symbols-outlined">arrow_forward</span>
           </Link>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <AuroraBackground className="flex items-center justify-center">
         <motion.div className="flex flex-col items-center gap-4">
           <motion.div
             className="w-12 h-12 border-3 border-emerald-500 border-t-transparent rounded-full"
@@ -208,54 +190,13 @@ export default function PerformancePage() {
           />
           <p className="text-slate-300">Loading reports...</p>
         </motion.div>
-      </main>
+      </AuroraBackground>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
-      <AnimatedBackground />
-      
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
-                  <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
-                </svg>
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-white">Clinix AI</h1>
-                <p className="text-xs text-slate-400">Performance Reports</p>
-              </div>
-            </div>
-            <nav className="hidden md:flex items-center gap-1">
-              {[
-                { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-                { href: "/claims/new", label: "New Claim", icon: "add_circle" },
-                { href: "/upload", label: "Upload", icon: "upload_file" },
-                { href: "/denials", label: "Denials", icon: "error" },
-                { href: "/settings", label: "Settings", icon: "settings" },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800/50 transition-colors">
-                  <span className="material-symbols-outlined text-lg" style={{ color: '#ffffff' }}>{item.icon}</span>
-                  <span style={{ color: '#ffffff' }}>{item.label}</span>
-                </Link>
-              ))}
-            </nav>
-            <div className="flex items-center gap-3">
-              <button className="p-2 rounded-xl hover:bg-slate-800 text-white hover:text-white transition-colors">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
-                C
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <AuroraBackground>
+      <ModernNav />
 
       {/* Main */}
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -414,6 +355,7 @@ export default function PerformancePage() {
           </>
         )}
       </main>
-    </div>
+    </AuroraBackground>
   );
 }
+
