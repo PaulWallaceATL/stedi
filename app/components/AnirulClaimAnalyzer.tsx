@@ -310,10 +310,10 @@ export default function AnirulClaimAnalyzer({
               <span className="text-xs text-[#6b5a45] uppercase tracking-wider">Pre-Submission Analysis</span>
             </div>
             <p className="text-sm text-[#8b7355]">
-              {analyzing ? "Scanning payer rules and billing wisdom..." :
-               error ? "The vision was interrupted. Please try again." :
+              {analyzing ? "Analyzing payer rules and billing best practices..." :
+               error ? "Analysis interrupted. Please try again." :
                result ? result.rationale :
-               "Awaken the Oracle to analyze your claim before submission."}
+               "Click to analyze your claim before submission."}
             </p>
           </div>
           

@@ -20,7 +20,7 @@ type AIClaimIntelligenceProps = {
   onApplySuggestions?: (optimizedClaim: any) => void;
 };
 
-// Anirul Oracle Background - Desert mystical waves
+// Anirul Background - Professional AI styling
 function AnirulBackground({ isActive = false, isThinking = false }: { isActive?: boolean; isThinking?: boolean }) {
   const baseIntensity = isThinking ? 1.5 : isActive ? 1 : 0.6;
   
@@ -134,8 +134,8 @@ function AnirulBackground({ isActive = false, isThinking = false }: { isActive?:
   );
 }
 
-// Anirul Oracle Eye - The prescient AI avatar
-function AnirulOracleEye({ 
+// Anirul Eye - AI Analysis indicator
+function AnirulEye({ 
   state, 
   onActivate 
 }: { 
@@ -251,8 +251,8 @@ function AnirulOracleEye({
   );
 }
 
-// Animated text that types out - Oracle speech
-function OracleTypewriter({ text, speed = 30 }: { text: string; speed?: number }) {
+// Animated text typing effect
+function TypewriterText({ text, speed = 30 }: { text: string; speed?: number }) {
   const [displayText, setDisplayText] = useState("");
   
   useEffect(() => {
@@ -320,7 +320,7 @@ function ChangeCard({ change, index }: { change: { path: string; before: any; af
   );
 }
 
-// Confidence visualization - Oracle certainty
+// Confidence visualization
 function ConfidenceRing({ value }: { value: number }) {
   const percentage = Math.round(value * 100);
   const circumference = 2 * Math.PI * 45;
@@ -372,7 +372,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [aiState, setAiState] = useState<"idle" | "thinking" | "ready" | "success" | "error">("idle");
-  const [aiMessage, setAiMessage] = useState("I have foreseen the paths of your claim. Awaken me to reveal optimizations hidden in the sands of time.");
+  const [aiMessage, setAiMessage] = useState("Ready to analyze your claim. Click to reveal optimizations and reduce denial risk.");
 
   const analyzeClaim = async () => {
     try {
@@ -380,7 +380,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
       setError(null);
       setSuggestion(null);
       setAiState("thinking");
-      setAiMessage("The spice flows... I am scanning payer rules and ancient billing wisdom...");
+      setAiMessage("Analyzing claim against payer rules and billing best practices...");
 
       // Build comprehensive claim data from whatever structure we receive
       // This handles both Supabase payload structure and direct claim structure
@@ -472,12 +472,12 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
       
       {/* Content */}
       <div className="relative z-10 p-8">
-        {/* Oracle Section */}
+        {/* Analysis Section */}
         <div className="flex flex-col items-center text-center mb-8">
-          {/* Anirul Oracle Eye */}
-          <AnirulOracleEye state={aiState} onActivate={analyzeClaim} />
+          {/* Anirul Eye */}
+          <AnirulEye state={aiState} onActivate={analyzeClaim} />
           
-          {/* Oracle Name */}
+          {/* AI Name */}
           <motion.h3
             className="mt-6 text-2xl font-bold bg-gradient-to-r from-[#e8dcc8] via-[#c97435] to-[#a67c52] bg-clip-text text-transparent tracking-wider"
             initial={{ opacity: 0, y: 10 }}
@@ -491,10 +491,10 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Oracle of Claim Intelligence
+            Claim Intelligence Engine
           </motion.p>
           
-          {/* Oracle Message Bubble */}
+          {/* AI Message */}
           <motion.div
             className="mt-4 max-w-md px-6 py-4 rounded-2xl bg-[#1a1512]/60 backdrop-blur-md border border-[#c97435]/20"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -502,11 +502,11 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
             key={aiMessage}
           >
             <p className="text-[#a67c52] text-sm leading-relaxed italic">
-              "{loading ? <OracleTypewriter text={aiMessage} speed={20} /> : aiMessage}"
+              "{loading ? <TypewriterText text={aiMessage} speed={20} /> : aiMessage}"
             </p>
           </motion.div>
           
-          {/* Oracle capabilities */}
+          {/* AI capabilities */}
           {!suggestion && !error && !loading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -515,8 +515,8 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
               className="mt-6 flex flex-wrap justify-center gap-4"
             >
               {[
-                { icon: "rule", label: "Payer Prophecy", color: "text-[#c97435]" },
-                { icon: "verified", label: "Code Divination", color: "text-emerald-400" },
+                { icon: "rule", label: "Payer Rules", color: "text-[#c97435]" },
+                { icon: "verified", label: "Code Validation", color: "text-emerald-400" },
                 { icon: "psychology", label: "Pattern Sight", color: "text-[#a67c52]" },
               ].map((item, i) => (
                 <motion.div
@@ -590,7 +590,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <span className="material-symbols-outlined text-sm">warning</span>
-                    Warnings to Heed
+                    Warnings
                   </h4>
                   <div className="space-y-2">
                     {suggestion.warnings.map((warning, index) => (
@@ -614,7 +614,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-[#a67c52] uppercase tracking-wider flex items-center gap-2">
                     <span className="material-symbols-outlined text-sm">tips_and_updates</span>
-                    Oracle's Wisdom
+                    Recommendations
                   </h4>
                   <div className="space-y-2">
                     {suggestion.recommendations.map((rec, index) => (
@@ -642,7 +642,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
                   whileTap={{ scale: 0.98 }}
                 >
                   <span className="material-symbols-outlined">check_circle</span>
-                  Accept the Prophecy
+                  Apply Optimizations
                 </motion.button>
                 <motion.button
                   onClick={analyzeClaim}
@@ -667,7 +667,7 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
             transition={{ delay: 1 }}
             className="text-center text-[#6b5a45] text-xs mt-4"
           >
-            Awaken the Oracle to begin your claim's journey
+            Click to analyze your claim for optimizations
           </motion.p>
         )}
       </div>

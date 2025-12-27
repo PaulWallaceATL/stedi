@@ -72,7 +72,7 @@ function TimelineEvent({ event, isLast }: { event: ClaimEvent; isLast: boolean }
     transaction_prefill: { icon: "link", label: "Transaction Linked", color: "text-[#a67c52]" },
     transaction_output: { icon: "receipt_long", label: "Remittance (835)", color: "text-emerald-400" },
     attachment: { icon: "attach_file", label: "Attachment Sent (275)", color: "text-amber-400" },
-    ai_analysis: { icon: "visibility", label: "Oracle Analysis", color: "text-[#c97435]" },
+    ai_analysis: { icon: "visibility", label: "AI Analysis", color: "text-[#c97435]" },
   };
   
   const config = typeConfig[event.type] || { icon: "event", label: event.type, color: "text-[#6b5a45]" };
@@ -527,7 +527,7 @@ export default function ClaimDetailPage() {
           </motion.div>
         </section>
 
-        {/* AI Claim Intelligence - Anirul Oracle */}
+        {/* AI Claim Intelligence - Anirul */}
         <section className="mb-8">
           <AIClaimIntelligence
             claim={claimPayload}

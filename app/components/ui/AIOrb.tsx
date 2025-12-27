@@ -12,7 +12,7 @@ interface AIOrbProps {
   className?: string;
 }
 
-// Anirul-inspired AI Orb - Mystical, oracle-like, Bene Gesserit aesthetic
+// Anirul-inspired AI Orb - Professional AI aesthetic
 export function AIOrb({
   isActive = false,
   isProcessing = false,
@@ -251,7 +251,7 @@ export function AIOrb({
   );
 }
 
-// AI Assistant Panel - Anirul Oracle Style
+// AI Assistant Panel - Anirul Style
 interface AIAssistantPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -284,7 +284,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
               {/* Mystical border accent */}
               <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c97435]/50 to-transparent" />
               
-              {/* Header - Oracle Title */}
+              {/* Header - AI Title */}
               <div className="relative flex items-center justify-between p-6 border-b border-[#c97435]/10">
                 {/* Sacred geometry background */}
                 <div className="absolute inset-0 opacity-5">
@@ -300,7 +300,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                   <AIOrb size="sm" isActive />
                   <div>
                     <h2 className="text-lg font-semibold text-[#e8dcc8] tracking-wide">ANIRUL</h2>
-                    <p className="text-xs text-[#8b7355] uppercase tracking-widest">Oracle Intelligence</p>
+                    <p className="text-xs text-[#8b7355] uppercase tracking-widest">AI Assistant</p>
                   </div>
                 </div>
                 <motion.button
@@ -313,7 +313,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                 </motion.button>
               </div>
 
-              {/* Oracle greeting */}
+              {/* AI greeting */}
               <div className="px-6 py-4 border-b border-[#c97435]/10 bg-[#c97435]/5">
                 <p className="text-sm text-[#a67c52] italic">
                   "I have seen the paths of your claims. Ask, and I shall illuminate the way forward."
@@ -325,7 +325,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                 {children}
               </div>
 
-              {/* Input - Oracle query */}
+              {/* Input field */}
               <div className="p-6 border-t border-[#c97435]/10 bg-[#0a0908]/50">
                 <div className="relative">
                   {/* Mystical input border */}
@@ -336,7 +336,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                     </span>
                     <input
                       type="text"
-                      placeholder="Seek guidance from the Oracle..."
+                      placeholder="Ask about claims, billing, or denials..."
                       className="flex-1 bg-transparent text-sm text-[#e8dcc8] placeholder-[#6b5a45] focus:outline-none"
                     />
                     <motion.button
@@ -349,7 +349,7 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                   </div>
                 </div>
                 <p className="text-xs text-[#6b5a45] mt-3 text-center">
-                  The Oracle speaks only of claims, accounts, and the ways of insurance
+                  Anirul specializes in claims, billing, and denial prevention
                 </p>
               </div>
             </div>
