@@ -103,12 +103,17 @@ export default function LoginPage() {
   const router = useRouter();
   const supabaseMissing = !supabase;
 
-  // Get the base URL for redirects (works in both dev and production)
+  // Get the base URL for redirects - prioritize production URL from env
   const getBaseUrl = () => {
+    // Always use NEXT_PUBLIC_SITE_URL if set (for production)
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return process.env.NEXT_PUBLIC_SITE_URL;
+    }
+    // Fallback to current origin for local development
     if (typeof window !== "undefined") {
       return window.location.origin;
     }
-    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    return "http://localhost:3000";
   };
 
   const submit = async () => {
