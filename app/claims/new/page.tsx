@@ -430,6 +430,55 @@ export default function NewClaimPage() {
     setDraft((prev) => ({ ...prev, serviceLines: prev.serviceLines.filter((sl) => sl.id !== id) }));
   };
 
+  // Handle AI suggestion application
+  const handleApplyAISuggestion = (path: string, value: any) => {
+    // Parse the path to determine what to update
+    // Common paths: claim.serviceLines[0].modifiers, claim.diagnosisCodes, etc.
+    const match = path.match(/claim\.serviceLines\[(\d+)\]\.(\w+)/);
+    if (match) {
+      const [, indexStr, field] = match;
+      const index = parseInt(indexStr, 10);
+      
+      setDraft((prev) => {
+        if (index >= prev.serviceLines.length) return prev;
+        
+        const updatedLines = [...prev.serviceLines];
+        const line = { ...updatedLines[index] };
+        
+        // Map RAG schema fields to our draft fields
+        if (field === "modifiers") {
+          // Value is an array of modifiers
+          const newModifiers = Array.isArray(value) ? value : [];
+          // Pad to 4 slots
+          line.modifiers = [...newModifiers, "", "", "", ""].slice(0, 4);
+        } else if (field === "diagnosisPointers") {
+          line.dxPointers = Array.isArray(value) ? value : [1];
+        } else if (field === "procedureCode") {
+          line.code = value;
+        } else if (field === "unitCount") {
+          line.units = typeof value === "number" ? value : parseInt(value, 10) || 1;
+        }
+        
+        updatedLines[index] = line;
+        return { ...prev, serviceLines: updatedLines };
+      });
+    }
+    
+    // Handle diagnosis code updates
+    const dxMatch = path.match(/claim\.diagnosisCodes\[(\d+)\]/);
+    if (dxMatch) {
+      const [, indexStr] = dxMatch;
+      const index = parseInt(indexStr, 10);
+      
+      setDraft((prev) => {
+        if (index >= prev.diagnoses.length) return prev;
+        const updatedDx = [...prev.diagnoses];
+        updatedDx[index] = { ...updatedDx[index], code: String(value).replace(".", "") };
+        return { ...prev, diagnoses: updatedDx };
+      });
+    }
+  };
+
   // Submit handler
   const handleSubmit = async () => {
     setLoading(true);
@@ -1041,6 +1090,7 @@ export default function NewClaimPage() {
                     <AnirulClaimAnalyzer 
                       draft={draft} 
                       totalCharge={totalCharge}
+                      onApplySuggestion={handleApplyAISuggestion}
                     />
 
                     {/* Error Display */}
