@@ -52,12 +52,14 @@ export function AIOrb({
     lg: { orb: "w-24 h-24", glow: "w-48 h-48", ring: "w-36 h-36", icon: "text-3xl" },
   };
 
+  const Wrapper = onClick ? motion.button : motion.div;
+  
   return (
-    <motion.button
+    <Wrapper
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className={cn("relative flex items-center justify-center", className)}
+      whileHover={onClick ? { scale: 1.05 } : undefined}
+      whileTap={onClick ? { scale: 0.95 } : undefined}
+      className={cn("relative flex items-center justify-center", onClick && "cursor-pointer", className)}
     >
       {/* Outer mystical glow - like prescient vision */}
       <motion.div
@@ -247,7 +249,7 @@ export function AIOrb({
           {isProcessing ? "sync" : "visibility"}
         </motion.span>
       </motion.div>
-    </motion.button>
+    </Wrapper>
   );
 }
 

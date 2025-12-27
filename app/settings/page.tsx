@@ -97,10 +97,13 @@ export default function SettingsPage() {
                     <SettingsInput label="DBA Name (optional)" value="Demo Clinic" />
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-[#a67c52]">Organization Type</label>
-                      <select className="w-full h-12 rounded-xl border border-[#c97435]/20 bg-[#0a0908]/50 px-4 text-[#e8dcc8] outline-none focus:border-[#c97435]">
-                        <option>Solo Practice</option>
-                        <option selected>Group Practice</option>
-                        <option>Hospital</option>
+                      <select 
+                        defaultValue="Group Practice"
+                        className="w-full h-12 rounded-xl border border-[#c97435]/20 bg-[#0a0908]/50 px-4 text-[#e8dcc8] outline-none focus:border-[#c97435]"
+                      >
+                        <option value="Solo Practice">Solo Practice</option>
+                        <option value="Group Practice">Group Practice</option>
+                        <option value="Hospital">Hospital</option>
                       </select>
                     </div>
                     <SettingsInput label="Main Phone" value="(555) 123-4567" type="tel" />

@@ -252,7 +252,9 @@ function DashboardContent() {
               onClick={() => setShowAI(true)}
               className="flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-[#c97435]/20 to-[#8b5a2b]/20 border border-[#c97435]/30 hover:border-[#c97435]/50 transition-all"
             >
-              <AIOrb size="sm" isActive />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#c97435] to-[#8b5a2b] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#0a0908] text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>visibility</span>
+              </div>
               <span className="font-medium text-[#e8dcc8]">AI Assistant</span>
             </motion.button>
 
