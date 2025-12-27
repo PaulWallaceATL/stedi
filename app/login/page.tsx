@@ -40,26 +40,50 @@ function AnimatedBackground() {
   );
 }
 
-// Floating particles - sand colored
+// Floating particles - sand colored (seeded positions to avoid hydration mismatch)
 function FloatingParticles() {
+  // Use deterministic positions based on index to avoid hydration mismatch
+  const particles = [
+    { left: 5, top: 10, duration: 6, delay: 0.5 },
+    { left: 15, top: 25, duration: 7, delay: 1 },
+    { left: 25, top: 45, duration: 8, delay: 1.5 },
+    { left: 35, top: 15, duration: 6, delay: 2 },
+    { left: 45, top: 65, duration: 7, delay: 2.5 },
+    { left: 55, top: 35, duration: 8, delay: 3 },
+    { left: 65, top: 55, duration: 6, delay: 3.5 },
+    { left: 75, top: 20, duration: 7, delay: 4 },
+    { left: 85, top: 70, duration: 8, delay: 4.5 },
+    { left: 95, top: 40, duration: 6, delay: 0 },
+    { left: 10, top: 80, duration: 7, delay: 0.3 },
+    { left: 20, top: 60, duration: 8, delay: 0.8 },
+    { left: 30, top: 90, duration: 6, delay: 1.3 },
+    { left: 40, top: 30, duration: 7, delay: 1.8 },
+    { left: 50, top: 50, duration: 8, delay: 2.3 },
+    { left: 60, top: 85, duration: 6, delay: 2.8 },
+    { left: 70, top: 5, duration: 7, delay: 3.3 },
+    { left: 80, top: 75, duration: 8, delay: 3.8 },
+    { left: 90, top: 95, duration: 6, delay: 4.3 },
+    { left: 3, top: 55, duration: 7, delay: 4.8 },
+  ];
+
   return (
     <div className="fixed inset-0 -z-5 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-[#c97435]/30"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
           }}
           animate={{
             y: [0, -100, 0],
             opacity: [0, 1, 0],
           }}
           transition={{
-            duration: 5 + Math.random() * 5,
+            duration: p.duration,
             repeat: Infinity,
-            delay: Math.random() * 5,
+            delay: p.delay,
             ease: "easeInOut",
           }}
         />
