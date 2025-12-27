@@ -74,9 +74,18 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabaseMissing = !supabase;
+
+  // Get the base URL for redirects (works in both dev and production)
+  const getBaseUrl = () => {
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  };
 
   const submit = async () => {
     if (!supabase) {
@@ -84,15 +93,24 @@ export default function LoginPage() {
       return;
     }
     setError(null);
+    setSuccess(null);
     setLoading(true);
+    
     if (mode === "signup") {
       const { error: err } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: { 
+          data: { full_name: fullName },
+          // Use auth callback route which handles the code exchange
+          emailRedirectTo: `${getBaseUrl()}/auth/callback`,
+        },
       });
-      if (err) setError(err.message);
-      else router.push("/dashboard");
+      if (err) {
+        setError(err.message);
+      } else {
+        setSuccess("Check your email for a confirmation link! You'll be redirected to the dashboard after confirming.");
+      }
     } else {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });
       if (err) setError(err.message);
@@ -212,6 +230,18 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
+
+              {/* Success message - GREEN */}
+              {success && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-start gap-3 p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10"
+                >
+                  <span className="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+                  <p className="text-sm text-emerald-400">{success}</p>
+                </motion.div>
+              )}
 
               {/* Error - RED for visibility */}
               {error && (
