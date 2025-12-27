@@ -122,75 +122,133 @@ const INITIAL_DRAFT: ClaimDraft = {
   serviceLines: [],
 };
 
-const TEST_DATA: ClaimDraft = {
-  patient: {
-    firstName: "JANE",
-    lastName: "DOE",
-    dob: "1985-03-14",
-    gender: "F",
-    mrn: "MRN-001234",
-    relationship: "self",
-    address: "123 Main Street",
-    city: "Dallas",
-    state: "TX",
-    zip: "75201",
-    phone: "5551234567",
-  },
-  insurance: {
-    payerName: "Stedi Test Payer",
-    payerId: "STEDI",
-    planType: "PPO",
-    policyNumber: "POL-987654",
-    groupNumber: "GRP-123",
-    subscriberId: "STEDI-TEST-001",
-    subscriberRelationship: "self",
-    priorAuthRequired: false,
-    priorAuthNumber: "",
-  },
-  provider: {
-    billingProviderName: "Clinix AI Demo Practice",
-    billingNpi: "1999999984",
-    billingTaxId: "123456789",
-    billingAddress: "456 Provider Way",
-    billingCity: "Dallas",
-    billingState: "TX",
-    billingZip: "75201",
-    renderingProviderName: "Dr. John Smith",
-    renderingNpi: "1999999984",
-    taxonomyCode: "207Q00000X",
-    facilityName: "Clinix AI Demo Facility",
-    facilityNpi: "1999999984",
-    posCode: "11",
-  },
-  diagnoses: [
-    { id: "dx1", code: "M542", description: "Low back pain", priority: 1 },
-    { id: "dx2", code: "R519", description: "Fever, unspecified", priority: 2 },
-  ],
-  serviceLines: [
-    {
-      id: "sl1",
-      code: "99213",
-      description: "Office/outpatient visit, est patient",
-      modifiers: ["25"],
-      dxPointers: [1],
-      fromDate: new Date().toISOString().split("T")[0],
-      toDate: new Date().toISOString().split("T")[0],
-      units: 1,
-      charge: 150.0,
+// Common CPT codes for random test data generation
+const CPT_CODES = [
+  { code: "99213", description: "Office visit, established patient, level 3", charge: 150 },
+  { code: "99214", description: "Office visit, established patient, level 4", charge: 200 },
+  { code: "99215", description: "Office visit, established patient, level 5", charge: 275 },
+  { code: "99203", description: "Office visit, new patient, level 3", charge: 175 },
+  { code: "99204", description: "Office visit, new patient, level 4", charge: 250 },
+  { code: "99385", description: "Preventive visit, 18-39 years, new", charge: 225 },
+  { code: "99395", description: "Preventive visit, 18-39 years, established", charge: 195 },
+  { code: "97110", description: "Therapeutic exercises", charge: 90 },
+  { code: "97140", description: "Manual therapy techniques", charge: 85 },
+  { code: "97530", description: "Therapeutic activities", charge: 80 },
+  { code: "90837", description: "Psychotherapy, 60 minutes", charge: 175 },
+  { code: "90834", description: "Psychotherapy, 45 minutes", charge: 135 },
+  { code: "36415", description: "Venipuncture", charge: 15 },
+  { code: "81002", description: "Urinalysis, non-automated", charge: 10 },
+  { code: "93000", description: "Electrocardiogram, complete", charge: 65 },
+  { code: "71046", description: "Chest X-ray, 2 views", charge: 85 },
+  { code: "20610", description: "Joint injection, major", charge: 125 },
+  { code: "11102", description: "Skin biopsy, tangential", charge: 145 },
+  { code: "17000", description: "Destruction, premalignant lesion", charge: 95 },
+  { code: "69210", description: "Ear wax removal", charge: 75 },
+];
+
+const ICD10_CODES = [
+  { code: "M542", description: "Low back pain" },
+  { code: "R519", description: "Fever, unspecified" },
+  { code: "J069", description: "Acute upper respiratory infection" },
+  { code: "K219", description: "Gastroesophageal reflux disease" },
+  { code: "I10", description: "Essential hypertension" },
+  { code: "E119", description: "Type 2 diabetes mellitus" },
+  { code: "F329", description: "Major depressive disorder" },
+  { code: "G439", description: "Migraine, unspecified" },
+  { code: "M791", description: "Myalgia" },
+  { code: "R109", description: "Abdominal pain, unspecified" },
+  { code: "J209", description: "Acute bronchitis, unspecified" },
+  { code: "N390", description: "Urinary tract infection" },
+  { code: "L309", description: "Dermatitis, unspecified" },
+  { code: "H109", description: "Conjunctivitis, unspecified" },
+  { code: "M255", description: "Joint pain" },
+];
+
+const PATIENT_NAMES = [
+  { first: "JANE", last: "DOE" },
+  { first: "JOHN", last: "SMITH" },
+  { first: "MARIA", last: "GARCIA" },
+  { first: "DAVID", last: "JOHNSON" },
+  { first: "SARAH", last: "WILLIAMS" },
+  { first: "MICHAEL", last: "BROWN" },
+  { first: "EMILY", last: "DAVIS" },
+  { first: "ROBERT", last: "MILLER" },
+];
+
+// Function to generate random test data
+function generateTestData(): ClaimDraft {
+  const today = new Date().toISOString().split("T")[0];
+  const patient = PATIENT_NAMES[Math.floor(Math.random() * PATIENT_NAMES.length)];
+  
+  // Pick 1-3 random diagnoses
+  const numDx = Math.floor(Math.random() * 3) + 1;
+  const shuffledDx = [...ICD10_CODES].sort(() => Math.random() - 0.5);
+  const diagnoses = shuffledDx.slice(0, numDx).map((dx, i) => ({
+    id: `dx${i + 1}`,
+    code: dx.code,
+    description: dx.description,
+    priority: i + 1,
+  }));
+  
+  // Pick 1-3 random service lines
+  const numSl = Math.floor(Math.random() * 3) + 1;
+  const shuffledCpt = [...CPT_CODES].sort(() => Math.random() - 0.5);
+  const serviceLines = shuffledCpt.slice(0, numSl).map((cpt, i) => ({
+    id: `sl${i + 1}`,
+    code: cpt.code,
+    description: cpt.description,
+    modifiers: i === 0 && numSl > 1 ? ["25", "", "", ""] : ["", "", "", ""],
+    dxPointers: [1],
+    fromDate: today,
+    toDate: today,
+    units: Math.floor(Math.random() * 2) + 1,
+    charge: cpt.charge,
+  }));
+  
+  return {
+    patient: {
+      firstName: patient.first,
+      lastName: patient.last,
+      dob: `19${70 + Math.floor(Math.random() * 30)}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, "0")}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, "0")}`,
+      gender: Math.random() > 0.5 ? "F" : "M",
+      mrn: `MRN-${String(Math.floor(Math.random() * 999999)).padStart(6, "0")}`,
+      relationship: "self",
+      address: `${Math.floor(Math.random() * 9999) + 100} Main Street`,
+      city: "Dallas",
+      state: "TX",
+      zip: "75201",
+      phone: `555${String(Math.floor(Math.random() * 9999999)).padStart(7, "0")}`,
     },
-    {
-      id: "sl2",
-      code: "97110",
-      description: "Therapeutic exercises",
-      modifiers: ["GP"],
-      dxPointers: [1, 2],
-      fromDate: new Date().toISOString().split("T")[0],
-      toDate: new Date().toISOString().split("T")[0],
-      units: 2,
-      charge: 90.0,
+    insurance: {
+      payerName: "Stedi Test Payer",
+      payerId: "STEDI",
+      planType: "PPO",
+      policyNumber: `POL-${String(Math.floor(Math.random() * 999999)).padStart(6, "0")}`,
+      groupNumber: `GRP-${String(Math.floor(Math.random() * 999)).padStart(3, "0")}`,
+      subscriberId: `STEDI-TEST-${String(Math.floor(Math.random() * 999)).padStart(3, "0")}`,
+      subscriberRelationship: "self",
+      priorAuthRequired: false,
+      priorAuthNumber: "",
     },
-  ],
-};
+    provider: {
+      billingProviderName: "Clinix AI Demo Practice",
+      billingNpi: "1999999984",
+      billingTaxId: "123456789",
+      billingAddress: "456 Provider Way",
+      billingCity: "Dallas",
+      billingState: "TX",
+      billingZip: "75201",
+      renderingProviderName: "Dr. John Smith",
+      renderingNpi: "1999999984",
+      taxonomyCode: "207Q00000X",
+      facilityName: "Clinix AI Demo Facility",
+      facilityNpi: "1999999984",
+      posCode: "11",
+    },
+    diagnoses,
+    serviceLines,
+  };
+}
 
 const STEPS = [
   { id: 1, label: "Patient Information", icon: "person" },
@@ -340,7 +398,7 @@ export default function NewClaimPage() {
   );
 
   const loadTestData = () => {
-    setDraft(TEST_DATA);
+    setDraft(generateTestData());
   };
 
   const nextStep = () => {

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface NavItem {
   href: string;
@@ -21,11 +21,132 @@ const navItems: NavItem[] = [
   { href: "/settings", label: "Settings", icon: "tune" },
 ];
 
+// Mock notifications
+const NOTIFICATIONS = [
+  { id: 1, type: "success", title: "Claim Accepted", message: "Claim #C8d2a... was accepted by Stedi Test Payer", time: "2 min ago", read: false },
+  { id: 2, type: "warning", title: "Review Required", message: "Claim #C3f1b... needs additional documentation", time: "1 hour ago", read: false },
+  { id: 3, type: "info", title: "Payment Received", message: "$2,160.00 deposited from Medicare", time: "3 hours ago", read: true },
+];
+
 export function ModernNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+      if (e.key === "Escape") {
+        setShowSearch(false);
+        setShowNotifications(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const searchResults = searchQuery.trim()
+    ? navItems.filter(item => 
+        item.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : navItems;
+
+  const handleSearchSelect = (href: string) => {
+    router.push(href);
+    setShowSearch(false);
+    setSearchQuery("");
+  };
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
+    <>
+      {/* Search Modal */}
+      <AnimatePresence>
+        {showSearch && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-[#0a0908]/80 backdrop-blur-sm z-[100]"
+              onClick={() => setShowSearch(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-lg z-[101]"
+            >
+              <div className="mx-4 rounded-2xl bg-[#1a1512] border border-[#c97435]/20 shadow-2xl shadow-[#c97435]/10 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-[#c97435]/10">
+                  <span className="material-symbols-outlined text-[#c97435]">search</span>
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search pages, claims, patients..."
+                    className="flex-1 bg-transparent text-[#e8dcc8] placeholder-[#6b5a45] focus:outline-none"
+                  />
+                  <kbd className="px-2 py-1 rounded bg-[#c97435]/10 text-[10px] text-[#8b7355] font-medium">ESC</kbd>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {searchResults.map((item) => (
+                    <button
+                      key={item.href}
+                      onClick={() => handleSearchSelect(item.href)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#c97435]/10 transition-colors text-left"
+                    >
+                      <span className="material-symbols-outlined text-[#8b7355]">{item.icon}</span>
+                      <span className="text-[#e8dcc8]">{item.label}</span>
+                      <span className="ml-auto text-xs text-[#6b5a45]">{item.href}</span>
+                    </button>
+                  ))}
+                  {searchQuery && searchResults.length === 0 && (
+                    <div className="px-4 py-8 text-center text-[#6b5a45]">
+                      No results found for "{searchQuery}"
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -134,70 +255,117 @@ export function ModernNav() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Search */}
-            <motion.div
+            {/* Search Button */}
+            <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1512]/50 border border-[#c97435]/10 hover:border-[#c97435]/20 transition-colors group"
+              onClick={() => setShowSearch(true)}
+              className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1a1512]/50 border border-[#c97435]/10 hover:border-[#c97435]/20 transition-colors group cursor-pointer"
             >
               <span className="material-symbols-outlined text-base text-[#6b5a45] group-hover:text-[#8b7355] transition-colors">
                 search
               </span>
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-24 xl:w-32 bg-transparent text-xs text-[#e8dcc8] placeholder-[#6b5a45] focus:outline-none"
-              />
+              <span className="w-24 xl:w-32 text-xs text-[#6b5a45]">Search...</span>
               <kbd className="hidden xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#c97435]/10 text-[9px] text-[#8b7355] font-medium">
                 ⌘K
               </kbd>
-            </motion.div>
-
-            {/* Notifications */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2 rounded-lg bg-[#1a1512]/50 border border-[#c97435]/10 hover:border-[#c97435]/20 transition-all group"
-            >
-              <span className="material-symbols-outlined text-lg text-[#8b7355] group-hover:text-[#e8dcc8] transition-colors">
-                notifications
-              </span>
-              {/* Notification badge */}
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[#c97435] opacity-75 animate-ping" />
-                <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[8px] font-bold text-[#0a0908] items-center justify-center">
-                  3
-                </span>
-              </span>
             </motion.button>
 
-            {/* AI Assistant Toggle */}
+            {/* Notifications */}
+            <div ref={notificationRef} className="relative">
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 rounded-lg bg-[#1a1512]/50 border border-[#c97435]/10 hover:border-[#c97435]/20 transition-all group"
+              >
+                <span className="material-symbols-outlined text-lg text-[#8b7355] group-hover:text-[#e8dcc8] transition-colors">
+                  notifications
+                </span>
+                {/* Notification badge */}
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#c97435] opacity-75 animate-ping" />
+                    <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[8px] font-bold text-[#0a0908] items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  </span>
+                )}
+              </motion.button>
+
+              {/* Notifications Dropdown */}
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-12 w-80 rounded-xl bg-[#1a1512] border border-[#c97435]/20 shadow-2xl shadow-[#c97435]/10 overflow-hidden z-50"
+                  >
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-[#c97435]/10">
+                      <h3 className="font-semibold text-[#e8dcc8]">Notifications</h3>
+                      {unreadCount > 0 && (
+                        <button 
+                          onClick={markAllRead}
+                          className="text-xs text-[#c97435] hover:text-[#e8dcc8] transition-colors"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={cn(
+                            "px-4 py-3 border-b border-[#c97435]/10 hover:bg-[#c97435]/5 transition-colors cursor-pointer",
+                            !notif.read && "bg-[#c97435]/10"
+                          )}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className={cn(
+                              "material-symbols-outlined text-lg mt-0.5",
+                              notif.type === "success" && "text-emerald-400",
+                              notif.type === "warning" && "text-amber-400",
+                              notif.type === "info" && "text-sky-400"
+                            )}>
+                              {notif.type === "success" ? "check_circle" : notif.type === "warning" ? "warning" : "info"}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-[#e8dcc8]">{notif.title}</p>
+                              <p className="text-xs text-[#8b7355] truncate">{notif.message}</p>
+                              <p className="text-xs text-[#6b5a45] mt-1">{notif.time}</p>
+                            </div>
+                            {!notif.read && (
+                              <div className="w-2 h-2 rounded-full bg-[#c97435] mt-2" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Link 
+                      href="/settings"
+                      className="block px-4 py-3 text-center text-sm text-[#c97435] hover:bg-[#c97435]/10 transition-colors"
+                    >
+                      View all notifications
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* User Avatar */}
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative p-2 rounded-lg bg-gradient-to-r from-[#c97435]/20 to-[#8b5a2b]/20 border border-[#c97435]/30 hover:border-[#c97435]/50 transition-all group overflow-hidden"
-            >
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#c97435]/10 to-[#8b5a2b]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="relative material-symbols-outlined text-lg text-[#c97435] group-hover:text-[#d4844c] transition-colors">
-                auto_awesome
-              </span>
-            </motion.button>
-
-            {/* User Avatar */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/settings")}
               className="relative"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-[#c97435] to-[#6b4423] rounded-lg blur opacity-50" />
@@ -209,5 +377,6 @@ export function ModernNav() {
         </div>
       </div>
     </motion.header>
+    </>
   );
 }
