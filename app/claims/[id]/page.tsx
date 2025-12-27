@@ -530,7 +530,7 @@ export default function ClaimDetailPage() {
         {/* AI Claim Intelligence - Anirul */}
         <section className="mb-8">
           <AIClaimIntelligence
-            claim={claimPayload}
+            claim={data}
             claimId={id}
             onApplySuggestions={(optimizedClaim) => {
               showNotification("success", "AI optimizations applied");

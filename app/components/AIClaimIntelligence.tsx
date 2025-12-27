@@ -107,25 +107,41 @@ function AnirulBackground({ isActive = false, isThinking = false }: { isActive?:
         </defs>
       </svg>
       
-      {/* Floating spice particles */}
-      {[...Array(15)].map((_, i) => (
+      {/* Floating spice particles - deterministic positions to avoid hydration mismatch */}
+      {[
+        { left: 5, y: -220, x: -30, dur: 5, delay: 0.5 },
+        { left: 15, y: -280, x: 20, dur: 6, delay: 1.2 },
+        { left: 25, y: -200, x: -15, dur: 4.5, delay: 0.8 },
+        { left: 35, y: -350, x: 40, dur: 7, delay: 2.0 },
+        { left: 45, y: -250, x: -25, dur: 5.5, delay: 1.5 },
+        { left: 55, y: -300, x: 35, dur: 6.5, delay: 0.3 },
+        { left: 65, y: -230, x: -45, dur: 4.8, delay: 2.5 },
+        { left: 75, y: -320, x: 15, dur: 5.8, delay: 1.8 },
+        { left: 85, y: -270, x: -20, dur: 6.2, delay: 3.0 },
+        { left: 95, y: -240, x: 30, dur: 5.2, delay: 0.1 },
+        { left: 10, y: -380, x: -10, dur: 7.5, delay: 2.2 },
+        { left: 30, y: -290, x: 25, dur: 5.3, delay: 3.5 },
+        { left: 50, y: -260, x: -35, dur: 4.2, delay: 1.0 },
+        { left: 70, y: -340, x: 50, dur: 6.8, delay: 2.8 },
+        { left: 90, y: -210, x: -5, dur: 4.6, delay: 0.6 },
+      ].map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-[#c97435]/60"
           style={{
-            left: `${Math.random() * 100}%`,
+            left: `${p.left}%`,
             bottom: 0,
           }}
           animate={{
-            y: [0, -200 - Math.random() * 200],
-            x: [0, (Math.random() - 0.5) * 100],
+            y: [0, p.y],
+            x: [0, p.x],
             opacity: [0, 0.8, 0],
             scale: [0, 1.5, 0],
           }}
           transition={{
-            duration: 4 + Math.random() * 4,
+            duration: p.dur,
             repeat: Infinity,
-            delay: Math.random() * 4,
+            delay: p.delay,
             ease: "easeOut",
           }}
         />
@@ -383,47 +399,62 @@ export default function AIClaimIntelligence({ claim, claimId, onApplySuggestions
       setAiMessage("Analyzing claim against payer rules and billing best practices...");
 
       // Build comprehensive claim data from whatever structure we receive
-      // This handles both Supabase payload structure and direct claim structure
-      const payload = claim?.payload || claim;
+      // `claim` can be either:
+      // 1. Full Supabase row with { id, patient_name, payload, trading_partner_service_id, ... }
+      // 2. Direct payload object
+      const isSupabaseRow = claim?.payload !== undefined;
+      const payload = isSupabaseRow ? claim.payload : claim;
+      const claimRow = isSupabaseRow ? claim : null;
       
+      // Extract service lines from various possible structures
+      const sourceServiceLines = payload?.claimInformation?.serviceLines || [];
+      const diagnosisInfo = payload?.claimInformation?.healthCareCodeInformation || [{ diagnosisTypeCode: "ABK", diagnosisCode: "R519" }];
+      
+      // Build claim in the schema format expected by the validator
       const transformedClaim = {
-        tradingPartnerId: payload?.tradingPartnerServiceId || payload?.receiver?.organizationName || claim?.trading_partner_service_id || "STEDI",
+        tradingPartnerId: payload?.tradingPartnerServiceId || claimRow?.trading_partner_service_id || payload?.receiver?.organizationName || "STEDI",
         usageIndicator: "T" as const,
         billingProvider: {
           npi: payload?.billing?.npi || "1999999984",
           name: payload?.billing?.organizationName || "Demo Clinic",
           address: payload?.billing?.address || {},
-          employerId: payload?.billing?.employerId || "",
         },
+        subscriber: {
+          memberId: payload?.subscriber?.memberId || "",
+          firstName: payload?.subscriber?.firstName || claimRow?.patient_name?.split(" ")[0] || "JANE",
+          lastName: payload?.subscriber?.lastName || claimRow?.patient_name?.split(" ").slice(1).join(" ") || "DOE",
+          dateOfBirth: payload?.subscriber?.dateOfBirth || "19700101",
+        },
+        // The validator expects `claim` not `claimInformation`
+        claim: {
+          patientControlNumber: payload?.claimInformation?.patientControlNumber || payload?.controlNumber || "PCN-001",
+          totalChargeAmount: payload?.claimInformation?.claimChargeAmount || claimRow?.total_charge?.toString() || claimRow?.claim_charge_amount?.toString() || "0",
+          placeOfServiceCode: payload?.claimInformation?.placeOfServiceCode || "11",
+          diagnosisCodes: diagnosisInfo.map((dx: any) => dx.diagnosisCode || "R519"),
+          serviceLines: sourceServiceLines.length > 0 
+            ? sourceServiceLines.map((line: any) => ({
+                procedureCode: line?.professionalService?.procedureCode || "99213",
+                modifiers: line?.professionalService?.procedureModifiers || [],
+                chargeAmount: line?.professionalService?.lineItemChargeAmount || "0",
+                unitCount: parseInt(line?.professionalService?.serviceUnitCount || "1", 10),
+                diagnosisPointers: line?.professionalService?.compositeDiagnosisCodePointers?.diagnosisCodePointers?.map((p: string) => parseInt(p, 10)) || [1],
+                serviceDate: line?.serviceDate || "",
+              }))
+            : [{
+                procedureCode: "99213",
+                modifiers: [],
+                chargeAmount: claimRow?.total_charge?.toString() || "0",
+                unitCount: 1,
+                diagnosisPointers: [1],
+                serviceDate: "",
+              }],
+        },
+        // Include additional context for analysis
         renderingProvider: {
           npi: payload?.rendering?.npi || payload?.billing?.npi || "",
           firstName: payload?.rendering?.firstName || "",
           lastName: payload?.rendering?.lastName || "",
-          taxonomyCode: payload?.rendering?.taxonomyCode || "",
         },
-        subscriber: {
-          memberId: payload?.subscriber?.memberId || "",
-          firstName: payload?.subscriber?.firstName || claim?.patient_name?.split(" ")[0] || "JANE",
-          lastName: payload?.subscriber?.lastName || claim?.patient_name?.split(" ").slice(1).join(" ") || "DOE",
-          dateOfBirth: payload?.subscriber?.dateOfBirth || "19700101",
-          gender: payload?.subscriber?.gender || "F",
-        },
-        claimInformation: {
-          patientControlNumber: payload?.claimInformation?.patientControlNumber || payload?.controlNumber || "PCN-001",
-          claimChargeAmount: payload?.claimInformation?.claimChargeAmount || claim?.total_charge?.toString() || claim?.claim_charge_amount?.toString() || "0",
-          placeOfServiceCode: payload?.claimInformation?.placeOfServiceCode || "11",
-          claimFilingCode: payload?.claimInformation?.claimFilingCode || "CI",
-          healthCareCodeInformation: payload?.claimInformation?.healthCareCodeInformation || [{ diagnosisTypeCode: "ABK", diagnosisCode: "R519" }],
-          serviceLines: payload?.claimInformation?.serviceLines?.map((line: any) => ({
-            procedureCode: line?.professionalService?.procedureCode || "99213",
-            procedureModifiers: line?.professionalService?.procedureModifiers || [],
-            lineItemChargeAmount: line?.professionalService?.lineItemChargeAmount || "0",
-            serviceUnitCount: line?.professionalService?.serviceUnitCount || "1",
-            serviceDate: line?.serviceDate || "",
-            compositeDiagnosisCodePointers: line?.professionalService?.compositeDiagnosisCodePointers || { diagnosisCodePointers: ["1"] },
-          })) || [],
-        },
-        // Include raw payload for comprehensive analysis
         rawPayload: payload,
       };
 
