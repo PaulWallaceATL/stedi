@@ -19,11 +19,12 @@ type ClaimRow = {
   payer_name: string;
   status: string;
   claim_charge_amount: number;
+  total_charge: number;
   date_of_service: string;
   created_at: string;
 };
 
-// Quick action card component
+// Quick action card component - Dune Theme
 function QuickActionCard({
   icon,
   title,
@@ -36,33 +37,33 @@ function QuickActionCard({
   title: string;
   description: string;
   href: string;
-  color: "blue" | "violet" | "emerald" | "amber";
+  color: "spice" | "sand" | "copper" | "rust";
   delay: number;
 }) {
   const colors = {
-    blue: {
-      bg: "from-blue-500/20 to-blue-600/10",
-      border: "border-blue-500/30 hover:border-blue-500/50",
-      icon: "text-blue-400",
-      glow: "group-hover:shadow-blue-500/20",
+    spice: {
+      bg: "from-[#c97435]/20 to-[#c97435]/5",
+      border: "border-[#c97435]/30 hover:border-[#c97435]/50",
+      icon: "text-[#c97435]",
+      glow: "group-hover:shadow-[#c97435]/20",
     },
-    violet: {
-      bg: "from-violet-500/20 to-violet-600/10",
-      border: "border-violet-500/30 hover:border-violet-500/50",
-      icon: "text-violet-400",
-      glow: "group-hover:shadow-violet-500/20",
+    sand: {
+      bg: "from-[#a67c52]/20 to-[#a67c52]/5",
+      border: "border-[#a67c52]/30 hover:border-[#a67c52]/50",
+      icon: "text-[#a67c52]",
+      glow: "group-hover:shadow-[#a67c52]/20",
     },
-    emerald: {
-      bg: "from-emerald-500/20 to-emerald-600/10",
-      border: "border-emerald-500/30 hover:border-emerald-500/50",
-      icon: "text-emerald-400",
-      glow: "group-hover:shadow-emerald-500/20",
+    copper: {
+      bg: "from-[#8b5a2b]/20 to-[#8b5a2b]/5",
+      border: "border-[#8b5a2b]/30 hover:border-[#8b5a2b]/50",
+      icon: "text-[#d4844c]",
+      glow: "group-hover:shadow-[#8b5a2b]/20",
     },
-    amber: {
-      bg: "from-amber-500/20 to-amber-600/10",
-      border: "border-amber-500/30 hover:border-amber-500/50",
-      icon: "text-amber-400",
-      glow: "group-hover:shadow-amber-500/20",
+    rust: {
+      bg: "from-[#6b4423]/20 to-[#6b4423]/5",
+      border: "border-[#6b4423]/30 hover:border-[#6b4423]/50",
+      icon: "text-[#8b5a2b]",
+      glow: "group-hover:shadow-[#6b4423]/20",
     },
   };
 
@@ -92,7 +93,7 @@ function QuickActionCard({
           <div
             className={cn(
               "flex h-12 w-12 items-center justify-center rounded-xl",
-              "bg-white/[0.05] ring-1 ring-white/[0.1]"
+              "bg-[#1a1512]/50 ring-1 ring-[#c97435]/10"
             )}
           >
             <span className={cn("material-symbols-outlined text-2xl", c.icon)}>
@@ -100,13 +101,13 @@ function QuickActionCard({
             </span>
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-white mb-1">{title}</h3>
-            <p className="text-sm text-slate-400">{description}</p>
+            <h3 className="font-semibold text-[#e8dcc8] mb-1">{title}</h3>
+            <p className="text-sm text-[#8b7355]">{description}</p>
           </div>
           <motion.span
             animate={{ x: [0, 5, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="material-symbols-outlined text-slate-500 group-hover:text-white transition-colors"
+            className="material-symbols-outlined text-[#6b5a45] group-hover:text-[#e8dcc8] transition-colors"
           >
             arrow_forward
           </motion.span>
@@ -143,7 +144,7 @@ function DashboardContent() {
 
       const { data: rows } = await supabase
         .from("claims")
-        .select("id, patient_name, payer_name, status, claim_charge_amount, date_of_service, created_at")
+        .select("id, patient_name, payer_name, status, claim_charge_amount, total_charge, date_of_service, created_at")
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -162,8 +163,8 @@ function DashboardContent() {
   const acceptedClaims = claims.filter((c) => c.status === "accepted" || c.status === "paid");
   const pendingClaims = claims.filter((c) => c.status === "submitted" || c.status === "pending");
   const deniedClaims = claims.filter((c) => c.status === "denied" || c.status === "rejected");
-  const totalRevenue = claims.reduce((sum, c) => sum + (c.claim_charge_amount || 0), 0);
-  const acceptedRevenue = acceptedClaims.reduce((sum, c) => sum + (c.claim_charge_amount || 0), 0);
+  const totalRevenue = claims.reduce((sum, c) => sum + (c.total_charge || c.claim_charge_amount || 0), 0);
+  const acceptedRevenue = acceptedClaims.reduce((sum, c) => sum + (c.total_charge || c.claim_charge_amount || 0), 0);
   const firstPassRate = totalClaims > 0 ? Math.round((acceptedClaims.length / totalClaims) * 100) : 0;
 
   // Auth check
@@ -180,17 +181,17 @@ function DashboardContent() {
             <div className="mb-8">
               <AIOrb size="lg" isActive />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-4">
+            <h1 className="text-3xl font-bold text-[#e8dcc8] mb-4">
               Welcome to Clinix AI
             </h1>
-            <p className="text-slate-400 mb-8">
+            <p className="text-[#8b7355] mb-8">
               The most advanced medical billing intelligence platform. Sign in to access your dashboard.
             </p>
             <Link href="/login">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 text-white font-semibold shadow-lg shadow-violet-500/30"
+                className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#c97435] via-[#8b5a2b] to-[#6b4423] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/30"
               >
                 Sign In
               </motion.button>
@@ -213,7 +214,7 @@ function DashboardContent() {
             className="flex flex-col items-center gap-6"
           >
             <AIOrb size="lg" isProcessing />
-            <p className="text-slate-400 animate-pulse">Loading your dashboard...</p>
+            <p className="text-[#8b7355] animate-pulse">Loading your dashboard...</p>
           </motion.div>
         </main>
       </AuroraBackground>
@@ -235,10 +236,10 @@ function DashboardContent() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10"
         >
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
+            <h1 className="text-4xl font-bold text-[#e8dcc8] mb-2">
               Command Center
             </h1>
-            <p className="text-slate-400">
+            <p className="text-[#8b7355]">
               Real-time intelligence for your medical billing operations
             </p>
           </div>
@@ -249,10 +250,10 @@ function DashboardContent() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowAI(true)}
-              className="flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500/20 to-violet-500/20 border border-blue-500/30 hover:border-blue-500/50 transition-all"
+              className="flex items-center gap-3 px-5 py-3 rounded-xl bg-gradient-to-r from-[#c97435]/20 to-[#8b5a2b]/20 border border-[#c97435]/30 hover:border-[#c97435]/50 transition-all"
             >
               <AIOrb size="sm" isActive />
-              <span className="font-medium text-white">AI Assistant</span>
+              <span className="font-medium text-[#e8dcc8]">AI Assistant</span>
             </motion.button>
 
             {/* New Claim Button */}
@@ -260,7 +261,7 @@ function DashboardContent() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 text-white font-semibold shadow-lg shadow-violet-500/30"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#c97435] via-[#8b5a2b] to-[#6b4423] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/30"
               >
                 <span className="material-symbols-outlined">add</span>
                 New Claim
@@ -276,7 +277,7 @@ function DashboardContent() {
             value={`$${totalRevenue.toLocaleString()}`}
             subtitle="All claims combined"
             icon="payments"
-            color="blue"
+            color="spice"
             delay={0}
           />
           <MetricCard
@@ -284,7 +285,7 @@ function DashboardContent() {
             value={`$${acceptedRevenue.toLocaleString()}`}
             subtitle={`${acceptedClaims.length} claims approved`}
             icon="verified"
-            color="emerald"
+            color="sand"
             delay={0.1}
           />
           <MetricCard
@@ -292,7 +293,7 @@ function DashboardContent() {
             value={pendingClaims.length.toString()}
             subtitle="Awaiting response"
             icon="schedule"
-            color="violet"
+            color="copper"
             delay={0.2}
           />
           <MetricCard
@@ -301,7 +302,7 @@ function DashboardContent() {
             subtitle="Approval efficiency"
             icon="insights"
             trend={{ value: 5, isPositive: true }}
-            color="amber"
+            color="rust"
             delay={0.3}
           />
         </div>
@@ -313,14 +314,14 @@ function DashboardContent() {
           transition={{ delay: 0.4 }}
           className="mb-10"
         >
-          <h2 className="text-xl font-semibold text-white mb-5">Quick Actions</h2>
+          <h2 className="text-xl font-semibold text-[#e8dcc8] mb-5">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
             <QuickActionCard
               icon="add_circle"
               title="New Claim"
               description="Create and submit a new claim"
               href="/claims/new"
-              color="blue"
+              color="spice"
               delay={0.5}
             />
             <QuickActionCard
@@ -328,7 +329,7 @@ function DashboardContent() {
               title="Batch Upload"
               description="Import claims from CSV"
               href="/upload"
-              color="violet"
+              color="sand"
               delay={0.6}
             />
             <QuickActionCard
@@ -336,7 +337,7 @@ function DashboardContent() {
               title="Denials"
               description="Review and appeal denials"
               href="/denials"
-              color="amber"
+              color="rust"
               delay={0.7}
             />
             <QuickActionCard
@@ -344,7 +345,7 @@ function DashboardContent() {
               title="Analytics"
               description="Performance insights"
               href="/performance"
-              color="emerald"
+              color="copper"
               delay={0.8}
             />
           </div>
@@ -358,13 +359,13 @@ function DashboardContent() {
         >
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-white">Recent Claims</h2>
-              <p className="text-sm text-slate-500">{totalClaims} total claims</p>
+              <h2 className="text-xl font-semibold text-[#e8dcc8]">Recent Claims</h2>
+              <p className="text-sm text-[#6b5a45]">{totalClaims} total claims</p>
             </div>
             <Link href="/claims">
               <motion.button
                 whileHover={{ x: 4 }}
-                className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-[#8b7355] hover:text-[#e8dcc8] transition-colors"
               >
                 View All
                 <span className="material-symbols-outlined text-lg">arrow_forward</span>

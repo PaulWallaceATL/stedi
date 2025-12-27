@@ -40,7 +40,7 @@ function formatDateFromYYYYMMDD(value: string | null | undefined) {
   return new Date(`${y}-${m}-${d}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-// Status badge component
+// Status badge component - FUNCTIONAL COLORS retained
 function StatusBadge({ status }: { status: string | null | undefined }) {
   const key = (status || "").toLowerCase();
   const config = {
@@ -54,7 +54,7 @@ function StatusBadge({ status }: { status: string | null | undefined }) {
     sent: { label: "Sent", bg: "bg-sky-500/10", text: "text-sky-400", icon: "outgoing_mail", border: "border-sky-500/30" },
     pending: { label: "Pending", bg: "bg-amber-500/10", text: "text-amber-400", icon: "hourglass_empty", border: "border-amber-500/30" },
     review: { label: "Needs Review", bg: "bg-amber-500/10", text: "text-amber-400", icon: "rate_review", border: "border-amber-500/30" },
-  }[key] || { label: "Draft", bg: "bg-slate-500/10", text: "text-slate-400", icon: "draft", border: "border-slate-500/30" };
+  }[key] || { label: "Draft", bg: "bg-[#6b5a45]/10", text: "text-[#8b7355]", icon: "draft", border: "border-[#6b5a45]/30" };
 
   return (
     <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${config.bg} ${config.text} border ${config.border}`}>
@@ -64,41 +64,41 @@ function StatusBadge({ status }: { status: string | null | undefined }) {
   );
 }
 
-// Timeline event component
+// Timeline event component - Dune themed
 function TimelineEvent({ event, isLast }: { event: ClaimEvent; isLast: boolean }) {
   const typeConfig: Record<string, { icon: string; label: string; color: string }> = {
     submission: { icon: "send", label: "Claim Submitted", color: "text-sky-400" },
-    status: { icon: "sync", label: "Status Check (277)", color: "text-violet-400" },
-    transaction_prefill: { icon: "link", label: "Transaction Linked", color: "text-indigo-400" },
+    status: { icon: "sync", label: "Status Check (277)", color: "text-[#c97435]" },
+    transaction_prefill: { icon: "link", label: "Transaction Linked", color: "text-[#a67c52]" },
     transaction_output: { icon: "receipt_long", label: "Remittance (835)", color: "text-emerald-400" },
     attachment: { icon: "attach_file", label: "Attachment Sent (275)", color: "text-amber-400" },
-    ai_analysis: { icon: "psychology", label: "AI Analysis", color: "text-fuchsia-400" },
+    ai_analysis: { icon: "visibility", label: "Oracle Analysis", color: "text-[#c97435]" },
   };
   
-  const config = typeConfig[event.type] || { icon: "event", label: event.type, color: "text-slate-400" };
+  const config = typeConfig[event.type] || { icon: "event", label: event.type, color: "text-[#6b5a45]" };
 
   return (
     <div className="flex gap-4">
       <div className="flex flex-col items-center">
-        <div className={`w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center ${config.color}`}>
+        <div className={`w-10 h-10 rounded-full bg-[#1a1512] border border-[#c97435]/20 flex items-center justify-center ${config.color}`}>
           <span className="material-symbols-outlined text-lg">{config.icon}</span>
         </div>
-        {!isLast && <div className="w-px h-full bg-slate-700 my-2" />}
+        {!isLast && <div className="w-px h-full bg-[#c97435]/20 my-2" />}
       </div>
       <div className="pb-6 flex-1">
         <div className="flex items-center justify-between">
           <p className={`font-medium ${config.color}`}>{config.label}</p>
-          <p className="text-xs text-slate-400">{formatDate(event.created_at, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+          <p className="text-xs text-[#6b5a45]">{formatDate(event.created_at, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
         </div>
         {event.transaction_id && (
-          <p className="text-xs text-slate-400 mt-1 font-mono">TXN: {event.transaction_id.slice(0, 8)}...</p>
+          <p className="text-xs text-[#6b5a45] mt-1 font-mono">TXN: {event.transaction_id.slice(0, 8)}...</p>
         )}
       </div>
     </div>
   );
 }
 
-// Service line component
+// Service line component - Dune themed
 function ServiceLine({ line, index }: { line: any; index: number }) {
   const ps = line?.professionalService || {};
   return (
@@ -106,27 +106,27 @@ function ServiceLine({ line, index }: { line: any; index: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="flex items-center justify-between p-4 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+      className="flex items-center justify-between p-4 bg-[#1a1512]/30 rounded-xl border border-[#c97435]/10 hover:border-[#c97435]/30 transition-colors"
     >
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-lg bg-[#137fec]/10 flex items-center justify-center">
-          <span className="text-[#137fec] font-bold text-sm">{index + 1}</span>
+        <div className="w-10 h-10 rounded-lg bg-[#c97435]/10 flex items-center justify-center">
+          <span className="text-[#c97435] font-bold text-sm">{index + 1}</span>
         </div>
         <div>
-          <p className="font-semibold text-slate-200">
+          <p className="font-semibold text-[#e8dcc8]">
             {ps.procedureCode || "—"}
             {ps.procedureModifiers?.length > 0 && (
-              <span className="ml-2 text-slate-400 font-normal">
+              <span className="ml-2 text-[#6b5a45] font-normal">
                 ({ps.procedureModifiers.join(", ")})
               </span>
             )}
           </p>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-[#8b7355]">
             {formatDateFromYYYYMMDD(line.serviceDate)} • {ps.serviceUnitCount || 1} unit(s)
           </p>
         </div>
       </div>
-      <p className="text-lg font-bold text-slate-200">
+      <p className="text-lg font-bold text-[#e8dcc8]">
         {formatCurrency(ps.lineItemChargeAmount)}
       </p>
     </motion.div>
@@ -160,12 +160,10 @@ export default function ClaimDetailPage() {
         return;
       }
       try {
-        // Load claim data
         const { data: row, error: claimErr } = await supabase.from("claims").select("*").eq("id", id).single();
         if (claimErr) throw claimErr;
         if (row) setData(row);
         
-        // Try to load events - gracefully handle if table schema differs
         try {
           const { data: evts } = await supabase
             .from("claim_status_events")
@@ -175,7 +173,7 @@ export default function ClaimDetailPage() {
             .limit(20);
           if (evts) setEvents(evts as ClaimEvent[]);
         } catch (evtErr) {
-          console.warn("Could not load claim events (table may have different schema):", evtErr);
+          console.warn("Could not load claim events:", evtErr);
         }
       } catch (err) {
         console.error("Failed to load claim:", err);
@@ -194,7 +192,6 @@ export default function ClaimDetailPage() {
     if (!isFinal && !loadingStatus) {
       handleCheckStatus();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.id]);
 
   // Derived values
@@ -206,13 +203,11 @@ export default function ClaimDetailPage() {
   const serviceLines = useMemo(() => Array.isArray(claimInfo?.serviceLines) ? claimInfo.serviceLines : [], [claimInfo]);
   const diagnoses = useMemo(() => claimInfo?.healthCareCodeInformation || [], [claimInfo]);
 
-  // Helper to show notifications
   const showNotification = (type: "success" | "error" | "info", message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // Check claim status (276/277)
   const handleCheckStatus = async () => {
     if (!data) return;
     
@@ -248,7 +243,6 @@ export default function ClaimDetailPage() {
       },
     };
 
-    // Check for missing required fields
     const missingFields = [];
     if (!payload.controlNumber) missingFields.push("Control Number");
     if (!payload.tradingPartnerServiceId) missingFields.push("Payer ID");
@@ -264,7 +258,6 @@ export default function ClaimDetailPage() {
       const res = await claimStatus(payload);
       setStatusResult(res.data);
       
-      // Parse response and update status
       const upstream = res.data?.data || res.data;
       let newStatus = String(data.status || "").toLowerCase();
       if (!newStatus || newStatus === "draft") newStatus = "submitted";
@@ -277,10 +270,8 @@ export default function ClaimDetailPage() {
         else if (["3", "15", "16"].includes(code)) newStatus = "pending";
       }
 
-      // Update database
       if (supabase) {
         await supabase.from("claims").update({ status: newStatus }).eq("id", id);
-        // Try to insert event - gracefully handle if table schema differs
         try {
           await supabase.from("claim_status_events").insert({ claim_id: id, type: "status", payload: res.data });
         } catch (e) { console.warn("Event insert failed:", e); }
@@ -296,7 +287,6 @@ export default function ClaimDetailPage() {
     }
   };
 
-  // Find matching transaction
   const handleFindTransaction = async () => {
     try {
       setLoadingTxn(true);
@@ -311,7 +301,6 @@ export default function ClaimDetailPage() {
       if (matched?.transactionId) {
         setTxnId(matched.transactionId);
         if (supabase) {
-          // Try to insert event - gracefully handle if table schema differs
           try {
             await supabase.from("claim_status_events").insert({ 
               claim_id: id, 
@@ -333,7 +322,6 @@ export default function ClaimDetailPage() {
     }
   };
 
-  // Get remittance/ERA data
   const handleGetRemittance = async () => {
     if (!txnId) {
       showNotification("error", "Link a transaction first");
@@ -344,7 +332,6 @@ export default function ClaimDetailPage() {
       const res = await getTransactionOutput(txnId);
       setTxnResult(res.data);
       
-      // Parse ERA and update status
       const output = res.data?.data || res.data;
       let newStatus = String(data?.status || "submitted").toLowerCase();
       
@@ -361,7 +348,6 @@ export default function ClaimDetailPage() {
 
       if (supabase) {
         await supabase.from("claims").update({ status: newStatus }).eq("id", id);
-        // Try to insert event - gracefully handle if table schema differs
         try {
           await supabase.from("claim_status_events").insert({ claim_id: id, type: "transaction_output", transaction_id: txnId, payload: res.data });
         } catch (e) { console.warn("Event insert failed:", e); }
@@ -379,18 +365,18 @@ export default function ClaimDetailPage() {
   // Loading state
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <main className="min-h-screen bg-[#0a0908] flex items-center justify-center">
         <motion.div
           className="flex flex-col items-center gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           <motion.div
-            className="w-12 h-12 border-3 border-[#137fec] border-t-transparent rounded-full"
+            className="w-12 h-12 border-3 border-[#c97435] border-t-transparent rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           />
-          <p className="text-slate-300">Loading claim...</p>
+          <p className="text-[#8b7355]">Loading claim...</p>
         </motion.div>
       </main>
     );
@@ -398,12 +384,12 @@ export default function ClaimDetailPage() {
 
   if (supabaseMissing || !data) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <main className="min-h-screen bg-[#0a0908] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-slate-300">{supabaseMissing ? "Database not configured" : "Claim not found"}</p>
+          <p className="text-[#8b7355]">{supabaseMissing ? "Database not configured" : "Claim not found"}</p>
           <button
             onClick={() => router.push("/dashboard")}
-            className="px-6 py-3 rounded-xl bg-[#137fec] text-white font-semibold hover:bg-[#0f6acc] transition-colors"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold hover:shadow-lg hover:shadow-[#c97435]/30 transition-colors"
           >
             Back to Dashboard
           </button>
@@ -413,8 +399,8 @@ export default function ClaimDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
-      {/* Notification Toast */}
+    <div className="min-h-screen bg-[#0a0908]">
+      {/* Notification Toast - functional colors */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -422,9 +408,9 @@ export default function ClaimDetailPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 ${
-              notification.type === "success" ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300" :
-              notification.type === "error" ? "bg-rose-500/20 border border-rose-500/30 text-rose-300" :
-              "bg-sky-500/20 border border-sky-500/30 text-sky-300"
+              notification.type === "success" ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400" :
+              notification.type === "error" ? "bg-rose-500/20 border border-rose-500/30 text-rose-400" :
+              "bg-sky-500/20 border border-sky-500/30 text-sky-400"
             }`}
           >
             <span className="material-symbols-outlined">
@@ -435,19 +421,19 @@ export default function ClaimDetailPage() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
+      {/* Header - Dune themed */}
+      <header className="sticky top-0 z-40 border-b border-[#c97435]/10 bg-[#0a0908]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => router.push("/dashboard")}
-              className="p-2 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition-colors"
+              className="p-2 rounded-lg hover:bg-[#c97435]/10 text-[#8b7355] hover:text-[#e8dcc8] transition-colors"
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
             <div>
-              <h1 className="text-xl font-bold text-white">Claim Details</h1>
-              <p className="text-sm text-slate-400 font-mono">{id.slice(0, 8)}...</p>
+              <h1 className="text-xl font-bold text-[#e8dcc8]">Claim Details</h1>
+              <p className="text-sm text-[#6b5a45] font-mono">{id.slice(0, 8)}...</p>
             </div>
           </div>
           <StatusBadge status={data.status} />
@@ -461,25 +447,25 @@ export default function ClaimDetailPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
+            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1512]/50 to-[#0a0908]/50 border border-[#c97435]/10"
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 rounded-xl bg-[#137fec]/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-[#137fec]">person</span>
+              <div className="w-14 h-14 rounded-xl bg-[#c97435]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-[#c97435]">person</span>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Patient</p>
-                <p className="text-xl font-bold text-white">{data.patient_name || "—"}</p>
+                <p className="text-xs text-[#6b5a45] uppercase tracking-wider">Patient</p>
+                <p className="text-xl font-bold text-[#e8dcc8]">{data.patient_name || "—"}</p>
               </div>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">DOB</span>
-                <span className="text-slate-300">{formatDateFromYYYYMMDD(subscriber?.dateOfBirth)}</span>
+                <span className="text-[#6b5a45]">DOB</span>
+                <span className="text-[#a67c52]">{formatDateFromYYYYMMDD(subscriber?.dateOfBirth)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Member ID</span>
-                <span className="text-slate-300 font-mono">{subscriber?.memberId || "—"}</span>
+                <span className="text-[#6b5a45]">Member ID</span>
+                <span className="text-[#a67c52] font-mono">{subscriber?.memberId || "—"}</span>
               </div>
             </div>
           </motion.div>
@@ -489,25 +475,25 @@ export default function ClaimDetailPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
+            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1512]/50 to-[#0a0908]/50 border border-[#c97435]/10"
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl text-violet-400">business</span>
+              <div className="w-14 h-14 rounded-xl bg-[#8b5a2b]/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl text-[#8b5a2b]">business</span>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Payer</p>
-                <p className="text-xl font-bold text-white">{data.payer_name || receiver?.organizationName || "—"}</p>
+                <p className="text-xs text-[#6b5a45] uppercase tracking-wider">Payer</p>
+                <p className="text-xl font-bold text-[#e8dcc8]">{data.payer_name || receiver?.organizationName || "—"}</p>
               </div>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">Payer ID</span>
-                <span className="text-slate-300 font-mono">{data.trading_partner_service_id || "—"}</span>
+                <span className="text-[#6b5a45]">Payer ID</span>
+                <span className="text-[#a67c52] font-mono">{data.trading_partner_service_id || "—"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Control #</span>
-                <span className="text-slate-300 font-mono">{claimPayload?.controlNumber || "—"}</span>
+                <span className="text-[#6b5a45]">Control #</span>
+                <span className="text-[#a67c52] font-mono">{claimPayload?.controlNumber || "—"}</span>
               </div>
             </div>
           </motion.div>
@@ -517,31 +503,31 @@ export default function ClaimDetailPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
+            className="p-6 rounded-2xl bg-gradient-to-br from-[#1a1512]/50 to-[#0a0908]/50 border border-[#c97435]/10"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-2xl text-emerald-400">payments</span>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Billed Amount</p>
-                <p className="text-3xl font-bold text-white">{formatCurrency(data.total_charge || data.claim_charge_amount)}</p>
+                <p className="text-xs text-[#6b5a45] uppercase tracking-wider">Billed Amount</p>
+                <p className="text-3xl font-bold text-[#e8dcc8]">{formatCurrency(data.total_charge || data.claim_charge_amount)}</p>
               </div>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">Service Lines</span>
-                <span className="text-slate-300">{serviceLines.length}</span>
+                <span className="text-[#6b5a45]">Service Lines</span>
+                <span className="text-[#a67c52]">{serviceLines.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Date of Service</span>
-                <span className="text-slate-300">{formatDateFromYYYYMMDD(serviceLines[0]?.serviceDate)}</span>
+                <span className="text-[#6b5a45]">Date of Service</span>
+                <span className="text-[#a67c52]">{formatDateFromYYYYMMDD(serviceLines[0]?.serviceDate)}</span>
               </div>
             </div>
           </motion.div>
         </section>
 
-        {/* AI Claim Intelligence - Prominent Placement */}
+        {/* AI Claim Intelligence - Anirul Oracle */}
         <section className="mb-8">
           <AIClaimIntelligence
             claim={claimPayload}
@@ -561,10 +547,10 @@ export default function ClaimDetailPage() {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800"
+              className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10"
             >
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#137fec]">receipt_long</span>
+              <h2 className="text-lg font-semibold text-[#e8dcc8] mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#c97435]">receipt_long</span>
                 Service Lines
               </h2>
               <div className="space-y-3">
@@ -573,7 +559,7 @@ export default function ClaimDetailPage() {
                     <ServiceLine key={i} line={line} index={i} />
                   ))
                 ) : (
-                  <p className="text-slate-400 text-center py-8">No service lines found</p>
+                  <p className="text-[#6b5a45] text-center py-8">No service lines found</p>
                 )}
               </div>
             </motion.section>
@@ -583,9 +569,9 @@ export default function ClaimDetailPage() {
               <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800"
+                className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10"
               >
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-[#e8dcc8] mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-amber-400">medical_information</span>
                   Diagnosis Codes
                 </h2>
@@ -593,7 +579,7 @@ export default function ClaimDetailPage() {
                   {diagnoses.map((dx: any, i: number) => (
                     <span
                       key={i}
-                      className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-mono"
+                      className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-mono"
                     >
                       {dx.diagnosisCode}
                     </span>
@@ -606,28 +592,28 @@ export default function ClaimDetailPage() {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800"
+              className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10"
             >
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-indigo-400">local_hospital</span>
+              <h2 className="text-lg font-semibold text-[#e8dcc8] mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#a67c52]">local_hospital</span>
                 Provider Information
               </h2>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-slate-400 mb-1">Billing Provider</p>
-                  <p className="text-slate-200 font-medium">{billing?.organizationName || "—"}</p>
+                  <p className="text-[#6b5a45] mb-1">Billing Provider</p>
+                  <p className="text-[#e8dcc8] font-medium">{billing?.organizationName || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 mb-1">NPI</p>
-                  <p className="text-slate-200 font-mono">{billing?.npi || "—"}</p>
+                  <p className="text-[#6b5a45] mb-1">NPI</p>
+                  <p className="text-[#e8dcc8] font-mono">{billing?.npi || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 mb-1">Tax ID</p>
-                  <p className="text-slate-200 font-mono">{billing?.employerId || "—"}</p>
+                  <p className="text-[#6b5a45] mb-1">Tax ID</p>
+                  <p className="text-[#e8dcc8] font-mono">{billing?.employerId || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 mb-1">Place of Service</p>
-                  <p className="text-slate-200">{claimInfo?.placeOfServiceCode || "—"}</p>
+                  <p className="text-[#6b5a45] mb-1">Place of Service</p>
+                  <p className="text-[#e8dcc8]">{claimInfo?.placeOfServiceCode || "—"}</p>
                 </div>
               </div>
             </motion.section>
@@ -639,9 +625,9 @@ export default function ClaimDetailPage() {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800"
+              className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10"
             >
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-[#e8dcc8] mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-sky-400">bolt</span>
                 Quick Actions
               </h2>
@@ -649,10 +635,10 @@ export default function ClaimDetailPage() {
                 <button
                   onClick={handleCheckStatus}
                   disabled={loadingStatus}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#137fec] text-white font-semibold hover:bg-[#0f6acc] disabled:opacity-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold hover:shadow-lg hover:shadow-[#c97435]/30 disabled:opacity-50 transition-all"
                 >
                   {loadingStatus ? (
-                    <motion.div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
+                    <motion.div className="w-5 h-5 border-2 border-[#0a0908]/30 border-t-[#0a0908] rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
                   ) : (
                     <span className="material-symbols-outlined">sync</span>
                   )}
@@ -662,10 +648,10 @@ export default function ClaimDetailPage() {
                 <button
                   onClick={handleFindTransaction}
                   disabled={loadingTxn}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-700 text-slate-300 font-medium hover:bg-slate-800 disabled:opacity-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-[#c97435]/20 text-[#a67c52] font-medium hover:bg-[#c97435]/10 disabled:opacity-50 transition-colors"
                 >
                   {loadingTxn ? (
-                    <motion.div className="w-5 h-5 border-2 border-slate-500 border-t-slate-300 rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
+                    <motion.div className="w-5 h-5 border-2 border-[#6b5a45] border-t-[#a67c52] rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
                   ) : (
                     <span className="material-symbols-outlined">link</span>
                   )}
@@ -675,7 +661,7 @@ export default function ClaimDetailPage() {
                 <button
                   onClick={handleGetRemittance}
                   disabled={loadingTxn || !txnId}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-700 text-slate-300 font-medium hover:bg-slate-800 disabled:opacity-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-[#c97435]/20 text-[#a67c52] font-medium hover:bg-[#c97435]/10 disabled:opacity-50 transition-colors"
                 >
                   <span className="material-symbols-outlined">download</span>
                   Get Payment Info
@@ -683,9 +669,9 @@ export default function ClaimDetailPage() {
               </div>
               
               {txnId && (
-                <div className="mt-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-                  <p className="text-xs text-slate-400 mb-1">Linked Transaction</p>
-                  <p className="text-sm text-slate-300 font-mono truncate">{txnId}</p>
+                <div className="mt-4 p-3 rounded-lg bg-[#1a1512]/50 border border-[#c97435]/10">
+                  <p className="text-xs text-[#6b5a45] mb-1">Linked Transaction</p>
+                  <p className="text-sm text-[#a67c52] font-mono truncate">{txnId}</p>
                 </div>
               )}
             </motion.section>
@@ -694,10 +680,10 @@ export default function ClaimDetailPage() {
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800"
+              className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10"
             >
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-fuchsia-400">timeline</span>
+              <h2 className="text-lg font-semibold text-[#e8dcc8] mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#c97435]">timeline</span>
                 Activity Timeline
               </h2>
               <div className="max-h-80 overflow-y-auto">
@@ -706,14 +692,14 @@ export default function ClaimDetailPage() {
                     <TimelineEvent key={event.id} event={event} isLast={i === events.length - 1} />
                   ))
                 ) : (
-                  <p className="text-slate-400 text-center py-8">No activity yet</p>
+                  <p className="text-[#6b5a45] text-center py-8">No activity yet</p>
                 )}
               </div>
             </motion.section>
           </div>
         </div>
 
-        {/* Developer Tools (Collapsible) */}
+        {/* Developer Tools */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -721,7 +707,7 @@ export default function ClaimDetailPage() {
         >
           <button
             onClick={() => setShowDevTools(!showDevTools)}
-            className="flex items-center gap-2 text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors"
+            className="flex items-center gap-2 text-[#6b5a45] hover:text-[#a67c52] text-sm font-medium transition-colors"
           >
             <motion.span
               animate={{ rotate: showDevTools ? 90 : 0 }}
@@ -740,26 +726,26 @@ export default function ClaimDetailPage() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-4 space-y-4"
               >
-                <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-                  <h3 className="text-sm font-semibold text-slate-400 mb-3">Raw Claim Payload</h3>
-                  <pre className="max-h-60 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-400 font-mono">
+                <div className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10">
+                  <h3 className="text-sm font-semibold text-[#6b5a45] mb-3">Raw Claim Payload</h3>
+                  <pre className="max-h-60 overflow-auto rounded-lg bg-[#0a0908] p-4 text-xs text-[#6b5a45] font-mono">
                     {JSON.stringify(claimPayload, null, 2)}
                   </pre>
                 </div>
                 
                 {statusResult && (
-                  <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Status API Response</h3>
-                    <pre className="max-h-60 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-400 font-mono">
+                  <div className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10">
+                    <h3 className="text-sm font-semibold text-[#6b5a45] mb-3">Status API Response</h3>
+                    <pre className="max-h-60 overflow-auto rounded-lg bg-[#0a0908] p-4 text-xs text-[#6b5a45] font-mono">
                       {JSON.stringify(statusResult, null, 2)}
                     </pre>
                   </div>
                 )}
 
                 {txnResult && (
-                  <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Transaction Output</h3>
-                    <pre className="max-h-60 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-400 font-mono">
+                  <div className="p-6 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10">
+                    <h3 className="text-sm font-semibold text-[#6b5a45] mb-3">Transaction Output</h3>
+                    <pre className="max-h-60 overflow-auto rounded-lg bg-[#0a0908] p-4 text-xs text-[#6b5a45] font-mono">
                       {JSON.stringify(txnResult, null, 2)}
                     </pre>
                   </div>

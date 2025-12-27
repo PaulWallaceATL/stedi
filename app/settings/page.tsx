@@ -19,13 +19,13 @@ const menuItems: { id: Section; label: string; icon: string; description: string
 function SettingsInput({ label, value, description, type = "text" }: { label: string; value: string; description?: string; type?: string }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-slate-300">{label}</label>
+      <label className="text-sm font-medium text-[#a67c52]">{label}</label>
       <input
         type={type}
         defaultValue={value}
-        className="w-full h-12 rounded-xl border border-slate-700 bg-slate-800/50 px-4 text-white placeholder-slate-500 outline-none focus:border-[#137fec] focus:ring-2 focus:ring-[#137fec]/20 transition-all"
+        className="w-full h-12 rounded-xl border border-[#c97435]/20 bg-[#0a0908]/50 px-4 text-[#e8dcc8] placeholder-[#6b5a45] outline-none focus:border-[#c97435] focus:ring-2 focus:ring-[#c97435]/20 transition-all"
       />
-      {description && <p className="text-xs text-slate-400">{description}</p>}
+      {description && <p className="text-xs text-[#6b5a45]">{description}</p>}
     </div>
   );
 }
@@ -41,13 +41,13 @@ export default function SettingsPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-white">Practice Settings</h2>
-            <p className="text-slate-400 mt-1">Configure your practice to auto-populate claims and streamline workflows</p>
+            <h2 className="text-2xl font-bold text-[#e8dcc8]">Practice Settings</h2>
+            <p className="text-[#8b7355] mt-1">Configure your practice to auto-populate claims and streamline workflows</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/20"
           >
             <span className="material-symbols-outlined text-lg">save</span>
             Save Changes
@@ -65,14 +65,14 @@ export default function SettingsPage() {
                   whileHover={{ x: 4 }}
                   className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     activeSection === item.id
-                      ? "bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec]"
-                      : "bg-slate-800/30 border border-slate-700/50 text-white hover:text-white hover:bg-slate-800"
+                      ? "bg-[#c97435]/10 border border-[#c97435]/30 text-[#c97435]"
+                      : "bg-[#1a1512]/30 border border-[#c97435]/10 text-[#e8dcc8] hover:text-[#e8dcc8] hover:bg-[#1a1512]/50"
                   }`}
                 >
                   <span className="material-symbols-outlined text-xl">{item.icon}</span>
                   <div>
                     <p className={`text-sm ${activeSection === item.id ? "font-semibold" : "font-medium"}`}>{item.label}</p>
-                    <p className="text-xs text-slate-400 hidden lg:block">{item.description}</p>
+                    <p className="text-xs text-[#6b5a45] hidden lg:block">{item.description}</p>
                   </div>
                 </motion.button>
               ))}
@@ -85,19 +85,19 @@ export default function SettingsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
               >
-                <div className="p-6 border-b border-slate-800">
-                  <h3 className="text-lg font-semibold text-white">Practice Profile</h3>
-                  <p className="text-sm text-slate-300">Primary practice identity on claims and communications</p>
+                <div className="p-6 border-b border-[#c97435]/10">
+                  <h3 className="text-lg font-semibold text-[#e8dcc8]">Practice Profile</h3>
+                  <p className="text-sm text-[#8b7355]">Primary practice identity on claims and communications</p>
                 </div>
                 <div className="p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SettingsInput label="Practice Legal Name" value="Demo Medical Group" />
                     <SettingsInput label="DBA Name (optional)" value="Demo Clinic" />
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-300">Organization Type</label>
-                      <select className="w-full h-12 rounded-xl border border-slate-700 bg-slate-800/50 px-4 text-white outline-none focus:border-[#137fec]">
+                      <label className="text-sm font-medium text-[#a67c52]">Organization Type</label>
+                      <select className="w-full h-12 rounded-xl border border-[#c97435]/20 bg-[#0a0908]/50 px-4 text-[#e8dcc8] outline-none focus:border-[#c97435]">
                         <option>Solo Practice</option>
                         <option selected>Group Practice</option>
                         <option>Hospital</option>
@@ -115,11 +115,11 @@ export default function SettingsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
               >
-                <div className="p-6 border-b border-slate-800">
-                  <h3 className="text-lg font-semibold text-white">Billing & Tax Information</h3>
-                  <p className="text-sm text-slate-300">Tax IDs, NPIs, and billing credentials</p>
+                <div className="p-6 border-b border-[#c97435]/10">
+                  <h3 className="text-lg font-semibold text-[#e8dcc8]">Billing & Tax Information</h3>
+                  <p className="text-sm text-[#8b7355]">Tax IDs, NPIs, and billing credentials</p>
                 </div>
                 <div className="p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -132,8 +132,8 @@ export default function SettingsPage() {
                     <div className="flex items-start gap-3">
                       <span className="material-symbols-outlined text-amber-400">info</span>
                       <div>
-                        <p className="text-sm text-amber-300 font-medium">Important</p>
-                        <p className="text-xs text-amber-200/70 mt-1">These identifiers are used for all claim submissions. Ensure they are accurate to avoid rejections.</p>
+                        <p className="text-sm text-amber-400 font-medium">Important</p>
+                        <p className="text-xs text-amber-300/70 mt-1">These identifiers are used for all claim submissions. Ensure they are accurate to avoid rejections.</p>
                       </div>
                     </div>
                   </div>
@@ -145,14 +145,14 @@ export default function SettingsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
               >
-                <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div className="p-6 border-b border-[#c97435]/10 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Service Locations</h3>
-                    <p className="text-sm text-slate-300">Manage where services are rendered</p>
+                    <h3 className="text-lg font-semibold text-[#e8dcc8]">Service Locations</h3>
+                    <p className="text-sm text-[#8b7355]">Manage where services are rendered</p>
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec] font-medium text-sm">
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#c97435]/10 border border-[#c97435]/30 text-[#c97435] font-medium text-sm">
                     <span className="material-symbols-outlined text-lg">add</span>
                     Add Location
                   </button>
@@ -162,24 +162,24 @@ export default function SettingsPage() {
                     { name: "Main Office", address: "123 Main St, Nashville, TN 37201", pos: "11", default: true },
                     { name: "Downtown Clinic", address: "456 Broadway, Nashville, TN 37203", pos: "11", default: false },
                   ].map((loc, idx) => (
-                    <div key={idx} className="rounded-xl bg-slate-800/30 border border-slate-700/50 p-4">
+                    <div key={idx} className="rounded-xl bg-[#0a0908]/30 border border-[#c97435]/10 p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#137fec]/10 flex items-center justify-center text-[#137fec]">
+                          <div className="w-10 h-10 rounded-xl bg-[#c97435]/10 flex items-center justify-center text-[#c97435]">
                             <span className="material-symbols-outlined">location_on</span>
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="text-white font-semibold">{loc.name}</p>
+                              <p className="text-[#e8dcc8] font-semibold">{loc.name}</p>
                               {loc.default && (
                                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">Default</span>
                               )}
                             </div>
-                            <p className="text-sm text-slate-300">{loc.address}</p>
-                            <p className="text-xs text-slate-400 mt-1">POS Code: {loc.pos}</p>
+                            <p className="text-sm text-[#8b7355]">{loc.address}</p>
+                            <p className="text-xs text-[#6b5a45] mt-1">POS Code: {loc.pos}</p>
                           </div>
                         </div>
-                        <button className="p-2 rounded-lg hover:bg-slate-700 text-white hover:text-white transition-colors">
+                        <button className="p-2 rounded-lg hover:bg-[#c97435]/10 text-[#8b7355] hover:text-[#e8dcc8] transition-colors">
                           <span className="material-symbols-outlined">edit</span>
                         </button>
                       </div>
@@ -193,14 +193,14 @@ export default function SettingsPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
               >
-                <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div className="p-6 border-b border-[#c97435]/10 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Providers</h3>
-                    <p className="text-sm text-slate-300">Rendering and referring provider profiles</p>
+                    <h3 className="text-lg font-semibold text-[#e8dcc8]">Providers</h3>
+                    <p className="text-sm text-[#8b7355]">Rendering and referring provider profiles</p>
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#137fec]/10 border border-[#137fec]/30 text-[#137fec] font-medium text-sm">
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#c97435]/10 border border-[#c97435]/30 text-[#c97435] font-medium text-sm">
                     <span className="material-symbols-outlined text-lg">add</span>
                     Add Provider
                   </button>
@@ -210,24 +210,24 @@ export default function SettingsPage() {
                     { name: "Dr. Sarah Johnson", npi: "1234567890", specialty: "Family Medicine", default: true },
                     { name: "Dr. Michael Chen", npi: "0987654321", specialty: "Internal Medicine", default: false },
                   ].map((provider, idx) => (
-                    <div key={idx} className="rounded-xl bg-slate-800/30 border border-slate-700/50 p-4">
+                    <div key={idx} className="rounded-xl bg-[#0a0908]/30 border border-[#c97435]/10 p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center text-violet-400 font-semibold">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c97435]/20 to-[#8b5a2b]/20 flex items-center justify-center text-[#c97435] font-semibold">
                             {provider.name.split(" ").map((n) => n[0]).join("")}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="text-white font-semibold">{provider.name}</p>
+                              <p className="text-[#e8dcc8] font-semibold">{provider.name}</p>
                               {provider.default && (
                                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">Default</span>
                               )}
                             </div>
-                            <p className="text-sm text-slate-300">{provider.specialty}</p>
-                            <p className="text-xs text-slate-400 mt-1 font-mono">NPI: {provider.npi}</p>
+                            <p className="text-sm text-[#8b7355]">{provider.specialty}</p>
+                            <p className="text-xs text-[#6b5a45] mt-1 font-mono">NPI: {provider.npi}</p>
                           </div>
                         </div>
-                        <button className="p-2 rounded-lg hover:bg-slate-700 text-white hover:text-white transition-colors">
+                        <button className="p-2 rounded-lg hover:bg-[#c97435]/10 text-[#8b7355] hover:text-[#e8dcc8] transition-colors">
                           <span className="material-symbols-outlined">edit</span>
                         </button>
                       </div>
@@ -243,10 +243,10 @@ export default function SettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-                  <div className="p-6 border-b border-slate-800">
-                    <h3 className="text-lg font-semibold text-white">Stedi Integration</h3>
-                    <p className="text-sm text-slate-300">Healthcare clearinghouse connection</p>
+                <div className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden">
+                  <div className="p-6 border-b border-[#c97435]/10">
+                    <h3 className="text-lg font-semibold text-[#e8dcc8]">Stedi Integration</h3>
+                    <p className="text-sm text-[#8b7355]">Healthcare clearinghouse connection</p>
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-4 mb-6">
@@ -254,8 +254,8 @@ export default function SettingsPage() {
                         <span className="material-symbols-outlined text-2xl">check_circle</span>
                       </div>
                       <div>
-                        <p className="text-white font-semibold">Connected</p>
-                        <p className="text-sm text-slate-300">Stedi API is active and operational</p>
+                        <p className="text-[#e8dcc8] font-semibold">Connected</p>
+                        <p className="text-sm text-[#8b7355]">Stedi API is active and operational</p>
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -265,27 +265,27 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-                  <div className="p-6 border-b border-slate-800">
-                    <h3 className="text-lg font-semibold text-white">AI Services</h3>
-                    <p className="text-sm text-slate-300">AI-powered claim optimization</p>
+                <div className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden">
+                  <div className="p-6 border-b border-[#c97435]/10">
+                    <h3 className="text-lg font-semibold text-[#e8dcc8]">AI Services</h3>
+                    <p className="text-sm text-[#8b7355]">AI-powered claim optimization</p>
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center text-violet-400">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c97435]/20 to-[#8b5a2b]/20 flex items-center justify-center text-[#c97435]">
                         <span className="material-symbols-outlined text-2xl">psychology</span>
                       </div>
                       <div>
-                        <p className="text-white font-semibold">AI Claim Intelligence</p>
-                        <p className="text-sm text-slate-300">RAG-powered optimization engine</p>
+                        <p className="text-[#e8dcc8] font-semibold">AI Claim Intelligence</p>
+                        <p className="text-sm text-[#8b7355]">RAG-powered optimization engine</p>
                       </div>
                     </div>
-                    <div className="rounded-xl bg-[#137fec]/5 border border-[#137fec]/20 p-4">
+                    <div className="rounded-xl bg-[#c97435]/5 border border-[#c97435]/20 p-4">
                       <div className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-[#137fec]">auto_awesome</span>
+                        <span className="material-symbols-outlined text-[#c97435]">auto_awesome</span>
                         <div>
-                          <p className="text-sm text-[#137fec] font-medium">AI Features Active</p>
-                          <p className="text-xs text-slate-400 mt-1">Claim scrubbing, denial prediction, and optimization suggestions are enabled.</p>
+                          <p className="text-sm text-[#c97435] font-medium">AI Features Active</p>
+                          <p className="text-xs text-[#8b7355] mt-1">Claim scrubbing, denial prediction, and optimization suggestions are enabled.</p>
                         </div>
                       </div>
                     </div>

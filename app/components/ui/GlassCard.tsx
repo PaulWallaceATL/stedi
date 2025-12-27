@@ -19,28 +19,28 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       className,
       variant = "default",
       hoverEffect = true,
-      glowColor = "blue",
+      glowColor = "spice",
       ...props
     },
     ref
   ) => {
     const variants = {
       default:
-        "bg-white/[0.03] border-white/[0.08] backdrop-blur-xl",
+        "bg-[#1a1512]/30 border-[#c97435]/10 backdrop-blur-xl",
       elevated:
-        "bg-white/[0.05] border-white/[0.1] backdrop-blur-2xl shadow-2xl shadow-black/20",
+        "bg-[#1a1512]/50 border-[#c97435]/15 backdrop-blur-2xl shadow-2xl shadow-black/30",
       subtle:
-        "bg-white/[0.02] border-white/[0.05] backdrop-blur-lg",
-      glow: `bg-white/[0.03] border-white/[0.08] backdrop-blur-xl shadow-lg ${
-        glowColor === "blue"
-          ? "shadow-blue-500/10"
-          : glowColor === "emerald"
-          ? "shadow-emerald-500/10"
-          : glowColor === "violet"
-          ? "shadow-violet-500/10"
-          : glowColor === "amber"
-          ? "shadow-amber-500/10"
-          : "shadow-rose-500/10"
+        "bg-[#1a1512]/20 border-[#c97435]/5 backdrop-blur-lg",
+      glow: `bg-[#1a1512]/30 border-[#c97435]/10 backdrop-blur-xl shadow-lg ${
+        glowColor === "spice"
+          ? "shadow-[#c97435]/10"
+          : glowColor === "sand"
+          ? "shadow-[#a67c52]/10"
+          : glowColor === "copper"
+          ? "shadow-[#8b5a2b]/10"
+          : glowColor === "rust"
+          ? "shadow-[#6b4423]/10"
+          : "shadow-[#c97435]/10"
       }`,
     };
 
@@ -61,14 +61,14 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         className={cn(
           "relative rounded-2xl border transition-all duration-300",
           variants[variant],
-          hoverEffect && "hover:border-white/[0.15] hover:bg-white/[0.04]",
+          hoverEffect && "hover:border-[#c97435]/20 hover:bg-[#1a1512]/40",
           className
         )}
         {...props}
       >
         {/* Inner glow effect */}
         <div className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="absolute inset-px rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent" />
+          <div className="absolute inset-px rounded-2xl bg-gradient-to-b from-[#c97435]/[0.08] to-transparent" />
         </div>
 
         {/* Content */}
@@ -80,14 +80,14 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
 
 GlassCard.displayName = "GlassCard";
 
-// Metric Card with animated counter
+// Metric Card with animated counter - Dune Theme
 interface MetricCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
   icon: string;
   trend?: { value: number; isPositive: boolean };
-  color?: "blue" | "emerald" | "violet" | "amber" | "rose";
+  color?: "spice" | "sand" | "copper" | "rust" | "ember";
   delay?: number;
 }
 
@@ -97,39 +97,39 @@ export function MetricCard({
   subtitle,
   icon,
   trend,
-  color = "blue",
+  color = "spice",
   delay = 0,
 }: MetricCardProps) {
   const colorStyles = {
-    blue: {
-      iconBg: "bg-blue-500/20",
-      iconText: "text-blue-400",
-      glow: "shadow-blue-500/20",
-      gradient: "from-blue-500/10 to-transparent",
+    spice: {
+      iconBg: "bg-[#c97435]/20",
+      iconText: "text-[#c97435]",
+      glow: "shadow-[#c97435]/20",
+      gradient: "from-[#c97435]/10 to-transparent",
     },
-    emerald: {
-      iconBg: "bg-emerald-500/20",
-      iconText: "text-emerald-400",
-      glow: "shadow-emerald-500/20",
-      gradient: "from-emerald-500/10 to-transparent",
+    sand: {
+      iconBg: "bg-[#a67c52]/20",
+      iconText: "text-[#a67c52]",
+      glow: "shadow-[#a67c52]/20",
+      gradient: "from-[#a67c52]/10 to-transparent",
     },
-    violet: {
-      iconBg: "bg-violet-500/20",
-      iconText: "text-violet-400",
-      glow: "shadow-violet-500/20",
-      gradient: "from-violet-500/10 to-transparent",
+    copper: {
+      iconBg: "bg-[#8b5a2b]/20",
+      iconText: "text-[#d4844c]",
+      glow: "shadow-[#8b5a2b]/20",
+      gradient: "from-[#8b5a2b]/10 to-transparent",
     },
-    amber: {
-      iconBg: "bg-amber-500/20",
-      iconText: "text-amber-400",
-      glow: "shadow-amber-500/20",
-      gradient: "from-amber-500/10 to-transparent",
+    rust: {
+      iconBg: "bg-[#6b4423]/20",
+      iconText: "text-[#8b5a2b]",
+      glow: "shadow-[#6b4423]/20",
+      gradient: "from-[#6b4423]/10 to-transparent",
     },
-    rose: {
-      iconBg: "bg-rose-500/20",
-      iconText: "text-rose-400",
-      glow: "shadow-rose-500/20",
-      gradient: "from-rose-500/10 to-transparent",
+    ember: {
+      iconBg: "bg-[#b85c38]/20",
+      iconText: "text-[#e07b4c]",
+      glow: "shadow-[#b85c38]/20",
+      gradient: "from-[#b85c38]/10 to-transparent",
     },
   };
 
@@ -147,8 +147,8 @@ export function MetricCard({
       whileHover={{ scale: 1.02, y: -4 }}
       className={cn(
         "group relative overflow-hidden rounded-2xl",
-        "bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl",
-        "hover:border-white/[0.12] transition-all duration-300",
+        "bg-[#1a1512]/30 border border-[#c97435]/10 backdrop-blur-xl",
+        "hover:border-[#c97435]/20 transition-all duration-300",
         `shadow-lg ${styles.glow}`
       )}
     >
@@ -164,9 +164,9 @@ export function MetricCard({
       <div className="relative p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-3">
-            <p className="text-sm font-medium text-slate-400">{title}</p>
+            <p className="text-sm font-medium text-[#8b7355]">{title}</p>
             <motion.p
-              className="text-4xl font-bold text-white tracking-tight"
+              className="text-4xl font-bold text-[#e8dcc8] tracking-tight"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: delay + 0.2, duration: 0.5 }}
@@ -174,7 +174,7 @@ export function MetricCard({
               {value}
             </motion.p>
             {subtitle && (
-              <p className="text-xs text-slate-500">{subtitle}</p>
+              <p className="text-xs text-[#6b5a45]">{subtitle}</p>
             )}
             {trend && (
               <div
@@ -204,7 +204,7 @@ export function MetricCard({
             className={cn(
               "flex h-14 w-14 items-center justify-center rounded-2xl",
               styles.iconBg,
-              "ring-1 ring-white/[0.1]"
+              "ring-1 ring-[#c97435]/10"
             )}
           >
             <span
@@ -220,18 +220,17 @@ export function MetricCard({
       <div
         className={cn(
           "absolute -bottom-20 -right-20 h-40 w-40 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-30",
-          color === "blue"
-            ? "bg-blue-500"
-            : color === "emerald"
-            ? "bg-emerald-500"
-            : color === "violet"
-            ? "bg-violet-500"
-            : color === "amber"
-            ? "bg-amber-500"
-            : "bg-rose-500"
+          color === "spice"
+            ? "bg-[#c97435]"
+            : color === "sand"
+            ? "bg-[#a67c52]"
+            : color === "copper"
+            ? "bg-[#8b5a2b]"
+            : color === "rust"
+            ? "bg-[#6b4423]"
+            : "bg-[#b85c38]"
         )}
       />
     </motion.div>
   );
 }
-

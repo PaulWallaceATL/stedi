@@ -32,7 +32,7 @@ type FieldMapping = {
 };
 
 
-// Stat card component
+// Stat card component - Dune themed with functional colors
 function StatCard({ title, value, icon, color, delay = 0 }: { title: string; value: string | number; icon: string; color: string; delay?: number }) {
   const colorClasses: Record<string, { bg: string; icon: string; text: string }> = {
     blue: { bg: "from-sky-500/10 to-sky-600/5", icon: "text-sky-400", text: "text-sky-400" },
@@ -47,14 +47,14 @@ function StatCard({ title, value, icon, color, delay = 0 }: { title: string; val
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={`rounded-2xl bg-gradient-to-br ${classes.bg} border border-slate-800 p-5`}
+      className={`rounded-2xl bg-gradient-to-br ${classes.bg} border border-[#c97435]/10 p-5`}
     >
       <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center ${classes.icon}`}>
+        <div className={`w-12 h-12 rounded-xl bg-[#1a1512]/50 flex items-center justify-center ${classes.icon}`}>
           <span className="material-symbols-outlined text-2xl">{icon}</span>
         </div>
         <div>
-          <p className="text-sm text-slate-300">{title}</p>
+          <p className="text-sm text-[#a67c52]">{title}</p>
           <p className={`text-2xl font-bold ${classes.text}`}>{value}</p>
         </div>
       </div>
@@ -136,10 +136,10 @@ export default function UploadPage() {
       {/* Main */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white">Upload Claims</h2>
-          <p className="text-slate-400 mt-1">
+          <h2 className="text-2xl font-bold text-[#e8dcc8]">Upload Claims</h2>
+          <p className="text-[#8b7355] mt-1">
             Validate and import claims from CSV files
-            {file && <span className="text-[#137fec] ml-2">• {file.name}</span>}
+            {file && <span className="text-[#c97435] ml-2">• {file.name}</span>}
           </p>
         </div>
 
@@ -152,13 +152,13 @@ export default function UploadPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+                  className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
                 >
                   <div
                     className={`p-8 border-2 border-dashed m-6 rounded-xl transition-all ${
                       isDragging 
-                        ? "border-[#137fec] bg-[#137fec]/5" 
-                        : "border-slate-700 hover:border-slate-600"
+                        ? "border-[#c97435] bg-[#c97435]/5" 
+                        : "border-[#c97435]/20 hover:border-[#c97435]/40"
                     }`}
                     onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                     onDragLeave={() => setIsDragging(false)}
@@ -168,17 +168,17 @@ export default function UploadPage() {
                       <motion.div
                         animate={validating ? { rotate: 360 } : {}}
                         transition={validating ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
-                        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#137fec]/20 to-indigo-500/20 flex items-center justify-center mb-6"
+                        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#c97435]/20 to-[#8b5a2b]/20 flex items-center justify-center mb-6"
                       >
-                        <span className="material-symbols-outlined text-4xl text-[#137fec]">
+                        <span className="material-symbols-outlined text-4xl text-[#c97435]">
                           {validating ? "sync" : "cloud_upload"}
                         </span>
                       </motion.div>
                       
-                      <h3 className="text-xl font-bold text-white mb-2">
+                      <h3 className="text-xl font-bold text-[#e8dcc8] mb-2">
                         {validating ? "Validating your file..." : "Upload CSV File"}
                       </h3>
-                      <p className="text-slate-300 text-sm mb-6 max-w-md">
+                      <p className="text-[#8b7355] text-sm mb-6 max-w-md">
                         {validating 
                           ? "We're checking your data for errors and mapping fields automatically." 
                           : "Drag & drop your file here or click to browse. We'll validate ICD-10, CPT, and payer IDs automatically."}
@@ -196,7 +196,7 @@ export default function UploadPage() {
                           <motion.span
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/20"
                           >
                             <span className="material-symbols-outlined">folder_open</span>
                             Select CSV File
@@ -207,11 +207,11 @@ export default function UploadPage() {
                   </div>
 
                   <div className="px-6 pb-6 flex flex-col items-center gap-4">
-                    <p className="text-xs text-slate-400">Accepted format: .csv · Max file size: 5MB</p>
+                    <p className="text-xs text-[#6b5a45]">Accepted format: .csv · Max file size: 5MB</p>
                     <div className="flex items-center gap-4">
-                      <a className="text-sm text-[#137fec] hover:underline" href="#">Download CSV Template</a>
-                      <span className="text-slate-500">•</span>
-                      <a className="text-sm text-[#137fec] hover:underline" href="#">View Required Fields</a>
+                      <a className="text-sm text-[#c97435] hover:underline" href="#">Download CSV Template</a>
+                      <span className="text-[#6b5a45]">•</span>
+                      <a className="text-sm text-[#c97435] hover:underline" href="#">View Required Fields</a>
                     </div>
                   </div>
                 </motion.div>
@@ -228,26 +228,26 @@ export default function UploadPage() {
                     <StatCard title="Ready to Import" value={validRows.toLocaleString()} icon="check_circle" color="green" delay={0.2} />
                   </div>
 
-                  {/* Error Details */}
-                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-                    <div className="p-6 border-b border-slate-800">
-                      <h3 className="text-lg font-semibold text-white">Error Details</h3>
-                      <p className="text-sm text-slate-300">{errorRows} rows need attention</p>
+                  {/* Error Details - RED for errors */}
+                  <div className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden">
+                    <div className="p-6 border-b border-[#c97435]/10">
+                      <h3 className="text-lg font-semibold text-[#e8dcc8]">Error Details</h3>
+                      <p className="text-sm text-[#8b7355]">{errorRows} rows need attention</p>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="border-b border-slate-800">
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Row</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Column</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Error</th>
+                          <tr className="border-b border-[#c97435]/10">
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Row</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Column</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Error</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y divide-[#c97435]/10">
                           {errorDetails.map((err, idx) => (
-                            <tr key={idx} className="hover:bg-slate-800/30">
-                              <td className="px-6 py-4 text-sm font-mono text-slate-300">{err.row}</td>
-                              <td className="px-6 py-4 text-sm text-slate-300">{err.column}</td>
+                            <tr key={idx} className="hover:bg-[#c97435]/5">
+                              <td className="px-6 py-4 text-sm font-mono text-[#a67c52]">{err.row}</td>
+                              <td className="px-6 py-4 text-sm text-[#a67c52]">{err.column}</td>
                               <td className="px-6 py-4 text-sm text-rose-400">{err.message}</td>
                             </tr>
                           ))}
@@ -257,13 +257,13 @@ export default function UploadPage() {
                   </div>
 
                   {/* Field Mappings */}
-                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-                    <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+                  <div className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden">
+                    <div className="p-6 border-b border-[#c97435]/10 flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-white">Field Mappings</h3>
-                        <p className="text-sm text-slate-300">We detected some columns that need mapping</p>
+                        <h3 className="text-lg font-semibold text-[#e8dcc8]">Field Mappings</h3>
+                        <p className="text-sm text-[#8b7355]">We detected some columns that need mapping</p>
                       </div>
-                      <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm font-medium hover:bg-slate-700 transition-colors">
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1512] border border-[#c97435]/20 text-[#a67c52] text-sm font-medium hover:bg-[#c97435]/10 transition-colors">
                         <span className="material-symbols-outlined text-lg">swap_horiz</span>
                         Map Fields
                       </button>
@@ -271,9 +271,9 @@ export default function UploadPage() {
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {fieldMappings.map((mapping, idx) => (
-                          <div key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-slate-800/30">
-                            <span className={`font-medium ${mapping.mapped ? "text-slate-300" : "text-rose-400"}`}>{mapping.source}</span>
-                            <span className="material-symbols-outlined text-slate-400">arrow_forward</span>
+                          <div key={idx} className="flex items-center gap-2 p-3 rounded-xl bg-[#0a0908]/30">
+                            <span className={`font-medium ${mapping.mapped ? "text-[#a67c52]" : "text-rose-400"}`}>{mapping.source}</span>
+                            <span className="material-symbols-outlined text-[#6b5a45]">arrow_forward</span>
                             <span className={`font-medium ${mapping.mapped ? "text-emerald-400" : "text-rose-400"}`}>{mapping.target}</span>
                           </div>
                         ))}
@@ -282,36 +282,36 @@ export default function UploadPage() {
                   </div>
 
                   {/* Data Preview */}
-                  <div className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden">
-                    <div className="p-6 border-b border-slate-800">
-                      <h3 className="text-lg font-semibold text-white">Data Preview</h3>
-                      <p className="text-sm text-slate-300">Showing rows with errors</p>
+                  <div className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden">
+                    <div className="p-6 border-b border-[#c97435]/10">
+                      <h3 className="text-lg font-semibold text-[#e8dcc8]">Data Preview</h3>
+                      <p className="text-sm text-[#8b7355]">Showing rows with errors</p>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
-                          <tr className="border-b border-slate-800">
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Patient ID</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Service Date</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Payer ID</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">CPT Code</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Charge</th>
+                          <tr className="border-b border-[#c97435]/10">
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Patient ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Service Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Payer ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">CPT Code</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-[#6b5a45] uppercase">Charge</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y divide-[#c97435]/10">
                           {previewData.map((row) => (
-                            <tr key={row.row} className="hover:bg-slate-800/30">
-                              <td className="px-6 py-4 text-sm text-slate-300">{row.patientName}</td>
-                              <td className={`px-6 py-4 text-sm ${row.errorField === "serviceDate" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                            <tr key={row.row} className="hover:bg-[#c97435]/5">
+                              <td className="px-6 py-4 text-sm text-[#a67c52]">{row.patientName}</td>
+                              <td className={`px-6 py-4 text-sm ${row.errorField === "serviceDate" ? "bg-rose-500/10 text-rose-400" : "text-[#a67c52]"}`}>
                                 {row.serviceDate}
                               </td>
-                              <td className={`px-6 py-4 text-sm ${row.errorField === "payerId" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                              <td className={`px-6 py-4 text-sm ${row.errorField === "payerId" ? "bg-rose-500/10 text-rose-400" : "text-[#a67c52]"}`}>
                                 {row.payerId}
                               </td>
-                              <td className={`px-6 py-4 text-sm font-mono ${row.errorField === "cptCode" ? "bg-rose-500/10 text-rose-400" : "text-slate-300"}`}>
+                              <td className={`px-6 py-4 text-sm font-mono ${row.errorField === "cptCode" ? "bg-rose-500/10 text-rose-400" : "text-[#a67c52]"}`}>
                                 {row.cptCode || "—"}
                               </td>
-                              <td className="px-6 py-4 text-sm text-slate-300">{row.billedAmount}</td>
+                              <td className="px-6 py-4 text-sm text-[#a67c52]">{row.billedAmount}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -326,17 +326,17 @@ export default function UploadPage() {
           {/* Sidebar */}
           <aside className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
-              <div className="rounded-2xl bg-gradient-to-br from-[#137fec]/10 to-violet-500/10 border border-[#137fec]/20 p-6">
+              <div className="rounded-2xl bg-gradient-to-br from-[#c97435]/10 to-[#8b5a2b]/10 border border-[#c97435]/20 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#137fec]/20 flex items-center justify-center text-[#137fec]">
+                  <div className="w-10 h-10 rounded-xl bg-[#c97435]/20 flex items-center justify-center text-[#c97435]">
                     <span className="material-symbols-outlined">verified</span>
                   </div>
-                  <h3 className="text-white font-semibold">Before You Upload</h3>
+                  <h3 className="text-[#e8dcc8] font-semibold">Before You Upload</h3>
                 </div>
-                <p className="text-sm text-slate-300 mb-4">
+                <p className="text-sm text-[#8b7355] mb-4">
                   Our system auto-validates ICD-10, CPT, and payer IDs to help you avoid denied claims.
                 </p>
-                <ul className="space-y-3 text-sm text-slate-300">
+                <ul className="space-y-3 text-sm text-[#a67c52]">
                   <li className="flex items-start gap-2">
                     <span className="material-symbols-outlined text-emerald-400 text-lg mt-0.5">check_circle</span>
                     Use our CSV template for fastest setup
@@ -350,7 +350,7 @@ export default function UploadPage() {
                     Multi-line claims share the same claim ID
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-[#137fec] text-lg mt-0.5">info</span>
+                    <span className="material-symbols-outlined text-[#c97435] text-lg mt-0.5">info</span>
                     ICD-10 and CPT codes are auto-validated
                   </li>
                 </ul>
@@ -360,15 +360,15 @@ export default function UploadPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6 space-y-4"
+                  className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 p-6 space-y-4"
                 >
-                  <h3 className="text-white font-semibold">Actions</h3>
+                  <h3 className="text-[#e8dcc8] font-semibold">Actions</h3>
                   <div className="space-y-2">
-                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">
+                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a1512] border border-[#c97435]/20 text-[#a67c52] font-medium hover:bg-[#c97435]/10 transition-colors">
                       <span className="material-symbols-outlined text-lg">cancel</span>
                       Cancel Upload
                     </button>
-                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">
+                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a1512] border border-[#c97435]/20 text-[#a67c52] font-medium hover:bg-[#c97435]/10 transition-colors">
                       <span className="material-symbols-outlined text-lg">build</span>
                       Fix Errors
                     </button>
@@ -376,7 +376,7 @@ export default function UploadPage() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleImport}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/20"
                     >
                       <span className="material-symbols-outlined text-lg">check_circle</span>
                       Proceed to Import
@@ -391,4 +391,3 @@ export default function UploadPage() {
     </AuroraBackground>
   );
 }
-

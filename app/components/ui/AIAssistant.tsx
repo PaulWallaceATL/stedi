@@ -152,17 +152,17 @@ export function AIAssistant({ isOpen, onClose, claims = [] }: AIAssistantProps) 
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 bottom-0 w-full max-w-md z-50"
           >
-            <div className="h-full flex flex-col bg-[#0a0a12]/95 backdrop-blur-2xl border-l border-white/[0.08]">
-              <div className="flex items-center justify-between p-4 border-b border-white/[0.08]">
+            <div className="h-full flex flex-col bg-[#0a0908]/95 backdrop-blur-2xl border-l border-[#c97435]/20">
+              <div className="flex items-center justify-between p-4 border-b border-[#c97435]/20">
                 <div className="flex items-center gap-3">
                   <AIOrb size="sm" isActive={!isLoading} isProcessing={isLoading} />
                   <div>
-                    <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
-                    <p className="text-xs text-slate-500">Claims & Billing Intelligence</p>
+                    <h2 className="text-lg font-semibold text-[#e8dcc8]">AI Assistant</h2>
+                    <p className="text-xs text-[#c97435]">Claims & Billing Intelligence</p>
                   </div>
                 </div>
-                <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/[0.05]">
-                  <span className="material-symbols-outlined text-slate-400">close</span>
+                <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#c97435]/10">
+                  <span className="material-symbols-outlined text-[#8b7355]">close</span>
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -175,13 +175,13 @@ export function AIAssistant({ isOpen, onClose, claims = [] }: AIAssistantProps) 
                   >
                     <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                       msg.role === "user"
-                        ? "bg-gradient-to-r from-blue-500 to-violet-500 text-white"
-                        : "bg-white/[0.05] border border-white/[0.08] text-slate-200"
+                        ? "bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908]"
+                        : "bg-[#1a1512]/60 border border-[#c97435]/20 text-[#e8dcc8]"
                     }`}>
                       <p className="text-sm whitespace-pre-wrap">
                         {msg.content.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
                           part.startsWith("**") && part.endsWith("**")
-                            ? <strong key={i}>{part.slice(2, -2)}</strong>
+                            ? <strong key={i} className="text-[#c97435]">{part.slice(2, -2)}</strong>
                             : part
                         )}
                       </p>
@@ -190,31 +190,31 @@ export function AIAssistant({ isOpen, onClose, claims = [] }: AIAssistantProps) 
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white/[0.05] border border-white/[0.08] rounded-2xl px-4 py-3">
+                    <div className="bg-[#1a1512]/60 border border-[#c97435]/20 rounded-2xl px-4 py-3">
                       <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
-                        <span className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-2 h-2 bg-fuchsia-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <span className="w-2 h-2 bg-[#c97435] rounded-full animate-bounce" />
+                        <span className="w-2 h-2 bg-[#a67c52] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <span className="w-2 h-2 bg-[#8b5a2b] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </div>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
-              <form onSubmit={handleSubmit} className="p-4 border-t border-white/[0.08]">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+              <form onSubmit={handleSubmit} className="p-4 border-t border-[#c97435]/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#1a1512]/40 border border-[#c97435]/20">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Ask about your claims..."
                     disabled={isLoading}
-                    className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+                    className="flex-1 bg-transparent text-sm text-[#e8dcc8] placeholder-[#6b5a45] focus:outline-none"
                   />
                   <button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-violet-500 text-white disabled:opacity-50"
+                    className="p-2 rounded-lg bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] disabled:opacity-50 hover:shadow-lg hover:shadow-[#c97435]/30 transition-all"
                   >
                     <span className="material-symbols-outlined text-lg">send</span>
                   </button>

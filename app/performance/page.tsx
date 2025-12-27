@@ -21,14 +21,14 @@ function currency(value?: number | null) {
 }
 
 
-// Metric card
+// Metric card with functional colors for KPIs
 function MetricCard({ title, value, subtitle, icon, color, delay = 0 }: { title: string; value: string; subtitle?: string; icon: string; color: string; delay?: number }) {
   const colorClasses: Record<string, { bg: string; icon: string; border: string }> = {
     blue: { bg: "from-sky-500/10 to-sky-600/5", icon: "text-sky-400", border: "border-sky-500/20" },
     green: { bg: "from-emerald-500/10 to-emerald-600/5", icon: "text-emerald-400", border: "border-emerald-500/20" },
     amber: { bg: "from-amber-500/10 to-amber-600/5", icon: "text-amber-400", border: "border-amber-500/20" },
     rose: { bg: "from-rose-500/10 to-rose-600/5", icon: "text-rose-400", border: "border-rose-500/20" },
-    violet: { bg: "from-violet-500/10 to-violet-600/5", icon: "text-violet-400", border: "border-violet-500/20" },
+    violet: { bg: "from-[#c97435]/10 to-[#8b5a2b]/5", icon: "text-[#c97435]", border: "border-[#c97435]/20" },
   };
   const classes = colorClasses[color] || colorClasses.blue;
 
@@ -41,11 +41,11 @@ function MetricCard({ title, value, subtitle, icon, color, delay = 0 }: { title:
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-300">{title}</p>
-          <p className="text-3xl font-bold text-white mt-1">{value}</p>
-          {subtitle && <p className="text-xs text-slate-400 mt-1">{subtitle}</p>}
+          <p className="text-sm font-medium text-[#a67c52]">{title}</p>
+          <p className="text-3xl font-bold text-[#e8dcc8] mt-1">{value}</p>
+          {subtitle && <p className="text-xs text-[#6b5a45] mt-1">{subtitle}</p>}
         </div>
-        <div className={`w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center ${classes.icon}`}>
+        <div className={`w-12 h-12 rounded-xl bg-[#1a1512]/50 flex items-center justify-center ${classes.icon}`}>
           <span className="material-symbols-outlined text-2xl">{icon}</span>
         </div>
       </div>
@@ -66,8 +66,8 @@ function SimpleBarChart({ data }: { data: { label: string; value: number; color:
           transition={{ delay: idx * 0.1 }}
           className="flex items-center gap-3"
         >
-          <span className="w-24 text-sm text-slate-300 truncate">{item.label}</span>
-          <div className="flex-1 h-8 bg-slate-800/50 rounded-lg overflow-hidden">
+          <span className="w-24 text-sm text-[#a67c52] truncate">{item.label}</span>
+          <div className="flex-1 h-8 bg-[#1a1512]/50 rounded-lg overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(item.value / max) * 100}%` }}
@@ -142,11 +142,11 @@ export default function PerformancePage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl border border-slate-800 bg-slate-900/70 backdrop-blur-xl p-8 shadow-2xl text-center space-y-4"
+          className="rounded-2xl border border-[#c97435]/20 bg-[#1a1512]/70 backdrop-blur-xl p-8 shadow-2xl text-center space-y-4"
         >
-          <span className="material-symbols-outlined text-5xl text-slate-500">cloud_off</span>
-          <p className="text-lg font-semibold text-white">Database Not Connected</p>
-          <p className="text-sm text-slate-300">Configure Supabase environment variables to view reports.</p>
+          <span className="material-symbols-outlined text-5xl text-[#6b5a45]">cloud_off</span>
+          <p className="text-lg font-semibold text-[#e8dcc8]">Database Not Connected</p>
+          <p className="text-sm text-[#8b7355]">Configure Supabase environment variables to view reports.</p>
         </motion.div>
       </AuroraBackground>
     );
@@ -158,18 +158,18 @@ export default function PerformancePage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl border border-slate-800 bg-slate-900/70 backdrop-blur-xl p-8 shadow-2xl text-center space-y-6"
+          className="rounded-2xl border border-[#c97435]/20 bg-[#1a1512]/70 backdrop-blur-xl p-8 shadow-2xl text-center space-y-6"
         >
           <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
             <span className="material-symbols-outlined text-4xl text-emerald-400">analytics</span>
           </div>
           <div>
-            <p className="text-xl font-semibold text-white">Sign In Required</p>
-            <p className="text-sm text-slate-300 mt-1">Access your performance reports</p>
+            <p className="text-xl font-semibold text-[#e8dcc8]">Sign In Required</p>
+            <p className="text-sm text-[#8b7355] mt-1">Access your performance reports</p>
           </div>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold hover:from-[#0f6acc] hover:to-indigo-500 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold hover:shadow-lg hover:shadow-[#c97435]/30 transition-all"
           >
             Sign In
             <span className="material-symbols-outlined">arrow_forward</span>
@@ -184,11 +184,11 @@ export default function PerformancePage() {
       <AuroraBackground className="flex items-center justify-center">
         <motion.div className="flex flex-col items-center gap-4">
           <motion.div
-            className="w-12 h-12 border-3 border-emerald-500 border-t-transparent rounded-full"
+            className="w-12 h-12 border-3 border-[#c97435] border-t-transparent rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           />
-          <p className="text-slate-300">Loading reports...</p>
+          <p className="text-[#8b7355]">Loading reports...</p>
         </motion.div>
       </AuroraBackground>
     );
@@ -202,12 +202,12 @@ export default function PerformancePage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-white">Performance Reports</h2>
-            <p className="text-slate-400 mt-1">Insights and analytics for your billing operations</p>
+            <h2 className="text-2xl font-bold text-[#e8dcc8]">Performance Reports</h2>
+            <p className="text-[#8b7355] mt-1">Insights and analytics for your billing operations</p>
           </div>
           <Link
             href="/claims/new"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20 hover:shadow-xl transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/20 hover:shadow-xl transition-all"
           >
             <span className="material-symbols-outlined">add</span>
             New Claim
@@ -218,16 +218,16 @@ export default function PerformancePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl bg-slate-900/50 border border-slate-800 p-12 text-center"
+            className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 p-12 text-center"
           >
             <div className="w-20 h-20 mx-auto rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-4xl text-amber-400">bar_chart</span>
             </div>
-            <p className="text-lg font-semibold text-white">No Data Yet</p>
-            <p className="text-sm text-slate-300 mt-1 mb-4">Submit claims to populate your performance reports</p>
+            <p className="text-lg font-semibold text-[#e8dcc8]">No Data Yet</p>
+            <p className="text-sm text-[#8b7355] mt-1 mb-4">Submit claims to populate your performance reports</p>
             <Link
               href="/claims/new"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#137fec] text-white font-semibold hover:bg-[#0f6acc] transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c97435] text-[#0a0908] font-semibold hover:bg-[#d4844c] transition-colors"
             >
               <span className="material-symbols-outlined">add</span>
               Create Your First Claim
@@ -235,7 +235,7 @@ export default function PerformancePage() {
           </motion.div>
         ) : (
           <>
-            {/* Metrics Grid */}
+            {/* Metrics Grid - functional colors for KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <MetricCard title="Total Claims" value={String(metrics.total)} subtitle="All time" icon="folder" color="blue" delay={0} />
               <MetricCard title="Total Billed" value={currency(metrics.totalCharges)} subtitle="Outstanding balance" icon="payments" color="violet" delay={0.1} />
@@ -250,30 +250,30 @@ export default function PerformancePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 p-6"
               >
-                <h3 className="text-lg font-semibold text-white mb-6">Throughput Overview</h3>
+                <h3 className="text-lg font-semibold text-[#e8dcc8] mb-6">Throughput Overview</h3>
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="p-4 rounded-xl bg-slate-800/30">
-                    <p className="text-sm text-slate-300">Submitted</p>
-                    <p className="text-2xl font-bold text-white mt-1">{metrics.submitted}</p>
-                    <p className="text-xs text-slate-400 mt-1">Awaiting response</p>
+                  <div className="p-4 rounded-xl bg-[#0a0908]/30">
+                    <p className="text-sm text-[#a67c52]">Submitted</p>
+                    <p className="text-2xl font-bold text-[#e8dcc8] mt-1">{metrics.submitted}</p>
+                    <p className="text-xs text-[#6b5a45] mt-1">Awaiting response</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-slate-800/30">
-                    <p className="text-sm text-slate-300">Avg per Claim</p>
-                    <p className="text-2xl font-bold text-white mt-1">{currency(metrics.avg)}</p>
-                    <p className="text-xs text-slate-400 mt-1">Average charge</p>
+                  <div className="p-4 rounded-xl bg-[#0a0908]/30">
+                    <p className="text-sm text-[#a67c52]">Avg per Claim</p>
+                    <p className="text-2xl font-bold text-[#e8dcc8] mt-1">{currency(metrics.avg)}</p>
+                    <p className="text-xs text-[#6b5a45] mt-1">Average charge</p>
                   </div>
                 </div>
-                <div className="mt-6 pt-6 border-t border-slate-800">
+                <div className="mt-6 pt-6 border-t border-[#c97435]/10">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-slate-300">Acceptance Rate</p>
+                      <p className="text-sm text-[#a67c52]">Acceptance Rate</p>
                       <p className="text-3xl font-bold text-emerald-400">{metrics.acceptanceRate}%</p>
                     </div>
                     <div className="w-24 h-24 relative">
                       <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1e293b" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1a1512" strokeWidth="3" />
                         <motion.circle
                           cx="18"
                           cy="18"
@@ -297,11 +297,11 @@ export default function PerformancePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="rounded-2xl bg-slate-900/50 border border-slate-800 p-6"
+                className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 p-6"
               >
-                <h3 className="text-lg font-semibold text-white mb-6">Top Payers by Volume</h3>
+                <h3 className="text-lg font-semibold text-[#e8dcc8] mb-6">Top Payers by Volume</h3>
                 {metrics.topPayers.length === 0 ? (
-                  <div className="flex items-center justify-center h-48 text-slate-400">
+                  <div className="flex items-center justify-center h-48 text-[#6b5a45]">
                     No payer data yet
                   </div>
                 ) : (
@@ -309,22 +309,22 @@ export default function PerformancePage() {
                     data={metrics.topPayers.map(([payer, count], idx) => ({
                       label: payer,
                       value: count,
-                      color: ["bg-[#137fec]", "bg-violet-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500"][idx] || "bg-slate-500",
+                      color: ["bg-[#c97435]", "bg-[#a67c52]", "bg-emerald-500", "bg-amber-500", "bg-rose-500"][idx] || "bg-[#6b5a45]",
                     }))}
                   />
                 )}
               </motion.div>
             </div>
 
-            {/* Recent Activity */}
+            {/* Status Distribution - functional colors */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden"
+              className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden"
             >
-              <div className="p-6 border-b border-slate-800">
-                <h3 className="text-lg font-semibold text-white">Status Distribution</h3>
+              <div className="p-6 border-b border-[#c97435]/10">
+                <h3 className="text-lg font-semibold text-[#e8dcc8]">Status Distribution</h3>
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-4">
@@ -332,14 +332,14 @@ export default function PerformancePage() {
                     { label: "Accepted", value: metrics.accepted, color: "bg-emerald-500" },
                     { label: "Submitted", value: metrics.submitted, color: "bg-sky-500" },
                     { label: "Denied", value: metrics.denied, color: "bg-rose-500" },
-                    { label: "Other", value: metrics.total - metrics.accepted - metrics.submitted - metrics.denied, color: "bg-slate-500" },
+                    { label: "Other", value: metrics.total - metrics.accepted - metrics.submitted - metrics.denied, color: "bg-[#6b5a45]" },
                   ].map((item) => (
                     <div key={item.label} className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-slate-300">{item.label}</span>
-                        <span className="text-sm font-semibold text-white">{item.value}</span>
+                        <span className="text-sm text-[#a67c52]">{item.label}</span>
+                        <span className="text-sm font-semibold text-[#e8dcc8]">{item.value}</span>
                       </div>
-                      <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-2 bg-[#1a1512] rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: metrics.total > 0 ? `${(item.value / metrics.total) * 100}%` : "0%" }}
@@ -358,4 +358,3 @@ export default function PerformancePage() {
     </AuroraBackground>
   );
 }
-

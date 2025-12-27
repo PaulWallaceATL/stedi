@@ -10,6 +10,7 @@ interface Claim {
   payer_name: string;
   status: string;
   claim_charge_amount: number;
+  total_charge?: number;
   date_of_service: string;
 }
 
@@ -18,6 +19,7 @@ interface ModernTableProps {
   isLoading?: boolean;
 }
 
+// Status colors - functional colors for visibility (green=success, red=error, yellow=pending)
 const statusConfig: Record<
   string,
   { label: string; icon: string; color: string; bgColor: string; glowColor: string }
@@ -39,9 +41,9 @@ const statusConfig: Record<
   submitted: {
     label: "Processing",
     icon: "schedule",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10",
-    glowColor: "shadow-blue-500/20",
+    color: "text-sky-400",
+    bgColor: "bg-sky-500/10",
+    glowColor: "shadow-sky-500/20",
   },
   pending: {
     label: "Pending",
@@ -67,9 +69,9 @@ const statusConfig: Record<
   draft: {
     label: "Draft",
     icon: "edit_note",
-    color: "text-slate-400",
-    bgColor: "bg-slate-500/10",
-    glowColor: "shadow-slate-500/20",
+    color: "text-[#8b7355]",
+    bgColor: "bg-[#6b5a45]/10",
+    glowColor: "shadow-[#6b5a45]/20",
   },
 };
 
@@ -101,7 +103,7 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: i * 0.1 }}
-            className="h-20 rounded-xl bg-white/[0.02] animate-pulse"
+            className="h-20 rounded-xl bg-[#1a1512]/30 animate-pulse"
           />
         ))}
       </div>
@@ -112,14 +114,14 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.06]"
+      className="overflow-hidden rounded-2xl bg-[#1a1512]/30 border border-[#c97435]/10"
     >
       {/* Header */}
-      <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_1fr_auto] gap-4 px-6 py-4 bg-white/[0.02] border-b border-white/[0.06]">
+      <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_1fr_auto] gap-4 px-6 py-4 bg-[#1a1512]/50 border-b border-[#c97435]/10">
         {["Patient", "Date", "Payer", "Amount", "Status", ""].map((header) => (
           <div
             key={header}
-            className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+            className="text-xs font-semibold text-[#6b5a45] uppercase tracking-wider"
           >
             {header}
           </div>
@@ -127,7 +129,7 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-white/[0.04]">
+      <div className="divide-y divide-[#c97435]/5">
         <AnimatePresence mode="popLayout">
           {claims.map((claim, index) => {
             const status = getStatusConfig(claim.status);
@@ -143,7 +145,7 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
                   duration: 0.3,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                whileHover={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                whileHover={{ backgroundColor: "rgba(201, 116, 53, 0.03)" }}
                 className="group grid grid-cols-[2fr_1fr_1.5fr_1fr_1fr_auto] gap-4 px-6 py-5 items-center transition-colors"
               >
                 {/* Patient */}
@@ -152,34 +154,34 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
                     whileHover={{ scale: 1.1 }}
                     className="relative"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-xl blur opacity-30" />
-                    <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-white/[0.1] flex items-center justify-center">
-                      <span className="text-sm font-bold text-white">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#c97435] to-[#8b5a2b] rounded-xl blur opacity-30" />
+                    <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#c97435]/20 to-[#8b5a2b]/20 border border-[#c97435]/20 flex items-center justify-center">
+                      <span className="text-sm font-bold text-[#e8dcc8]">
                         {claim.patient_name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </motion.div>
                   <div>
-                    <p className="font-semibold text-white">
+                    <p className="font-semibold text-[#e8dcc8]">
                       {claim.patient_name.toUpperCase()}
                     </p>
-                    <p className="text-xs text-slate-500 font-mono">
+                    <p className="text-xs text-[#6b5a45] font-mono">
                       {claim.id.slice(0, 8)}...
                     </p>
                   </div>
                 </div>
 
                 {/* Date */}
-                <div className="text-sm text-slate-300">
+                <div className="text-sm text-[#a67c52]">
                   {formatDate(claim.date_of_service)}
                 </div>
 
                 {/* Payer */}
-                <div className="text-sm text-slate-300">{claim.payer_name}</div>
+                <div className="text-sm text-[#a67c52]">{claim.payer_name}</div>
 
                 {/* Amount */}
-                <div className="text-sm font-semibold text-white">
-                  {formatCurrency(claim.claim_charge_amount)}
+                <div className="text-sm font-semibold text-[#e8dcc8]">
+                  {formatCurrency(claim.total_charge || claim.claim_charge_amount || 0)}
                 </div>
 
                 {/* Status */}
@@ -213,9 +215,9 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
                     <motion.div
                       whileHover={{ scale: 1.05, x: 4 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] hover:border-white/[0.15] transition-all group/btn"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#c97435]/5 border border-[#c97435]/15 hover:border-[#c97435]/30 transition-all group/btn"
                     >
-                      <span className="text-sm font-medium text-white">View</span>
+                      <span className="text-sm font-medium text-[#e8dcc8]">View</span>
                       <motion.span
                         animate={{ x: [0, 4, 0] }}
                         transition={{
@@ -223,7 +225,7 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
                           repeat: Infinity,
                           repeatType: "loop",
                         }}
-                        className="material-symbols-outlined text-lg text-slate-400 group-hover/btn:text-white transition-colors"
+                        className="material-symbols-outlined text-lg text-[#8b7355] group-hover/btn:text-[#e8dcc8] transition-colors"
                       >
                         arrow_forward
                       </motion.span>
@@ -243,20 +245,20 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center justify-center py-16 text-center"
         >
-          <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center mb-6">
-            <span className="material-symbols-outlined text-4xl text-slate-600">
+          <div className="w-20 h-20 rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 flex items-center justify-center mb-6">
+            <span className="material-symbols-outlined text-4xl text-[#6b5a45]">
               inbox
             </span>
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">No claims yet</h3>
-          <p className="text-sm text-slate-500 max-w-sm">
+          <h3 className="text-lg font-semibold text-[#e8dcc8] mb-2">No claims yet</h3>
+          <p className="text-sm text-[#6b5a45] max-w-sm">
             Create your first claim to get started with intelligent billing
           </p>
           <Link href="/claims/new">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="mt-6 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-violet-500 text-white font-medium shadow-lg shadow-violet-500/25"
+              className="mt-6 px-6 py-3 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-medium shadow-lg shadow-[#c97435]/25"
             >
               Create Claim
             </motion.button>
@@ -266,4 +268,3 @@ export function ModernTable({ claims, isLoading = false }: ModernTableProps) {
     </motion.div>
   );
 }
-

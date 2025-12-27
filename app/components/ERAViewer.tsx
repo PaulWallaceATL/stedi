@@ -107,3 +107,4 @@ export default function ERAViewer({ transactionId, claimId }: ERAViewerProps) {
     </div>
   );
 }
+

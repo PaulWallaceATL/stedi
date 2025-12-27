@@ -1,9 +1,9 @@
-const BASE = (process.env.NEXT_PUBLIC_PROXY_URL || "").replace(/\/+$/, "");
+// Use NEXT_PUBLIC_PROXY_URL if set, otherwise fallback to local API routes
+const BASE = (process.env.NEXT_PUBLIC_PROXY_URL || "/api/stedi").replace(/\/+$/, "");
 
 function ensureBase() {
-  if (!BASE) {
-    throw new Error("NEXT_PUBLIC_PROXY_URL is not set");
-  }
+  // BASE will always have a value now (either env var or fallback)
+  return true;
 }
 
 async function handleJson(res: Response) {
@@ -14,13 +14,19 @@ async function handleJson(res: Response) {
   } catch {
     data = raw || null;
   }
-  const ok = res.ok || res.status === 302;
+  const ok = res.ok || res.status === 302 || res.status === 200;
   if (!ok) {
-    const err = new Error(`Request failed (${res.status})`);
+    // Extract error message from the response
+    const errorMsg = data?.error || 
+                    data?.data?.errors?.[0]?.message || 
+                    data?.message || 
+                    `Request failed (${res.status})`;
+    const err = new Error(errorMsg);
     (err as any).data = data;
+    (err as any).status = res.status;
     throw err;
   }
-  return { data, status: res.status, ok: res.ok };
+  return { data, status: res.status, ok };
 }
 
 export async function submitClaim(body: any, idempotencyKey?: string) {
@@ -79,8 +85,11 @@ export async function getTransactionOutput(transactionId: string) {
 }
 
 export async function ragSuggest(payload: any) {
-  ensureBase();
-  const res = await fetch(`${BASE}/rag/suggest`, {
+  // RAG suggest has its own route at /api/rag/suggest
+  const ragBase = process.env.NEXT_PUBLIC_PROXY_URL 
+    ? `${process.env.NEXT_PUBLIC_PROXY_URL.replace(/\/+$/, "")}/rag/suggest`
+    : "/api/rag/suggest";
+  const res = await fetch(ragBase, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

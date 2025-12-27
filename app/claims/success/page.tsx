@@ -5,18 +5,18 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { motion } from "framer-motion";
 
-// Animated background
+// Dune-themed animated background
 function AnimatedBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
-      <div className="absolute inset-0 bg-[#0a0a0f]" />
+      <div className="absolute inset-0 bg-[#0a0908]" />
       <motion.div
-        className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-emerald-600/15 via-teal-600/15 to-cyan-600/15 blur-3xl"
+        className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-r from-emerald-600/15 via-[#c97435]/15 to-[#8b5a2b]/15 blur-3xl"
         animate={{ x: [0, 30, 0], y: [0, 20, 0], scale: [1, 1.1, 1] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-1/4 right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-violet-500/10 via-purple-500/10 to-indigo-500/10 blur-3xl"
+        className="absolute bottom-1/4 right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-l from-[#c97435]/10 via-[#a67c52]/10 to-[#6b4423]/10 blur-3xl"
         animate={{ x: [0, -30, 0], y: [0, -20, 0], scale: [1.1, 1, 1.1] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -24,7 +24,7 @@ function AnimatedBackground() {
   );
 }
 
-// Confetti animation
+// Confetti animation - sand/spice colored
 function Confetti() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden -z-5">
@@ -32,7 +32,7 @@ function Confetti() {
         <motion.div
           key={i}
           className={`absolute w-2 h-2 rounded-full ${
-            ["bg-emerald-500", "bg-[#137fec]", "bg-violet-500", "bg-amber-500", "bg-rose-500"][i % 5]
+            ["bg-emerald-500", "bg-[#c97435]", "bg-[#a67c52]", "bg-amber-500", "bg-[#8b5a2b]"][i % 5]
           }`}
           style={{
             left: `${Math.random() * 100}%`,
@@ -57,30 +57,32 @@ function Confetti() {
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const claimId = searchParams.get("id");
-  const patientName = searchParams.get("patient") || "Jane Doe";
-  const payer = searchParams.get("payer") || "United Healthcare";
-  const amount = searchParams.get("amount") || "550.00";
+  // Support both 'id' and 'claimId' parameters
+  const claimId = searchParams.get("claimId") || searchParams.get("id");
+  const patientName = searchParams.get("patient") || "Patient";
+  const payer = searchParams.get("payer") || "Payer";
+  const amount = searchParams.get("amount") || "0.00";
   
-  const hasValidClaimId = claimId && claimId.length > 10 && !claimId.startsWith("CL-");
+  // Valid if it has content and is at least 6 characters
+  const hasValidClaimId = claimId && claimId.length >= 6;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+    <div className="min-h-screen bg-[#0a0908] flex flex-col">
       <AnimatedBackground />
       <Confetti />
       
-      <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-[#c97435]/10 bg-[#0a0908]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#137fec] to-indigo-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 48 48">
+              <Link href="/dashboard" className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c97435] to-[#8b5a2b] flex items-center justify-center">
+                <svg className="w-6 h-6 text-[#0a0908]" fill="none" viewBox="0 0 48 48">
                   <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor" />
                 </svg>
               </Link>
               <div>
-                <h1 className="text-lg font-bold text-white">Clinix AI</h1>
-                <p className="text-xs text-slate-400">Claim Submitted</p>
+                <h1 className="text-lg font-bold text-[#e8dcc8]">Clinix AI</h1>
+                <p className="text-xs text-[#6b5a45]">Claim Submitted</p>
               </div>
             </div>
           </div>
@@ -94,6 +96,7 @@ function SuccessContent() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-2xl"
         >
+          {/* Success Icon - GREEN for positive outcome */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -121,40 +124,40 @@ function SuccessContent() {
             transition={{ delay: 0.3 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold text-white mb-2">Claim Created Successfully!</h1>
-            <p className="text-slate-300">Your claim has been submitted and is now being processed</p>
+            <h1 className="text-3xl font-bold text-[#e8dcc8] mb-2">Claim Created Successfully!</h1>
+            <p className="text-[#8b7355]">Your claim has been submitted and is now being processed</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="rounded-2xl bg-slate-900/50 border border-slate-800 overflow-hidden mb-8"
+            className="rounded-2xl bg-[#1a1512]/50 border border-[#c97435]/10 overflow-hidden mb-8"
           >
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-slate-400 mb-1">Claim ID</p>
-                  <p className="text-white font-semibold font-mono">
+                  <p className="text-sm text-[#6b5a45] mb-1">Claim ID</p>
+                  <p className="text-[#e8dcc8] font-semibold font-mono">
                     {hasValidClaimId ? claimId?.slice(0, 8) + "..." : "Pending..."}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400 mb-1">Payer</p>
-                  <p className="text-white font-semibold">{payer}</p>
+                  <p className="text-sm text-[#6b5a45] mb-1">Payer</p>
+                  <p className="text-[#e8dcc8] font-semibold">{payer}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400 mb-1">Patient Name</p>
-                  <p className="text-white font-semibold">{patientName}</p>
+                  <p className="text-sm text-[#6b5a45] mb-1">Patient Name</p>
+                  <p className="text-[#e8dcc8] font-semibold">{patientName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400 mb-1">Total Billed</p>
+                  <p className="text-sm text-[#6b5a45] mb-1">Total Billed</p>
                   <p className="text-emerald-400 font-bold text-lg">${amount}</p>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-800">
-                <p className="text-sm text-slate-400 mb-2">Current Status</p>
+              <div className="pt-6 border-t border-[#c97435]/10">
+                <p className="text-sm text-[#6b5a45] mb-2">Current Status</p>
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Submitted to Payer
@@ -171,7 +174,7 @@ function SuccessContent() {
           >
             <Link
               href="/dashboard"
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#137fec] to-indigo-600 text-white font-semibold shadow-lg shadow-[#137fec]/20 hover:shadow-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] font-semibold shadow-lg shadow-[#c97435]/20 hover:shadow-xl transition-all"
             >
               <span className="material-symbols-outlined">dashboard</span>
               Go to Dashboard
@@ -180,17 +183,17 @@ function SuccessContent() {
             <div className="grid grid-cols-2 gap-3">
               <Link
                 href="/claims/new"
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium hover:bg-slate-700 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#2a2018] border border-[#c97435]/40 font-medium hover:bg-[#c97435]/30 hover:border-[#c97435]/60 transition-colors"
               >
-                <span className="material-symbols-outlined text-lg">add</span>
-                Create Another
+                <span className="material-symbols-outlined text-lg text-[#c97435]">add</span>
+                <span className="text-white">Create Another</span>
               </Link>
               <Link
                 href="/dashboard"
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 font-medium hover:bg-slate-700 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#2a2018] border border-[#c97435]/40 font-medium hover:bg-[#c97435]/30 hover:border-[#c97435]/60 transition-colors"
               >
-                <span className="material-symbols-outlined text-lg">list</span>
-                View All Claims
+                <span className="material-symbols-outlined text-lg text-[#c97435]">list</span>
+                <span className="text-white">View All Claims</span>
               </Link>
             </div>
           </motion.div>
@@ -204,9 +207,9 @@ export default function ClaimSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="min-h-screen bg-[#0a0908] flex items-center justify-center">
           <motion.div
-            className="w-12 h-12 border-3 border-emerald-500 border-t-transparent rounded-full"
+            className="w-12 h-12 border-3 border-[#c97435] border-t-transparent rounded-full"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           />

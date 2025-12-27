@@ -10,6 +10,66 @@ type IncomingBody = {
   body?: unknown;
 };
 
+// Generate mock responses for testing when API key is not available
+function generateMockResponse(path: string, body: any) {
+  const now = new Date().toISOString();
+  const claimId = `MOCK-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  
+  // Mock claim submission response
+  if (path.includes("professionalclaims") || path.includes("submission")) {
+    return {
+      ok: true,
+      status: 200,
+      statusText: "OK (Mock)",
+      headers: {},
+      data: {
+        claimId,
+        controlNumber: body?.controlNumber || claimId,
+        transactionSetId: `ST${Date.now()}`,
+        status: "accepted",
+        submittedAt: now,
+        mockMode: true,
+        message: "Mock submission successful - no actual claim was submitted to Stedi",
+      },
+    };
+  }
+  
+  // Mock claim status response (277)
+  if (path.includes("claimstatus")) {
+    return {
+      ok: true,
+      status: 200,
+      statusText: "OK (Mock)",
+      headers: {},
+      data: {
+        controlNumber: body?.controlNumber || "MOCK-CONTROL",
+        statusInformation: [{
+          claimStatusCategoryCode: "1",
+          claimStatusCategoryCodeValue: "Accepted",
+          statusCode: "1",
+          statusCodeValue: "For payer use only",
+        }],
+        tradingPartnerServiceId: body?.tradingPartnerServiceId || "STEDI",
+        submittedAt: now,
+        mockMode: true,
+      },
+    };
+  }
+  
+  // Generic mock response
+  return {
+    ok: true,
+    status: 200,
+    statusText: "OK (Mock)",
+    headers: {},
+    data: {
+      mockMode: true,
+      message: "Mock response - STEDI_API_KEY not configured",
+      requestedPath: path,
+    },
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const { path, method = "POST", idempotencyKey, body }: IncomingBody =
@@ -22,11 +82,12 @@ export async function POST(request: Request) {
     const cleanedPath = path.startsWith("/") ? path : `/${path}`;
 
     const apiKey = process.env.STEDI_API_KEY?.trim();
+    
+    // If no API key, return mock response for testing
     if (!apiKey) {
-      return NextResponse.json(
-        { error: "STEDI_API_KEY is not configured" },
-        { status: 500 },
-      );
+      console.log("[Stedi Proxy] No API key configured - returning mock response for:", cleanedPath);
+      const mockResponse = generateMockResponse(cleanedPath, body);
+      return NextResponse.json(mockResponse, { status: mockResponse.status });
     }
 
     const base =

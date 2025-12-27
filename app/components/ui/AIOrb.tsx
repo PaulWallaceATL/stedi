@@ -12,6 +12,7 @@ interface AIOrbProps {
   className?: string;
 }
 
+// Anirul-inspired AI Orb - Mystical, oracle-like, Bene Gesserit aesthetic
 export function AIOrb({
   isActive = false,
   isProcessing = false,
@@ -19,24 +20,36 @@ export function AIOrb({
   onClick,
   className,
 }: AIOrbProps) {
-  const [particles, setParticles] = useState<{ id: number; angle: number }[]>([]);
+  const [particles, setParticles] = useState<{ id: number; angle: number; delay: number }[]>([]);
+  const [sacredRings, setSacredRings] = useState<{ id: number; scale: number; opacity: number }[]>([]);
 
   useEffect(() => {
     if (isActive || isProcessing) {
-      const newParticles = Array.from({ length: 8 }, (_, i) => ({
+      // Orbiting particles like spice essence
+      const newParticles = Array.from({ length: 12 }, (_, i) => ({
         id: i,
-        angle: (360 / 8) * i,
+        angle: (360 / 12) * i,
+        delay: i * 0.1,
       }));
       setParticles(newParticles);
+      
+      // Sacred geometry rings
+      const rings = Array.from({ length: 3 }, (_, i) => ({
+        id: i,
+        scale: 1 + i * 0.3,
+        opacity: 0.3 - i * 0.08,
+      }));
+      setSacredRings(rings);
     } else {
       setParticles([]);
+      setSacredRings([]);
     }
   }, [isActive, isProcessing]);
 
   const sizes = {
-    sm: { orb: "w-12 h-12", glow: "w-20 h-20", ring: "w-16 h-16" },
-    md: { orb: "w-16 h-16", glow: "w-28 h-28", ring: "w-24 h-24" },
-    lg: { orb: "w-24 h-24", glow: "w-40 h-40", ring: "w-36 h-36" },
+    sm: { orb: "w-12 h-12", glow: "w-24 h-24", ring: "w-18 h-18", icon: "text-lg" },
+    md: { orb: "w-16 h-16", glow: "w-32 h-32", ring: "w-24 h-24", icon: "text-2xl" },
+    lg: { orb: "w-24 h-24", glow: "w-48 h-48", ring: "w-36 h-36", icon: "text-3xl" },
   };
 
   return (
@@ -46,125 +59,199 @@ export function AIOrb({
       whileTap={{ scale: 0.95 }}
       className={cn("relative flex items-center justify-center", className)}
     >
-      {/* Outer glow */}
+      {/* Outer mystical glow - like prescient vision */}
       <motion.div
         animate={{
-          scale: isProcessing ? [1, 1.2, 1] : 1,
-          opacity: isActive || isProcessing ? 0.6 : 0.3,
+          scale: isProcessing ? [1, 1.3, 1] : isActive ? [1, 1.1, 1] : 1,
+          opacity: isActive || isProcessing ? [0.3, 0.6, 0.3] : 0.2,
         }}
         transition={{
-          scale: { duration: 2, repeat: isProcessing ? Infinity : 0 },
-          opacity: { duration: 0.3 },
+          duration: isProcessing ? 2 : 4,
+          repeat: Infinity,
+          ease: "easeInOut",
         }}
         className={cn(
-          "absolute rounded-full blur-2xl",
+          "absolute rounded-full blur-3xl",
           sizes[size].glow,
-          "bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500"
+          "bg-gradient-radial from-[#c97435]/40 via-[#8b5a2b]/20 to-transparent"
         )}
       />
 
-      {/* Animated ring */}
+      {/* Sacred geometry rings - Bene Gesserit symbols */}
       <AnimatePresence>
-        {(isActive || isProcessing) && (
+        {sacredRings.map((ring) => (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
+            key={ring.id}
+            initial={{ scale: 0.8, opacity: 0, rotate: 0 }}
             animate={{
-              scale: 1,
-              opacity: 1,
-              rotate: 360,
+              scale: ring.scale,
+              opacity: ring.opacity,
+              rotate: ring.id % 2 === 0 ? 360 : -360,
             }}
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{
-              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-              scale: { duration: 0.3 },
-              opacity: { duration: 0.3 },
+              rotate: { duration: 20 + ring.id * 5, repeat: Infinity, ease: "linear" },
+              scale: { duration: 0.5 },
+              opacity: { duration: 0.5 },
             }}
             className={cn(
-              "absolute rounded-full",
+              "absolute rounded-full border",
               sizes[size].ring,
-              "border-2 border-transparent",
-              "bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500",
-              "[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)]",
-              "[mask-composite:exclude]",
-              "p-[2px]"
+              "border-[#c97435]/30"
             )}
+            style={{
+              borderStyle: ring.id === 1 ? "dashed" : "solid",
+            }}
           />
+        ))}
+      </AnimatePresence>
+
+      {/* Hexagonal sacred pattern overlay */}
+      <AnimatePresence>
+        {(isActive || isProcessing) && (
+          <motion.svg
+            initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
+            animate={{ opacity: 0.4, scale: 1, rotate: 60 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+              rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+            }}
+            className={cn("absolute", sizes[size].ring)}
+            viewBox="0 0 100 100"
+          >
+            <polygon
+              points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
+              fill="none"
+              stroke="#c97435"
+              strokeWidth="0.5"
+              opacity="0.5"
+            />
+            <polygon
+              points="50,20 80,35 80,65 50,80 20,65 20,35"
+              fill="none"
+              stroke="#a67c52"
+              strokeWidth="0.5"
+              opacity="0.3"
+            />
+          </motion.svg>
         )}
       </AnimatePresence>
 
-      {/* Orbiting particles */}
+      {/* Orbiting essence particles - like spice motes */}
       <AnimatePresence>
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
             initial={{ scale: 0, opacity: 0 }}
             animate={{
-              scale: 1,
-              opacity: [0.5, 1, 0.5],
+              scale: [0.5, 1, 0.5],
+              opacity: [0.3, 0.8, 0.3],
               rotate: [particle.angle, particle.angle + 360],
             }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{
-              rotate: { duration: 4, repeat: Infinity, ease: "linear" },
-              opacity: { duration: 2, repeat: Infinity },
+              rotate: { duration: 6, repeat: Infinity, ease: "linear", delay: particle.delay },
+              scale: { duration: 3, repeat: Infinity, delay: particle.delay },
+              opacity: { duration: 3, repeat: Infinity, delay: particle.delay },
             }}
             className="absolute"
             style={{
-              transformOrigin: `${size === "lg" ? "60px" : size === "md" ? "40px" : "32px"} center`,
+              transformOrigin: `${size === "lg" ? "70px" : size === "md" ? "50px" : "38px"} center`,
             }}
           >
             <div
               className={cn(
                 "rounded-full",
                 size === "lg" ? "w-2 h-2" : "w-1.5 h-1.5",
-                "bg-gradient-to-r from-blue-400 to-violet-400"
+                "bg-gradient-to-r from-[#e8dcc8] to-[#c97435]",
+                "shadow-lg shadow-[#c97435]/50"
               )}
             />
           </motion.div>
         ))}
       </AnimatePresence>
 
-      {/* Main orb */}
+      {/* Inner mystical eye glow */}
+      <motion.div
+        animate={{
+          opacity: isProcessing ? [0.5, 1, 0.5] : isActive ? 0.7 : 0.4,
+          scale: isProcessing ? [0.9, 1.1, 0.9] : 1,
+        }}
+        transition={{ duration: 2, repeat: isProcessing ? Infinity : 0 }}
+        className={cn(
+          "absolute rounded-full blur-md",
+          size === "lg" ? "w-16 h-16" : size === "md" ? "w-10 h-10" : "w-8 h-8",
+          "bg-gradient-radial from-[#e8dcc8]/60 via-[#c97435]/40 to-transparent"
+        )}
+      />
+
+      {/* Main orb - the Eye of Anirul */}
       <motion.div
         animate={{
           scale: isProcessing ? [1, 1.05, 1] : 1,
+          boxShadow: isActive || isProcessing
+            ? [
+                "0 0 20px rgba(201, 116, 53, 0.5), inset 0 0 20px rgba(232, 220, 200, 0.2)",
+                "0 0 40px rgba(201, 116, 53, 0.7), inset 0 0 30px rgba(232, 220, 200, 0.3)",
+                "0 0 20px rgba(201, 116, 53, 0.5), inset 0 0 20px rgba(232, 220, 200, 0.2)",
+              ]
+            : "0 0 15px rgba(201, 116, 53, 0.3)",
         }}
         transition={{
-          duration: 1.5,
-          repeat: isProcessing ? Infinity : 0,
+          duration: 2,
+          repeat: isActive || isProcessing ? Infinity : 0,
         }}
         className={cn(
           "relative rounded-full",
           sizes[size].orb,
-          "bg-gradient-to-br from-blue-500 via-violet-500 to-fuchsia-500",
-          "shadow-lg shadow-violet-500/50",
-          "flex items-center justify-center",
-          "ring-2 ring-white/20"
+          "bg-gradient-to-br from-[#1a1512] via-[#2a2018] to-[#0a0908]",
+          "border border-[#c97435]/40",
+          "flex items-center justify-center overflow-hidden"
         )}
       >
-        {/* Inner highlight */}
-        <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white/30 to-transparent" />
+        {/* Inner orb gradient layers */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-t from-[#c97435]/20 to-transparent" />
+        <div className="absolute inset-1 rounded-full bg-gradient-to-br from-[#e8dcc8]/10 via-transparent to-[#c97435]/10" />
+        
+        {/* Mystical eye center */}
+        <motion.div
+          animate={{
+            opacity: isProcessing ? [0.6, 1, 0.6] : 0.8,
+            scale: isProcessing ? [0.95, 1.05, 0.95] : 1,
+          }}
+          transition={{ duration: 1.5, repeat: isProcessing ? Infinity : 0 }}
+          className={cn(
+            "absolute rounded-full",
+            size === "lg" ? "w-8 h-8" : size === "md" ? "w-5 h-5" : "w-4 h-4",
+            "bg-gradient-radial from-[#e8dcc8] via-[#c97435] to-[#8b5a2b]",
+            "shadow-inner"
+          )}
+        />
 
         {/* Icon */}
         <motion.span
           animate={{
             rotate: isProcessing ? [0, 360] : 0,
+            opacity: isProcessing ? [0.8, 1, 0.8] : 1,
           }}
           transition={{
-            duration: 2,
-            repeat: isProcessing ? Infinity : 0,
-            ease: "linear",
+            rotate: { duration: 3, repeat: isProcessing ? Infinity : 0, ease: "linear" },
+            opacity: { duration: 1, repeat: isProcessing ? Infinity : 0 },
           }}
-          className="relative material-symbols-outlined text-white text-2xl"
+          className={cn(
+            "relative material-symbols-outlined text-[#e8dcc8] z-10",
+            sizes[size].icon
+          )}
+          style={{ fontVariationSettings: "'FILL' 1" }}
         >
-          {isProcessing ? "sync" : "auto_awesome"}
+          {isProcessing ? "sync" : "visibility"}
         </motion.span>
       </motion.div>
     </motion.button>
   );
 }
 
-// AI Assistant Panel
+// AI Assistant Panel - Anirul Oracle Style
 interface AIAssistantPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -176,13 +263,13 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop with mystical overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-[#0a0908]/80 backdrop-blur-md z-40"
           />
 
           {/* Panel */}
@@ -193,24 +280,44 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 bottom-0 w-full max-w-lg z-50"
           >
-            <div className="h-full bg-[#0a0a12]/95 backdrop-blur-2xl border-l border-white/[0.08] overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/[0.08]">
-                <div className="flex items-center gap-4">
+            <div className="h-full bg-gradient-to-b from-[#0a0908] via-[#0d0b09] to-[#0a0908] backdrop-blur-2xl border-l border-[#c97435]/20 overflow-hidden">
+              {/* Mystical border accent */}
+              <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#c97435]/50 to-transparent" />
+              
+              {/* Header - Oracle Title */}
+              <div className="relative flex items-center justify-between p-6 border-b border-[#c97435]/10">
+                {/* Sacred geometry background */}
+                <div className="absolute inset-0 opacity-5">
+                  <svg className="w-full h-full" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice">
+                    <pattern id="sacredPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                      <polygon points="20,5 35,12.5 35,27.5 20,35 5,27.5 5,12.5" fill="none" stroke="#c97435" strokeWidth="0.5"/>
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#sacredPattern)" />
+                  </svg>
+                </div>
+                
+                <div className="relative flex items-center gap-4">
                   <AIOrb size="sm" isActive />
                   <div>
-                    <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
-                    <p className="text-sm text-slate-500">Powered by Clinix Intelligence</p>
+                    <h2 className="text-lg font-semibold text-[#e8dcc8] tracking-wide">ANIRUL</h2>
+                    <p className="text-xs text-[#8b7355] uppercase tracking-widest">Oracle Intelligence</p>
                   </div>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
+                  className="relative p-2 rounded-lg hover:bg-[#c97435]/10 transition-colors"
                 >
-                  <span className="material-symbols-outlined text-slate-400">close</span>
+                  <span className="material-symbols-outlined text-[#8b7355]">close</span>
                 </motion.button>
+              </div>
+
+              {/* Oracle greeting */}
+              <div className="px-6 py-4 border-b border-[#c97435]/10 bg-[#c97435]/5">
+                <p className="text-sm text-[#a67c52] italic">
+                  "I have seen the paths of your claims. Ask, and I shall illuminate the way forward."
+                </p>
               </div>
 
               {/* Content */}
@@ -218,22 +325,32 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
                 {children}
               </div>
 
-              {/* Input */}
-              <div className="p-6 border-t border-white/[0.08]">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-                  <input
-                    type="text"
-                    placeholder="Ask anything about your claims..."
-                    className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-violet-500 text-white"
-                  >
-                    <span className="material-symbols-outlined text-lg">send</span>
-                  </motion.button>
+              {/* Input - Oracle query */}
+              <div className="p-6 border-t border-[#c97435]/10 bg-[#0a0908]/50">
+                <div className="relative">
+                  {/* Mystical input border */}
+                  <div className="absolute -inset-px rounded-xl bg-gradient-to-r from-[#c97435]/30 via-[#e8dcc8]/10 to-[#c97435]/30 opacity-50" />
+                  <div className="relative flex items-center gap-3 p-3 rounded-xl bg-[#1a1512]/70 border border-[#c97435]/20">
+                    <span className="material-symbols-outlined text-[#c97435] text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      auto_awesome
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Seek guidance from the Oracle..."
+                      className="flex-1 bg-transparent text-sm text-[#e8dcc8] placeholder-[#6b5a45] focus:outline-none"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="p-2 rounded-lg bg-gradient-to-r from-[#c97435] to-[#8b5a2b] text-[#0a0908] shadow-lg shadow-[#c97435]/30"
+                    >
+                      <span className="material-symbols-outlined text-lg">send</span>
+                    </motion.button>
+                  </div>
                 </div>
+                <p className="text-xs text-[#6b5a45] mt-3 text-center">
+                  The Oracle speaks only of claims, accounts, and the ways of insurance
+                </p>
               </div>
             </div>
           </motion.div>
@@ -242,4 +359,3 @@ export function AIAssistantPanel({ isOpen, onClose, children }: AIAssistantPanel
     </AnimatePresence>
   );
 }
-
